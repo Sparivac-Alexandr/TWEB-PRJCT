@@ -13,5 +13,10 @@ namespace taskore.Controllers
         {
             return View();
         }
+
+        public ActionResult test()
+        {
+            return View();
+        }
     }
 }
