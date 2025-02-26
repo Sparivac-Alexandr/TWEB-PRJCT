@@ -1,7 +1,32 @@
 ﻿
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "GuestPage";
 }
 
-<h2>Index</h2>
+<svg class="background-lines" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+    <path class="line floating-line" d="M0,200 Q250,100 500,300 T1000,200" style="animation-delay: 0s" />
+    <path class="line floating-line" d="M0,400 Q250,300 500,500 T1000,400" style="animation-delay: -2s" />
+    <path class="line floating-line" d="M0,600 Q250,500 500,700 T1000,600" style="animation-delay: -4s" />
+    <path class="line floating-line" d="M0,800 Q250,700 500,900 T1000,800" style="animation-delay: -6s" />
+    <path class="line" d="M100,0 L200,1000" style="opacity: 0.3" />
+    <path class="line" d="M300,0 L400,1000" style="opacity: 0.2" />
+    <path class="line" d="M700,0 L600,1000" style="opacity: 0.3" />
+    <path class="line" d="M900,0 L800,1000" style="opacity: 0.2" />
+</svg>
 
+<div class="login-container">
+    <div class="login-card">
+        <h2>Welcome! </h2>
+        <p>Join our vibrant community of freelancers and clients. Collaborate on exciting projects, communicate seamlessly, and bring your ideas to life with our powerful platform.</p>
+        <div class="login-buttons">
+            <a href="#" class="login-button secondary">Sign In</a>
+            <a href="#" class="login-button secondary">
+                Create Account
+                <svg class="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
