@@ -1,8 +1,8 @@
-﻿
+﻿@using System.Web.Optimization
 @{
-    ViewBag.Title = "ForgotPass";
+    ViewBag.Title = "Password Recovery";
 }
-
+@Styles.Render("~/Content/css")
 <body>
     <!-- Background Animation -->
     <svg class="background-lines" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
@@ -33,7 +33,7 @@
             </form>
         </div>
     </div>
-   </div>
+    </div>
     @Html.Partial("_Footer")
 </body>
 

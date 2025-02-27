@@ -1,8 +1,9 @@
-﻿
+﻿@using System.Web.Optimization
 @{
     ViewBag.Title = "_Header";
 }
 
+@Styles.Render("~/Content/css")
 <header>
     <h1>taskore. //</h1>
     <nav>
@@ -10,11 +11,8 @@
         <a href="#">Dashboard</a>
         <a href="@Url.Action("ExplorePage", "Main")">Explore</a>
         <a href="@Url.Action("ChatPage", "Main")">Messages</a>
-
-
-        <a href="@Url.Action("MyProfile", "Auth")" >
+        <a href="@Url.Action("MyProfile", "Auth")">
             <div class="user-profile">
-
                 <span class="user-name">Sparivac Alexandr</span>
                 <div class="user-avatar">
                     <img src="/api/placeholder/32/32" alt=".gif">
