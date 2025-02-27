@@ -19,6 +19,11 @@ namespace taskore.Controllers
             return View();
         }
 
+        public ActionResult ForgotPass()
+        {
+            return View();
+        }
+
         public ActionResult MyProfile()
         {
             return View();
