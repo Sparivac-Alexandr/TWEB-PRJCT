@@ -21,7 +21,5 @@ namespace taskore.App_Start
 
 
         }
-
-
     }
 }

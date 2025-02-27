@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "GuestPage";
 }
-
+@Html.Partial("_Header_guest")
 <svg class="background-lines" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
     <path class="line floating-line" d="M0,200 Q250,100 500,300 T1000,200" style="animation-delay: 0s" />
     <path class="line floating-line" d="M0,400 Q250,300 500,500 T1000,400" style="animation-delay: -2s" />
@@ -19,9 +19,8 @@
         <h2>Welcome! </h2>
         <p>Join our vibrant community of freelancers and clients. Collaborate on exciting projects, communicate seamlessly, and bring your ideas to life with our powerful platform.</p>
         <div class="login-buttons">
-            <a href="#" class="login-button secondary">Sign In</a>
-            <a href="#" class="login-button secondary">
-                Create Account
+            <a href="@Url.Action("SignIn", "Auth")" class="login-button secondary">Sign In</a>
+            <a href="#" class="login-button secondary"> Create Account</a>
                 <svg class="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
@@ -30,3 +29,5 @@
         </div>
     </div>
 </div>
+
+@Html.Partial("_Footer_guest")

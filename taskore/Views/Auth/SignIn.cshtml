@@ -1,0 +1,43 @@
+﻿
+
+@{
+    ViewBag.Title = "SignIn";
+}
+
+
+<!-- Background Animation -->
+<svg class="background-lines" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+    <path class="line floating-line" d="M0,200 Q250,100 500,300 T1000,200" style="animation-delay: 0s" />
+    <path class="line floating-line" d="M0,400 Q250,300 500,500 T1000,400" style="animation-delay: -2s" />
+    <path class="line floating-line" d="M0,600 Q250,500 500,700 T1000,600" style="animation-delay: -4s" />
+    <path class="line floating-line" d="M0,800 Q250,700 500,900 T1000,800" style="animation-delay: -6s" />
+    <path class="line" d="M100,0 L200,1000" style="opacity: 0.3" />
+    <path class="line" d="M300,0 L400,1000" style="opacity: 0.2" />
+    <path class="line" d="M700,0 L600,1000" style="opacity: 0.3" />
+    <path class="line" d="M900,0 L800,1000" style="opacity: 0.2" />
+</svg>
+<div class="auth-right">
+    <div class="auth-form-container">
+        <div class="auth-header">
+            <h1>taskore. //</h1>
+            <p>Please enter your details to login</p>
+        </div>
+        <form id="login-form">
+            <div class="input-group">
+                <input type="email" placeholder="Email address" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="login-password" placeholder="Password" required>
+                <span class="password-toggle" onclick="togglePassword('login-password')">Show</span>
+            </div>
+            <button type="submit" class="submit-button">Sign in</button>
+            <div class="back-link">
+                <a href="Forgotpas.html" onclick="showPage('forgot-password')">Forgot password?</a>
+                <br><br>
+                Don't have an account? <a href="SignUp.html" onclick="showPage('signup')">Sign up</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@Html.Partial("_Footer_guest")
