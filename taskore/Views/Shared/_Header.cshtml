@@ -8,13 +8,18 @@
     <nav>
         <a href="#">Home</a>
         <a href="#">Dashboard</a>
-        <a class="active" href="#">Explore</a>
-        <a href="#">Messages</a>
-        <div class="user-profile">
-            <span class="user-name">Sparivac Alexandr</span>
-            <div class="user-avatar">
-                <img src="/api/placeholder/32/32" alt=".gif">
+        <a href="@Url.Action("ExplorePage", "Main")">Explore</a>
+        <a href="@Url.Action("ChatPage", "Main")">Messages</a>
+
+
+        <a href="@Url.Action("MyProfile", "Auth")" >
+            <div class="user-profile">
+
+                <span class="user-name">Sparivac Alexandr</span>
+                <div class="user-avatar">
+                    <img src="/api/placeholder/32/32" alt=".gif">
+                </div>
             </div>
-        </div>
+        </a>
     </nav>
 </header>

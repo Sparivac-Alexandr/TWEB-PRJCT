@@ -24,3 +24,12 @@ document.querySelectorAll('form').forEach(form => {
         console.log('Form submitted:', e.target.id);
     });
 });
+
+function toggleEdit(section) {
+    const textElement = document.getElementById(`${section}-text`);
+    const editElement = document.getElementById(`${section}-edit`);
+    const controls = textElement.nextElementSibling.nextElementSibling;
+
+    textElement.classList.add('hidden');
+    editElement.classList.add('active');
+    controls.style.display = 'block';

@@ -3,5 +3,104 @@
     ViewBag.Title = "MyProfile";
 }
 
-<h2>MyProfile</h2>
+
+<body>
+    @Html.Partial("_Header")
+
+    <!-- Background Animation -->
+    <svg class="background-lines" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+        <path class="line floating-line" d="M0,200 Q250,100 500,300 T1000,200" style="animation-delay: 0s" />
+        <path class="line floating-line" d="M0,400 Q250,300 500,500 T1000,400" style="animation-delay: -2s" />
+        <path class="line floating-line" d="M0,600 Q250,500 500,700 T1000,600" style="animation-delay: -4s" />
+        <path class="line floating-line" d="M0,800 Q250,700 500,900 T1000,800" style="animation-delay: -6s" />
+        <path class="line" d="M100,0 L200,1000" style="opacity: 0.3" />
+        <path class="line" d="M300,0 L400,1000" style="opacity: 0.2" />
+        <path class="line" d="M700,0 L600,1000" style="opacity: 0.3" />
+        <path class="line" d="M900,0 L800,1000" style="opacity: 0.2" />
+    </svg>
+
+
+    <div class="container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="avatar">
+                    <img src="/api/placeholder/400/400" alt=" avatar ">
+                </div>
+                <div class="profile-info">
+                    <h1>
+                        Sparivac Alexandr
+                        <span class="rating-container">
+                            ★ 4.8 (324)
+                        </span>
+                    </h1>
+                    <div class="profile-tag">Student</div>
+                    <div class="profile-location">Republic of Moldova, Chisinau</div>
+                </div>
+            </div>
+
+            <div class="edit-section" id="about-section">
+                <h2>About Me</h2>
+                <button class="edit-button" onclick="toggleEdit('about')">✎ Edit</button>
+                <p class="content-text" id="about-text">
+                    I'm a passionate web developer and UI/UX designer with over 5 years of experience creating beautiful, functional websites and applications. My approach combines clean code with intuitive design to deliver exceptional user experiences.
+                </p>
+                <textarea class="editable-content" id="about-edit" rows="4"></textarea>
+                <div class="edit-controls" style="display: none;">
+                    <button class="save-button" onclick="saveContent('about')">Save</button>
+                    <button class="cancel-button" onclick="cancelEdit('about')">Cancel</button>
+                </div>
+            </div>
+
+            <div class="edit-section" id="skills-section">
+                <h2>My Skills</h2>
+                <button class="edit-button" onclick="toggleEdit('skills')">✎ Edit</button>
+                <div class="content-text" id="skills-text">
+                    <div class="skills-list">
+                        <span class="skill-tag">HTML5</span>
+                        <span class="skill-tag">CSS3</span>
+                        <span class="skill-tag">JavaScript</span>
+                        <span class="skill-tag">React</span>
+                        <span class="skill-tag">Node.js</span>
+                        <span class="skill-tag">UI/UX Design</span>
+                        <span class="skill-tag">Figma</span>
+                        <span class="skill-tag">Responsive Design</span>
+                    </div>
+                </div>
+                <textarea class="editable-content" id="skills-edit" placeholder="Enter skills separated by commas"></textarea>
+                <div class="edit-controls" style="display: none;">
+                    <button class="save-button" onclick="saveContent('skills')">Save</button>
+                    <button class="cancel-button" onclick="cancelEdit('skills')">Cancel</button>
+                </div>
+            </div>
+
+            <div class="edit-section" id="education-section">
+                <h2>Education</h2>
+                <button class="edit-button" onclick="toggleEdit('education')">✎ Edit</button>
+                <div class="content-text" id="education-text">
+                    <div class="education-item">
+                        <h3>Master's Degree in Computer Science</h3>
+                        <p class="institution">New York University</p>
+                        <p class="degree">Specialization in Human-Computer Interaction</p>
+                        <p class="years">2016 - 2018</p>
+                    </div>
+                    <div class="education-item">
+                        <h3>Bachelor's Degree in Software Engineering</h3>
+                        <p class="institution">Columbia University</p>
+                        <p class="degree">Minor in Graphic Design</p>
+                        <p class="years">2012 - 2016</p>
+                    </div>
+                </div>
+                <textarea class="editable-content" id="education-edit" placeholder="Enter education details"></textarea>
+                <div class="edit-controls" style="display: none;">
+                    <button class="save-button" onclick="saveContent('education')">Save</button>
+                    <button class="cancel-button" onclick="cancelEdit('education')">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    @Html.Partial("_Footer")
+</body>
 

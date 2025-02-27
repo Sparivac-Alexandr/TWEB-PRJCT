@@ -3,5 +3,122 @@
     ViewBag.Title = "CreateProjectPage";
 }
 
-<h2>CreateProjectPage</h2>
+<body>
+
+
+    @Html.Partial("_Header")
+
+    <div class="body-post-project">
+        <aside class="project-sidebar">
+            <h2>Project Guidelines</h2>
+            <p>Follow these tips to get the best responses from freelancers</p>
+
+            <div class="sidebar-stats">
+                <div class="stat-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                    <span>Clear project scope</span>
+                </div>
+                <div class="stat-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                    </svg>
+                    <span>Realistic timeline</span>
+                </div>
+                <div class="stat-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                    <span>Detailed requirements</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="project-main">
+            <section class="hero">
+                <h1>Post a New Project</h1>
+                <p>Share your project details and connect with talented freelancers ready to bring your vision to life.</p>
+            </section>
+
+            <form class="project-form">
+                <div class="form-group full-width">
+                    <label for="project-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                        Project Title
+                    </label>
+                    <input type="text" id="project-title" placeholder="Enter a clear, descriptive title" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="project-description">Project Description</label>
+                    <textarea id="project-description" placeholder="Describe your project in detail, including specific requirements and deliverables" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="project-category">Category</label>
+                    <select id="project-category" required>
+                        <option value="">Select a category</option>
+                        <option value="web-development">Web Development</option>
+                        <option value="graphic-design">Graphic Design</option>
+                        <option value="mobile-development">Mobile Development</option>
+                        <option value="digital-marketing">Digital Marketing</option>
+                        <option value="content-writing">Content Writing</option>
+                        <option value="video-production">Video Production</option>
+                        <option value="data-analysis">Data Analysis</option>
+                        <option value="cybersecurity">Cybersecurity</option>
+                        <option value="ai-ml">AI & Machine Learning</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="project-budget">Budget Range</label>
+                    <input type="text" id="project-budget" placeholder="e.g., $1,000 - $5,000" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="project-deadline">Expected Deadline</label>
+                    <input type="date" id="project-deadline" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="project-files">Project Files</label>
+                    <div class="file-upload">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        <p>Drag & drop files here or click to browse</p>
+                        <input type="file" id="project-files" multiple>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="reset" class="btn btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                            <path d="M3 3v5h5" />
+                        </svg>
+                        Reset Form
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        Post Project
+                    </button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    @Html.Partial("_Footer")
+</body>
 
