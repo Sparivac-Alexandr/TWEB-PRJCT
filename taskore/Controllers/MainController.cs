@@ -13,5 +13,16 @@ namespace taskore.Controllers
         {
             return View();
         }
+
+        public ActionResult ChatPage()
+        {
+            return View();
+        }
+
+        public ActionResult CreateProjectPage() {
+            
+            return View();
+        }
+            
     }
 }

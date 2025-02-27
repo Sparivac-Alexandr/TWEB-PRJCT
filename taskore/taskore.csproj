@@ -238,6 +238,8 @@
     <Content Include="Views\Auth\ForgotPass.cshtml" />
     <Content Include="Views\Main\ExplorePage.cshtml" />
     <Content Include="Views\Shared\_Header.cshtml" />
+    <Content Include="Views\Main\ChatPage.cshtml" />
+    <Content Include="Views\Main\CreateProjectPage.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
