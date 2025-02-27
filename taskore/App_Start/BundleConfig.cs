@@ -12,7 +12,8 @@ namespace taskore.App_Start
 
             //Style Bundle
             bundles.Add(new StyleBundle("~/Content/css").Include(
-            "~/Content/static/site.css"));
+     "~/Content/static/site.css",
+     "~/Content/static/Auth.css"));
 
 
             //Script Bundle
