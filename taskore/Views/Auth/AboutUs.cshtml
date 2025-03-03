@@ -1,0 +1,82 @@
+﻿
+@{
+    ViewBag.Title = "About Us";
+}
+@Html.Partial("_Header_guest")
+<svg class="background-lines" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+    <path class="line floating-line" d="M0,200 Q250,100 500,300 T1000,200" style="animation-delay: 0s" />
+    <path class="line floating-line" d="M0,400 Q250,300 500,500 T1000,400" style="animation-delay: -2s" />
+    <path class="line floating-line" d="M0,600 Q250,500 500,700 T1000,600" style="animation-delay: -4s" />
+    <path class="line floating-line" d="M0,800 Q250,700 500,900 T1000,800" style="animation-delay: -6s" />
+    <path class="line" d="M100,0 L200,1000" style="opacity: 0.3" />
+    <path class="line" d="M300,0 L400,1000" style="opacity: 0.2" />
+    <path class="line" d="M700,0 L600,1000" style="opacity: 0.3" />
+    <path class="line" d="M900,0 L800,1000" style="opacity: 0.2" />
+</svg>
+
+<div class="container">
+    <div class="about-content">
+        <h1>About Us</h1>
+
+        <section id="our-story">
+            <h2>Our Story</h2>
+            <p>Founded in 2024, taskore emerged from a simple vision: to create a seamless connection between talented freelancers and innovative clients. Our platform has grown to become a trusted marketplace where skills meet opportunities, fostering professional growth and business success.</p>
+        </section>
+
+        <section id="our-mission">
+            <h2>Our Mission</h2>
+            <p>At taskore, we're committed to revolutionizing the way work gets done. Our mission is to empower professionals worldwide by providing a secure, efficient, and transparent platform for freelance collaboration. We believe in creating opportunities that transcend geographical boundaries and traditional work constraints.</p>
+        </section>
+
+        <section id="what-we-offer">
+            <h2>What We Offer</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>For Freelancers</h3>
+                    <ul>
+                        <li>Access to global opportunities</li>
+                        <li>Secure payment system</li>
+                        <li>Professional growth tools</li>
+                        <li>Community support</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>For Clients</h3>
+                    <ul>
+                        <li>Verified talent pool</li>
+                        <li>Project management tools</li>
+                        <li>Quality guarantees</li>
+                        <li>Dedicated support</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="our-values">
+            <h2>Our Values</h2>
+            <div class="values-grid">
+                <div class="value-item">
+                    <h3>Trust</h3>
+                    <p>Building reliable connections between clients and freelancers through transparency and security.</p>
+                </div>
+                <div class="value-item">
+                    <h3>Innovation</h3>
+                    <p>Continuously improving our platform to meet the evolving needs of the digital workforce.</p>
+                </div>
+                <div class="value-item">
+                    <h3>Quality</h3>
+                    <p>Maintaining high standards in service delivery and user experience.</p>
+                </div>
+                <div class="value-item">
+                    <h3>Community</h3>
+                    <p>Fostering a supportive environment for professional growth and collaboration.</p>
+                </div>
+            </div>
+        </section>
+        <section id="join-us">
+            <h2>Join Our Community</h2>
+            <p>Whether you're a freelancer looking to showcase your talents or a client seeking exceptional professionals, taskore is your platform for success. Join our growing community and be part of the future of work.</p>
+        </section>
+    </div>
+</div>
+@Html.Partial("_Footer_guest")

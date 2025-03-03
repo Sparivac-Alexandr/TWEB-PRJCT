@@ -243,6 +243,7 @@
     <Content Include="Views\Auth\ContactUs.cshtml" />
     <Content Include="Views\Auth\Privacy.cshtml" />
     <Content Include="Views\Auth\Terms.cshtml" />
+    <Content Include="Views\Auth\AboutUs.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
