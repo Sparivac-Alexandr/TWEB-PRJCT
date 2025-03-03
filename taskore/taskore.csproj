@@ -240,6 +240,7 @@
     <Content Include="Views\Shared\_Header.cshtml" />
     <Content Include="Views\Main\ChatPage.cshtml" />
     <Content Include="Views\Main\CreateProjectPage.cshtml" />
+    <Content Include="Views\Auth\ContactUs.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

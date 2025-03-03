@@ -28,5 +28,23 @@ namespace taskore.Controllers
         {
             return View();
         }
+        public ActionResult Terms()
+        {
+            return View();
+        }
+
+        public ActionResult AboutUs()
+        {
+            return View();
+        }
+        public ActionResult Privacy()
+        {
+            return View();
+        }
+        public ActionResult ContactUs()
+        {
+            return View();
+        }
     }
+
 }
