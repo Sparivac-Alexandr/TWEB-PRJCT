@@ -241,6 +241,7 @@
     <Content Include="Views\Main\ChatPage.cshtml" />
     <Content Include="Views\Main\CreateProjectPage.cshtml" />
     <Content Include="Views\Auth\ContactUs.cshtml" />
+    <Content Include="Views\Auth\Privacy.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
