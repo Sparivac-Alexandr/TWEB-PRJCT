@@ -12,11 +12,15 @@ namespace taskore.App_Start
 
             //Style Bundle
             bundles.Add(new StyleBundle("~/Content/css").Include(
-     "~/Content/static/site.css",
-     "~/Content/static/Auth.css"));
+     "~/Content/static/about.css",
+     "~/Content/static/auth-pages.css",
+      "~/Content/static/contact.css",
+      "~/Content/static/my-profile.css",
+      "~/Content/static/privacy.css",
+      "~/Content/static/terms.css"));
 
 
-            //Script Bundle
+           //Script Bundle
             bundles.Add(new ScriptBundle("~/bundles/sitejs").Include(
             "~/Content/static/site.js"));
 

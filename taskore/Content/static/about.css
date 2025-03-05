@@ -1,0 +1,303 @@
+﻿:root {
+    /* Culori primare */
+    --color-primary: #2d7de3; /* Un albastru modern puțin mai intens */
+    --color-primary-light: #5a9df0; /* Nuanță mai deschisă */
+    --color-primary-dark: #1a5ab3; /* Nuanță mai închisă */
+    /* Culori secundare */
+    --color-secondary: #f4f7fa; /* Foarte deschis, aproape alb */
+    --color-secondary-light: #ffffff;
+    --color-secondary-dark: #f0f3f6;
+    /* Culori text */
+    --color-text-primary: #1a1a2e; /* Albastru-negru pentru contrast */
+    --color-text-secondary: #4a5568; /* Nuanță de gri pentru text secundar */
+    --color-text-light: #718096; /* Gri mai deschis */
+    /* Culori background */
+    --color-bg-body: #ffffff;
+    --color-bg-card: #ffffff;
+    --color-bg-hover: #f8f9fc;
+    --color-bg-section: #f9fafb;
+    /* Culori border */
+    --color-border: #e2e8f0; /* Gri foarte deschis */
+    --color-border-light: #f1f5f9; /* Și mai deschis */
+    /* Culori shadow */
+    --color-shadow-light: rgba(0, 0, 0, 0.03);
+    --color-shadow-medium: rgba(0, 0, 0, 0.06);
+    --color-shadow-dark: rgba(0, 0, 0, 0.09);
+    /* Culori linie și fundal */
+    --color-line: #5a9df0; /* Aceeași nuanță ca primary-light */
+    --color-line-bg: rgba(90, 157, 240, 0.05);
+    /* Culori pentru stări */
+    --color-success: #48bb78; /* Verde crud */
+    --color-warning: #ecc94b; /* Galben vibrant */
+    --color-error: #f56565; /* Roșu corai */
+    --color-info: #4299e1; /* Albastru info */
+    /* Culori pentru header și footer */
+    --color-header-bg: #ffffff;
+    --color-footer-bg: rgba(247, 250, 252, 0.9); /* Foarte deschis, transparent */
+}
+
+/* Header Styles */
+.header {
+    background-color: var(--color-header-bg);
+    box-shadow: 0 4px 6px var(--color-shadow-light);
+    padding: 1.25rem 2.5rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.header-container {
+    max-width: 1350px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+    .header-logo img {
+        max-height: 60px;
+        transition: transform 0.3s ease;
+    }
+
+        .header-logo img:hover {
+            transform: scale(1.05);
+        }
+
+    .header-logo h1 {
+        font-size: 1.75rem;
+        color: var(--color-text-primary);
+        margin: 0;
+        font-weight: 700;
+    }
+
+.nav-menu {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+    .nav-menu a {
+        text-decoration: none;
+        color: var(--color-text-primary);
+        font-weight: 500;
+        position: relative;
+        padding-bottom: 5px;
+    }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--color-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: var(--color-primary);
+        }
+
+            .nav-menu a:hover::after {
+                width: 100%;
+            }
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-cta {
+    padding: 0.75rem 1.25rem;
+    background-color: var(--color-primary);
+    color: var(--color-secondary-light);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px var(--color-shadow-medium);
+}
+
+    .header-cta:hover {
+        background-color: var(--color-primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px var(--color-shadow-dark);
+    }
+
+/* About Page Specific Styles */
+.about-content {
+    padding-top: 100px; /* Ajustare pentru header fix */
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+.feature-card, .value-item {
+    background-color: var(--color-bg-card);
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px var(--color-shadow-light);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .feature-card:hover, .value-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 6px 12px var(--color-shadow-medium);
+    }
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+}
+
+/* Footer Styles */
+footer {
+    background-color: var(--color-footer-bg);
+    color: var(--color-text-primary);
+    padding: 4rem 2rem;
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--color-border);
+}
+
+.footer-container {
+    max-width: 1350px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2.5rem;
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+    .footer-column h4 {
+        color: var(--color-primary);
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+        font-weight: 700;
+        border-bottom: 3px solid var(--color-primary);
+        padding-bottom: 0.75rem;
+        transition: color 0.3s ease;
+    }
+
+        .footer-column h4:hover {
+            color: var(--color-primary-dark);
+        }
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+    .footer-links a {
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+        padding-left: 15px;
+    }
+
+        .footer-links a::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--color-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--color-primary);
+            padding-left: 25px;
+        }
+
+            .footer-links a:hover::before {
+                opacity: 1;
+            }
+
+.footer-bottom {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.social-media {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+    .social-media a {
+        color: var(--color-text-secondary);
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+        .social-media a:hover {
+            color: var(--color-primary);
+            transform: translateY(-5px) scale(1.1);
+        }
+
+.newsletter {
+    display: flex;
+    width: 100%;
+    max-width: 500px;
+    gap: 1rem;
+}
+
+    .newsletter input {
+        flex-grow: 1;
+        padding: 0.75rem;
+        border: 2px solid var(--color-border);
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+        .newsletter input:focus {
+            border-color: var(--color-primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(81, 182, 133, 0.1);
+        }
+
+    .newsletter button {
+        padding: 0.75rem 1.5rem;
+        background-color: var(--color-primary);
+        color: var(--color-secondary-light);
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .newsletter button:hover {
+            background-color: var(--color-primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px var(--color-shadow-medium);
+        }

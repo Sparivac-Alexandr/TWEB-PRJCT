@@ -2,13 +2,10 @@
 @{
     ViewBag.Title = "Contact Us";
 }
+
+
 @Html.Partial("_Header_guest")
-<svg class="background-lines" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
-    <path class="line floating-line" d="M0,200 Q250,100 500,300 T1000,200" style="animation-delay: 0s" />
-    <path class="line floating-line" d="M0,400 Q250,300 500,500 T1000,400" style="animation-delay: -2s" />
-    <path class="line floating-line" d="M0,600 Q250,500 500,700 T1000,600" style="animation-delay: -4s" />
-    <path class="line floating-line" d="M0,800 Q250,700 500,900 T1000,800" style="animation-delay: -6s" />
-</svg>
+@Html.Partial("_Background")
 
 <main class="main-content">
     <div class="container">
