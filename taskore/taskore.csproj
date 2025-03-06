@@ -99,15 +99,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\static\about.css" />
-    <Content Include="Content\static\auth-pages.css" />
-    <Content Include="Content\static\contact.css" />
-    <Content Include="Content\static\my-profile.css" />
-    <Content Include="Content\static\privacy.css" />
-    <Content Include="Content\static\taskore.js" />
-    <Content Include="Content\static\terms.css" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
+    <Content Include="wwwroot\about.css" />
+    <Content Include="wwwroot\auth-pages.css" />
+    <Content Include="wwwroot\chat.css" />
+    <Content Include="wwwroot\contact.css" />
+    <Content Include="wwwroot\create-prjct.css" />
+    <Content Include="wwwroot\explore-page.css" />
+    <Content Include="wwwroot\home.css" />
+    <Content Include="wwwroot\my-profile.css" />
+    <Content Include="wwwroot\privacy.css" />
+    <Content Include="wwwroot\taskore.js" />
+    <Content Include="wwwroot\terms.css" />
     <None Include="Scripts\jquery-3.7.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.1.js" />
     <Content Include="Scripts\jquery-3.7.1.min.js" />
@@ -146,7 +150,6 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\_Header_guest.cshtml" />
-    <Content Include="Views\Shared\_Footer_guest.cshtml" />
     <Content Include="Views\Auth\SignIn.cshtml" />
     <Content Include="Views\Auth\SignUp.cshtml" />
     <Content Include="Views\Auth\MyProfile.cshtml" />
@@ -170,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <PropertyGroup>

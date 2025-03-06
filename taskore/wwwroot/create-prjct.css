@@ -1,0 +1,63 @@
+﻿/* Main Content Styles */
+.container {
+    max-width: 1200px;
+    margin: 6rem auto 2rem;
+    padding: 0 2rem;
+}
+
+.create-project-content h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: var(--color-text-primary);
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--color-text-primary);
+        font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--color-border);
+        border-radius: 0.5rem;
+        background-color: var(--color-secondary-light);
+        color: var(--color-text-primary);
+        outline: none;
+        transition: border-color 0.3s ease;
+    }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--color-primary);
+        }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 150px;
+    }
+
+.submit-btn {
+    background-color: var(--color-primary);
+    color: var(--color-secondary-light);
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .submit-btn:hover {
+        background-color: var(--color-primary-dark);
+    }
