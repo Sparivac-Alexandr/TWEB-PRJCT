@@ -12,7 +12,7 @@ namespace taskore.App_Start
             //Style Bundle
             bundles.Add(new StyleBundle("~/Content/css").Include(
      "~/wwwroot/about.css",
-     "~/wwwroot/auth-pages.css",
+     "~/wwwroot/signup.css",
       "~/wwwroot/contact.css",
       "~/wwwroot/my-profile.css",
       "~/wwwroot/privacy.css",

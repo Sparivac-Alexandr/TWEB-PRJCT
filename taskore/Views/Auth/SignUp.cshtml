@@ -1,14 +1,14 @@
 ﻿@using System.Web.Optimization
 @{
-    ViewBag.Title = "SignUp";
+    ViewBag.Title = "Sign Up";
 }
-@Styles.Render("~/Content/css")
-<body>
+@Styles.Render("~/Content/css");
 
+<body>
     <div class="auth-right">
         <div class="auth-form-container">
             <div class="auth-header">
-                <h1>taskore. //</h1>
+                <h1>Sign Up</h1>
                 <p>Please fill in your information</p>
             </div>
             <form id="signup-form">
@@ -32,8 +32,8 @@
                 <div class="input-group">
                     <select required>
                         <option value="" disabled selected>Select user type</option>
-                        <option value="employer">Employer</option>
-                        <option value="customer">Customer</option>
+                        <option value="employer">Freelancer</option>
+                        <option value="customer">Client</option>
                     </select>
                 </div>
                 <button type="submit" class="submit-button">Create Account</button>
@@ -43,7 +43,5 @@
             </form>
         </div>
     </div>
-    </div>
-    @Html.Partial("_Footer")
 </body>
 

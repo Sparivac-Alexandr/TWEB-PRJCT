@@ -102,7 +102,6 @@
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="Global.asax" />
     <Content Include="wwwroot\about.css" />
-    <Content Include="wwwroot\auth-pages.css" />
     <Content Include="wwwroot\chat.css" />
     <Content Include="wwwroot\contact.css" />
     <Content Include="wwwroot\create-prjct.css" />
@@ -110,6 +109,7 @@
     <Content Include="wwwroot\home.css" />
     <Content Include="wwwroot\my-profile.css" />
     <Content Include="wwwroot\privacy.css" />
+    <Content Include="wwwroot\signup.css" />
     <Content Include="wwwroot\taskore.js" />
     <Content Include="wwwroot\terms.css" />
     <None Include="Scripts\jquery-3.7.1.intellisense.js" />
