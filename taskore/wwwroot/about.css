@@ -37,7 +37,7 @@
 }
 
 /* Header Styles */
-.header {
+.header  {
     background-color: var(--color-header-bg);
     box-shadow: 0 4px 6px var(--color-shadow-light);
     padding: 1.25rem 2.5rem;
@@ -48,6 +48,8 @@
     z-index: 1000;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
+    max-height: 90px;
+    height: 100%;
 }
 
 .header-container {
