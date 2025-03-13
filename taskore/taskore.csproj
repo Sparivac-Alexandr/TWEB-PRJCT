@@ -176,6 +176,16 @@
     <Folder Include="Content\" />
     <Folder Include="Models\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\taskoreBusinessLogic\taskoreBusinessLogic.csproj">
+      <Project>{f1a3c873-3905-4f02-856b-1be46f084f7b}</Project>
+      <Name>taskoreBusinessLogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\taskoreDomain\taskoreDomain.csproj">
+      <Project>{c0b841cf-477f-4966-ab65-3782a0b9c487}</Project>
+      <Name>taskoreDomain</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

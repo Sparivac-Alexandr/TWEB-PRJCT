@@ -1,9 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35806.99 d17.13
+VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "taskore", "taskore\taskore.csproj", "{D14E35B2-65BB-4DDF-9D27-3C7F710D5A6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "taskoreBusinessLogic", "taskoreBusinessLogic\taskoreBusinessLogic.csproj", "{F1A3C873-3905-4F02-856B-1BE46F084F7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "taskoreDomain", "taskoreDomain\taskoreDomain.csproj", "{C0B841CF-477F-4966-AB65-3782A0B9C487}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "taskoreHelpers", "taskoreHelpers\taskoreHelpers.csproj", "{8C61DE67-5966-469C-985D-342F2C38BE06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +21,18 @@ Global
 		{D14E35B2-65BB-4DDF-9D27-3C7F710D5A6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D14E35B2-65BB-4DDF-9D27-3C7F710D5A6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D14E35B2-65BB-4DDF-9D27-3C7F710D5A6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1A3C873-3905-4F02-856B-1BE46F084F7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1A3C873-3905-4F02-856B-1BE46F084F7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1A3C873-3905-4F02-856B-1BE46F084F7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1A3C873-3905-4F02-856B-1BE46F084F7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0B841CF-477F-4966-AB65-3782A0B9C487}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0B841CF-477F-4966-AB65-3782A0B9C487}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0B841CF-477F-4966-AB65-3782A0B9C487}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0B841CF-477F-4966-AB65-3782A0B9C487}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C61DE67-5966-469C-985D-342F2C38BE06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C61DE67-5966-469C-985D-342F2C38BE06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C61DE67-5966-469C-985D-342F2C38BE06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C61DE67-5966-469C-985D-342F2C38BE06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
