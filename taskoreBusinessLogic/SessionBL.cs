@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using taskoreBusinessLogic.Core;
+using taskoreBusinessLogic.Interfaces;
 
 namespace taskoreBusinessLogic
 {
-   public class SessionBL : UserApi, ISession
+   public class SessionBL : UserApi, ISesion
     {
+
     }
 }

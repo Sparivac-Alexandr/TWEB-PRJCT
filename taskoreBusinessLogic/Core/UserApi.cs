@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace taskoreBusinessLogic.Core
 {
-    class UserApi
+   public class UserApi
     {
     }
 }
