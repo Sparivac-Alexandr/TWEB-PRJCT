@@ -49,13 +49,13 @@
     <Compile Include="SessionBL.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\taskoreDomain\taskoreDomain.csproj">
+    <ProjectReference Include="..\taskoreDomain\taskore.Domain.csproj">
       <Project>{c0b841cf-477f-4966-ab65-3782a0b9c487}</Project>
-      <Name>taskoreDomain</Name>
+      <Name>taskore.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\taskoreHelpers\taskoreHelpers.csproj">
+    <ProjectReference Include="..\taskoreHelpers\taskore.Helpers.csproj">
       <Project>{8c61de67-5966-469c-985d-342f2c38be06}</Project>
-      <Name>taskoreHelpers</Name>
+      <Name>taskore.Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

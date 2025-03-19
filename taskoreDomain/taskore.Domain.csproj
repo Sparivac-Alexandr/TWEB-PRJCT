@@ -41,7 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enteties\User\ULoginData.cs" />
+    <Compile Include="Enteties\User\UserLoginData.cs" />
     <Compile Include="Enteties\User\UserLogin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -49,9 +49,9 @@
     <Folder Include="Enums\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\taskoreHelpers\taskoreHelpers.csproj">
+    <ProjectReference Include="..\taskoreHelpers\taskore.Helpers.csproj">
       <Project>{8c61de67-5966-469c-985d-342f2c38be06}</Project>
-      <Name>taskoreHelpers</Name>
+      <Name>taskore.Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

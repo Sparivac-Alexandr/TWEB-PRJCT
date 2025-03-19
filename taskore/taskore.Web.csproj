@@ -152,17 +152,17 @@
     <Content Include="Views\Shared\_Header_guest.cshtml" />
     <Content Include="Views\Auth\SignIn.cshtml" />
     <Content Include="Views\Auth\SignUp.cshtml" />
-    <Content Include="Views\Auth\MyProfile.cshtml" />
+    <Content Include="Views\Main\MyProfile.cshtml" />
     <Content Include="Views\Shared\_Footer.cshtml" />
     <Content Include="Views\Auth\ForgotPass.cshtml" />
     <Content Include="Views\Main\ExplorePage.cshtml" />
     <Content Include="Views\Shared\_Header.cshtml" />
     <Content Include="Views\Main\ChatPage.cshtml" />
     <Content Include="Views\Main\CreateProjectPage.cshtml" />
-    <Content Include="Views\Auth\ContactUs.cshtml" />
-    <Content Include="Views\Auth\Privacy.cshtml" />
-    <Content Include="Views\Auth\Terms.cshtml" />
-    <Content Include="Views\Auth\AboutUs.cshtml" />
+    <Content Include="Views\Main\ContactUs.cshtml" />
+    <Content Include="Views\Main\Privacy.cshtml" />
+    <Content Include="Views\Main\Terms.cshtml" />
+    <Content Include="Views\Main\AboutUs.cshtml" />
     <Content Include="Views\Shared\_Background.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -177,13 +177,13 @@
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\taskoreBusinessLogic\taskoreBusinessLogic.csproj">
+    <ProjectReference Include="..\taskoreBusinessLogic\taskore.BusinessLogic.csproj">
       <Project>{f1a3c873-3905-4f02-856b-1be46f084f7b}</Project>
-      <Name>taskoreBusinessLogic</Name>
+      <Name>taskore.BusinessLogic</Name>
     </ProjectReference>
-    <ProjectReference Include="..\taskoreDomain\taskoreDomain.csproj">
+    <ProjectReference Include="..\taskoreDomain\taskore.Domain.csproj">
       <Project>{c0b841cf-477f-4966-ab65-3782a0b9c487}</Project>
-      <Name>taskoreDomain</Name>
+      <Name>taskore.Domain</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

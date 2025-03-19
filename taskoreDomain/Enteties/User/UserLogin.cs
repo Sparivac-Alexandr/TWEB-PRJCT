@@ -8,5 +8,6 @@ namespace taskoreDomain.Enteties.User
 {
     class UserLogin
     {
+
     }
 }

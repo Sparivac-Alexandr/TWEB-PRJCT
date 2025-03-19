@@ -8,5 +8,6 @@ namespace taskoreBusinessLogic.Core
 {
    public class UserApi
     {
+
     }
 }
