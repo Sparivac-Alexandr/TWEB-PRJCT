@@ -11,7 +11,7 @@ namespace taskore.Controllers
 {
     public class AuthController : Controller
     {
-
+        //Get Session
         private readonly ISesion _session;
             public AuthController()
         {
@@ -34,7 +34,7 @@ namespace taskore.Controllers
                     LoginDataTime = DateTime.Now
                 };
 
-                var userLogin = _session.UserLogin(data);
+                LoginResult userLogin = (LoginResult)_session.UserLogin(data);
                 if (userLogin.Status)
                 {
                     return RedirectToAction("Index", "Home");
@@ -45,7 +45,7 @@ namespace taskore.Controllers
                     return View();
                 }
             }
-            return View();  
+            return View();
         }
 
         // GET: Auth

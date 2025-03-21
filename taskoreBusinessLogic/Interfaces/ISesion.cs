@@ -11,5 +11,5 @@ namespace taskoreBusinessLogic.Interfaces
     {
       object UserLogin(UserLoginData data);
     }
-  
+
 }
