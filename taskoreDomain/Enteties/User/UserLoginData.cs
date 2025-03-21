@@ -16,3 +16,9 @@ namespace taskoreDomain.Enteties.User
 
     }
 }
+
+public class LoginResult
+{
+    public bool Status { get; internal set; }
+    public Exception StatusMsg { get; internal set; }
+}
