@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace taskoreDomain.Enteties.User
 {
-    class UserLogin
+   public class UserLoginDTO
     {
+        //Auth
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string UserIp { get; set; }
 
     }
 }

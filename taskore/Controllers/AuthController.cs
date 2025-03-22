@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using taskore.Models.Auth;
 using taskoreBusinessLogic;
 using taskoreBusinessLogic.Interfaces;
 using taskoreDomain.Enteties.User;
@@ -11,12 +12,15 @@ namespace taskore.Controllers
 {
     public class AuthController : Controller
     {
+
+        private readonly IAuth _auth;
         //Get Session
         private readonly ISesion _session;
             public AuthController()
         {
             var bl = new BusinessLogic();
             _session = bl.GetSesionBL();
+            _auth = bl.GetAuthBL();
         }
 
         [HttpPost]
@@ -61,6 +65,24 @@ namespace taskore.Controllers
 
         public ActionResult ForgotPass()
         {
+            return View();
+        }
+
+        // GET: Auth
+
+        [HttpPost]
+        public ActionResult Auth(UserDataLogin login)
+        {
+
+            var data = new UserLoginDTO
+            {
+                Email = login.Email,
+                Password = login.Password,
+                UserIp = "localhost"
+            };
+
+            string token = _auth.UserAuthLogic(data);
+
             return View();
         }
     }

@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enteties\User\UserLoginData.cs" />
-    <Compile Include="Enteties\User\UserLogin.cs" />
+    <Compile Include="Enteties\User\UserLoginDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
