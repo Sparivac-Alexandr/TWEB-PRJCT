@@ -11,9 +11,9 @@ namespace taskoreBusinessLogic
 {
     public class SessionBL : UserApi, ISesion
     {
-        public object UserLogin(UserLoginData data)
+        public object UserLogin(UserLoginSession data)
         {
-            throw new NotImplementedException();
+            return UserLoginAction(data);
         }
     }
 }

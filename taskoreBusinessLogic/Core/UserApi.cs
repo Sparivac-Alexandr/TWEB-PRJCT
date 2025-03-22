@@ -12,9 +12,12 @@ namespace taskoreBusinessLogic.Core
         //Auth
         public string UserAuthLogicAction(UserLoginDTO data)
         {
-
-
             return "token-key";
+        }
+
+        public string UserLoginAction(UserLoginSession data)
+        {
+            return "session-key";
         }
     }
 }

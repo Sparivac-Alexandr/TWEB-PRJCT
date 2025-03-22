@@ -9,7 +9,7 @@ namespace taskoreBusinessLogic.Interfaces
 {
     public interface ISesion
     {
-      object UserLogin(UserLoginData data);
+      object UserLogin(UserLoginSession data);
     }
 
 }

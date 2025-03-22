@@ -26,11 +26,11 @@ namespace taskore.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public ActionResult SignIn(UserLoginData login)
+        public ActionResult SignIn(UserLoginSession login)
         {
             if (ModelState.IsValid)
             {
-                UserLoginData data = new UserLoginData
+                UserLoginSession data = new UserLoginSession
                 {
                     Email = login.Email,
                     Password = login.Password,

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace taskoreDomain.Enteties.User
 {
-    public class UserLoginData
+ public class UserLoginSession
     {
         //Session
         public string Password { get; set; }
