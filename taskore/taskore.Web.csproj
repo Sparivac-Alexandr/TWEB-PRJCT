@@ -137,6 +137,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Auth\UserDataLogin.cs" />
+    <Compile Include="Models\Auth\UserDataRegister.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +166,7 @@
     <Content Include="Views\Main\Terms.cshtml" />
     <Content Include="Views\Main\AboutUs.cshtml" />
     <Content Include="Views\Shared\_Background.cshtml" />
+    <Content Include="Views\Auth\asfasfasfaffas.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
