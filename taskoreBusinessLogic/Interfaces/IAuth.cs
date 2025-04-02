@@ -10,5 +10,6 @@ namespace taskoreBusinessLogic.Interfaces
     public interface IAuth
     {
         string UserAuthLogic(UserLoginDTO data);
+        bool UserRegisterLogic(UserRegisterDTO data);
     }
 }

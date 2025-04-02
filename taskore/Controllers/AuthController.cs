@@ -16,7 +16,7 @@ namespace taskore.Controllers
         private readonly IAuth _auth;
         //Get Session
         private readonly ISesion _session;
-            public AuthController()
+        public AuthController()
         {
             var bl = new BusinessLogic();
             _session = bl.GetSesionBL();
@@ -84,6 +84,32 @@ namespace taskore.Controllers
             string token = _auth.UserAuthLogic(data);
 
             return View();
+        }
+
+        [HttpPost]
+        public ActionResult SignUp(UserDataRegister register)
+        {
+            var data = new UserRegisterDTO
+            {
+                Email = register.Email,
+                Password = register.Password,
+                FirstName = register.FirstName,
+                LastName = register.LastName,
+                Role = register.Role,
+
+            };
+
+            bool isRegistered = _auth.UserRegisterLogic(data);
+
+            if (isRegistered)
+            {
+                return RedirectToAction("MyProfile");
+            }
+            else
+            {
+                ModelState.AddModelError("", "Registration failed. Try again.");
+                return View();
+            }
         }
     }
 }
