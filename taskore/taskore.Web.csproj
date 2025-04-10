@@ -173,7 +173,6 @@
     <Content Include="Views\Main\Terms.cshtml" />
     <Content Include="Views\Main\AboutUs.cshtml" />
     <Content Include="Views\Shared\_Background.cshtml" />
-    <Content Include="Views\Auth\asfasfasfaffas.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

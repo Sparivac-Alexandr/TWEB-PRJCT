@@ -15,5 +15,10 @@ namespace taskoreBusinessLogic.BL_Struct
         {
             return UserAuthLogicAction(data);
         }
+
+        public bool UserRegisterLogic(UserRegisterDTO data)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

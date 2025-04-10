@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DBModel\Seed\UserContext.cs" />
     <Compile Include="BL_Struct\AuthBL.cs" />
     <Compile Include="BusinessLogic.cs" />
     <Compile Include="Core\AdminApi.cs" />
@@ -74,6 +75,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
