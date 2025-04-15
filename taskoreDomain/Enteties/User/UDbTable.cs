@@ -17,20 +17,27 @@ namespace taskoreDomain.Enteties.User
         public int Id { get; set; }
 
         [Required]
-        [Display(Name = "username")]
-        [StringLength(30 ,MinimumLength = 5)]
+        [Display(Name = "Username")]
+        [StringLength(30 ,MinimumLength = 5, ErrorMessage ="Username cannot be longer then 30 characters.")]
         public string Name { get; set; }
 
-        public string Phone {  get; set; }
+        [Required]
+        [Display(Name = "Password")]
+        [StringLength(30, MinimumLength = 8 ,ErrorMessage = "Password cannot be shorter then 8 characters.")]
+        public string Password { get; set; }
 
-        public string Address { get; set; }
 
-        public string UserIP  { get; set; }
+        [Required]
+        [Display(Name = "Email Address")]
+        [StringLength(30)]
 
-        [Display (Name  = "reg_dt")]
-        public DateTime RegistrationDateTime  { get; set; }
+        public string Email { get; set; }
 
-        [Display (Name = "Login_dt")]
+        [DataType(DataType.Date)]
+        public DateTime LastLogin { get; set; }
+
+        [StringLength(30)]
+        public string LastIp { get; set; }
 
         public URole Level { get; set; }
 
