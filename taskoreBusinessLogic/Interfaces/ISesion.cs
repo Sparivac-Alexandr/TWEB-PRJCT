@@ -10,6 +10,8 @@ namespace taskoreBusinessLogic.Interfaces
     public interface ISesion
     {
       object UserLogin(UserLoginSession data);
+      
+      bool CheckEmailExists(string email);
     }
 
 }

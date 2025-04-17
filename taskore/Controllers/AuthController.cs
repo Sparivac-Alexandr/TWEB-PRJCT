@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -58,6 +59,7 @@ namespace taskore.Controllers
             return View();
         }
 
+        [HttpGet]
         public ActionResult SignUp()
         {
             return View();
@@ -87,29 +89,46 @@ namespace taskore.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SignUp(UserDataRegister register)
         {
-            var data = new UserRegisterDTO
+            Debug.WriteLine(register.Email);
+            
+            // Check if email already exists before proceeding
+            if (_session.CheckEmailExists(register.Email))
             {
-                Email = register.Email,
-                Password = register.Password,
-                FirstName = register.FirstName,
-                LastName = register.LastName,
-                Role = register.Role,
-
-            };
-
-            bool isRegistered = _auth.UserRegisterLogic(data);
-
-            if (isRegistered)
-            {
-                return RedirectToAction("MyProfile");
+                ModelState.AddModelError("Email", "This email is already registered. Please use a different email address.");
+                return View(register);
             }
-            else
+            
+            // Only proceed if model is valid
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("", "Registration failed. Try again.");
-                return View();
+                var data = new UserRegisterDTO
+                {
+                    Email = register.Email,
+                    Password = register.Password,
+                    FirstName = register.FirstName,
+                    LastName = register.LastName,
+                    Role = register.Role
+                };
+
+                bool isRegistered = _auth.UserRegisterLogic(data);
+
+                if (isRegistered)
+                {
+                    TempData["SuccessMessage"] = "Account created successfully! Please sign in.";
+                    return RedirectToAction("SignIn");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Registration failed. Please try again.");
+                }
             }
+            
+            // If we got this far, something failed, redisplay form
+            return View(register);
         }
+
     }
 }

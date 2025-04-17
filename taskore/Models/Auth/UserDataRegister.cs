@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace taskoreDomain.Enteties.User
+namespace taskore.Models.Auth
 {
    public class UserDataRegister
     {
@@ -16,5 +16,7 @@ namespace taskoreDomain.Enteties.User
         public string LastName { get; set; }
 
         public string Role { get; set; }
+
+        public string ConfirmPassword { get; set; }
     }
 }
