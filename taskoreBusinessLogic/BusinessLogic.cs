@@ -20,5 +20,10 @@ namespace taskoreBusinessLogic
         {
             return new AuthBL();
         }
+        
+        public IProject GetProjectBL()
+        {
+            return new ProjectBL();
+        }
     }
 }

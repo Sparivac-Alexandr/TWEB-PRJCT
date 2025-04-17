@@ -1,6 +1,7 @@
-﻿
+﻿@model taskoreBusinessLogic.DBModel.ProjectDBModel
+
 @{
-    ViewBag.Title = "CreateProjectPage";
+    ViewBag.Title = "Create Project";
 }
 
 <body>
@@ -9,62 +10,89 @@
         <div class="create-project-content">
             <h1>Create a New Project</h1>
 
-            <form id="project-form">
+            @if (!string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
+            {
+                <div class="alert alert-success">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @using (Html.BeginForm("CreateProjectPage", "Main", FormMethod.Post, new { id = "project-form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
                 <div class="form-group">
-                    <label for="project-title">Project Title</label>
-                    <input type="text" id="project-title" name="project-title" placeholder="Enter project title" required>
+                    @Html.LabelFor(m => m.Title, "Project Title")
+                    @Html.TextBoxFor(m => m.Title, new { @class = "form-control", placeholder = "Enter project title" })
+                    @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="form-group">
-                    <label for="project-description">Project Description</label>
-                    <textarea id="project-description" name="project-description" placeholder="Describe your project in detail" rows="5" required></textarea>
+                    @Html.LabelFor(m => m.Description, "Project Description")
+                    @Html.TextAreaFor(m => m.Description, new { @class = "form-control", placeholder = "Describe your project in detail", rows = "5" })
+                    @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="form-group">
-                    <label for="project-category">Category</label>
-                    <select id="project-category" name="project-category" required>
-                        <option value="">Select a category</option>
-                        <option value="web-development">Web Development</option>
-                        <option value="graphic-design">Graphic Design</option>
-                        <option value="content-writing">Content Writing</option>
-                        <option value="digital-marketing">Digital Marketing</option>
-                        <option value="mobile-apps">Mobile Apps</option>
-                    </select>
+                    @Html.LabelFor(m => m.Category, "Category")
+                    @Html.DropDownListFor(m => m.Category, 
+                        new List<SelectListItem>
+                        {
+                            new SelectListItem { Text = "Select a category", Value = "", Selected = true },
+                            new SelectListItem { Text = "Web Development", Value = "web-development" },
+                            new SelectListItem { Text = "Graphic Design", Value = "graphic-design" },
+                            new SelectListItem { Text = "Content Writing", Value = "content-writing" },
+                            new SelectListItem { Text = "Digital Marketing", Value = "digital-marketing" },
+                            new SelectListItem { Text = "Mobile Apps", Value = "mobile-apps" }
+                        }, 
+                        new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Category, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="form-group">
-                    <label for="project-budget">Budget</label>
-                    <select id="project-budget" name="project-budget" required>
-                        <option value="">Select a budget range</option>
-                        <option value="under-500">Under $500</option>
-                        <option value="500-1000">$500 - $1,000</option>
-                        <option value="1000-5000">$1,000 - $5,000</option>
-                        <option value="over-5000">Over $5,000</option>
-                    </select>
+                    @Html.LabelFor(m => m.Budget, "Budget")
+                    @Html.DropDownListFor(m => m.Budget,
+                        new List<SelectListItem>
+                        {
+                            new SelectListItem { Text = "Select a budget range", Value = "", Selected = true },
+                            new SelectListItem { Text = "Under $500", Value = "under-500" },
+                            new SelectListItem { Text = "$500 - $1,000", Value = "500-1000" },
+                            new SelectListItem { Text = "$1,000 - $5,000", Value = "1000-5000" },
+                            new SelectListItem { Text = "Over $5,000", Value = "over-5000" }
+                        },
+                        new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Budget, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="form-group">
-                    <label for="project-deadline">Deadline</label>
-                    <select id="project-deadline" name="project-deadline" required>
-                        <option value="">Select a deadline</option>
-                        <option value="urgent">Urgent (24h)</option>
-                        <option value="week">Within a week</option>
-                        <option value="month">Within a month</option>
-                        <option value="long-term">Long-term</option>
-                    </select>
+                    @Html.LabelFor(m => m.Deadline, "Deadline")
+                    @Html.DropDownListFor(m => m.Deadline,
+                        new List<SelectListItem>
+                        {
+                            new SelectListItem { Text = "Select a deadline", Value = "", Selected = true },
+                            new SelectListItem { Text = "Urgent (24h)", Value = "urgent" },
+                            new SelectListItem { Text = "Within a week", Value = "week" },
+                            new SelectListItem { Text = "Within a month", Value = "month" },
+                            new SelectListItem { Text = "Long-term", Value = "long-term" }
+                        },
+                        new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Deadline, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="form-group">
-                    <label for="project-skills">Required Skills</label>
-                    <input type="text" id="project-skills" name="project-skills" placeholder="Enter required skills (comma separated)" required>
+                    @Html.LabelFor(m => m.RequiredSkills, "Required Skills")
+                    @Html.TextBoxFor(m => m.RequiredSkills, new { @class = "form-control", placeholder = "Enter required skills (comma separated)" })
+                    @Html.ValidationMessageFor(m => m.RequiredSkills, "", new { @class = "text-danger" })
                 </div>
 
                 <div class="form-group">
                     <button type="submit" class="submit-btn">Create Project</button>
                 </div>
-            </form>
+            }
         </div>
     </div>
     @Html.Partial("_Footer")
+    
 </body>
 
