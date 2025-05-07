@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "MyProfile";
 }
 
@@ -16,13 +15,14 @@
                 </div>
                 <div class="profile-info">
                     <h1>
-                        Sparivac Alexandr
+                        @(Session["UserFullName"] ?? "Guest User")
                         <span class="rating-container">
                             ★ 4.8 (324)
                         </span>
                     </h1>
                     <div class="profile-tag">Student</div>
                     <div class="profile-location">Republic of Moldova, Chisinau</div>
+                    <div class="profile-email">@(Session["UserEmail"] ?? "No email available")</div>
                 </div>
             </div>
 

@@ -1,4 +1,5 @@
 ﻿@using System.Web.Optimization
+@model taskoreDomain.Enteties.User.UserLoginSession
 @{
     ViewBag.Title = "Sign In";
 }
@@ -20,21 +21,37 @@
                 </div>
             }
             
-            <form id="login-form">
-                <div class="input-group">
-                    <input type="email" placeholder="Email address" required>
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["ErrorMessage"]
                 </div>
+            }
+            
+            @using (Html.BeginForm("SignIn", "Auth", FormMethod.Post, new { id = "login-form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                
                 <div class="input-group">
-                    <input type="password" id="login-password" placeholder="Password" required>
+                    @Html.TextBoxFor(m => m.Email, new { @type = "email", @placeholder = "Email address", @required = "required" })
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                </div>
+                
+                <div class="input-group">
+                    @Html.PasswordFor(m => m.Password, new { @id = "login-password", @placeholder = "Password", @required = "required" })
                     <span class="password-toggle" onclick="togglePassword('login-password')">Show</span>
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                 </div>
+                
                 <button type="submit" class="submit-button">Sign in</button>
+                
                 <div class="back-link">
                     <a href="@Url.Action("ForgotPass", "Auth")" onclick="showPage('forgot-password')">Forgot password?</a>
                     <br><br>
                     Don't have an account? <a href="@Url.Action("SignUp", "Auth")" onclick="showPage('signup')">Sign up</a>
                 </div>
-            </form>
+            }
         </div>
     </div>
 </body>

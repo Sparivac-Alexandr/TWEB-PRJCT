@@ -42,11 +42,17 @@ namespace taskore.Controllers
                 LoginResult userLogin = (LoginResult)_session.UserLogin(data);
                 if (userLogin.Status)
                 {
-                    return RedirectToAction("Index", "Home");
+                    // Stocăm informațiile utilizatorului în sesiune
+                    Session["UserId"] = userLogin.UserId;
+                    Session["UserFullName"] = $"{userLogin.FirstName} {userLogin.LastName}";
+                    Session["UserEmail"] = userLogin.Email;
+                    
+                    // Redirect către pagina MyProfile
+                    return RedirectToAction("MyProfile", "Main");
                 }
                 else
                 {
-                    ModelState.AddModelError("", userLogin.StatusMsg);
+                    ModelState.AddModelError("", userLogin.StatusMsg.Message);
                     return View();
                 }
             }
@@ -68,6 +74,17 @@ namespace taskore.Controllers
         public ActionResult ForgotPass()
         {
             return View();
+        }
+
+        // GET: SignOut - Acțiune pentru deconectare
+        public ActionResult SignOut()
+        {
+            // Curățăm datele din sesiune
+            Session.Clear();
+            
+            // Redirecționăm către pagina de autentificare
+            TempData["SuccessMessage"] = "You have been successfully signed out.";
+            return RedirectToAction("SignIn");
         }
 
         // GET: Auth

@@ -20,6 +20,10 @@ namespace taskoreDomain.Enteties.User
 
 public class LoginResult
 {
-    public bool Status { get; internal set; }
-    public Exception StatusMsg { get; internal set; }
+    public bool Status { get; set; }
+    public Exception StatusMsg { get; set; }
+    public int UserId { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
 }

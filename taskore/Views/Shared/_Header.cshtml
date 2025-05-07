@@ -11,7 +11,7 @@
             <img src="/api/placeholder/50/50" alt="Taskore Logo">
         </div>
         <nav class="nav-menu">
-            <a href="@Url.Action("Index", "Main")">Explore</a>
+            <a href="@Url.Action("Index", "Home")">Home</a>
             <a href="@Url.Action("ExplorePage", "Main")">Projects</a>
             <a href="#">Freelancers</a>
             <a href="@Url.Action("ChatPage", "Main")">Chat's</a>
@@ -19,8 +19,78 @@
         <div class="header-actions">
             <div class="user-profile">
                 <img src="/api/placeholder/40/40" alt="" class="user-avatar">
-                <span class="user-nickname">Johnny Sins</span>
+                @if (Session["UserFullName"] != null)
+                {
+                    <span class="user-nickname">@Session["UserFullName"]</span>
+                    <div class="dropdown">
+                        <a href="@Url.Action("MyProfile", "Main")">My Profile</a>
+                        <a href="@Url.Action("CreateProjectPage", "Main")">Create Project</a>
+                        <a href="@Url.Action("SignOut", "Auth")">Sign Out</a>
+                    </div>
+                }
+                else
+                {
+                    <span class="user-nickname">Guest</span>
+                    <div class="dropdown">
+                        <a href="@Url.Action("SignIn", "Auth")">Sign In</a>
+                        <a href="@Url.Action("SignUp", "Auth")">Sign Up</a>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </header>
+
+<style>
+    .dropdown {
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        border-radius: 5px;
+        padding: 10px 0;
+        margin-top: 5px;
+    }
+    
+    .dropdown a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        transition: background-color 0.3s;
+    }
+    
+    .dropdown a:hover {
+        background-color: #f1f1f1;
+    }
+    
+    .user-profile:hover .dropdown {
+        display: block;
+    }
+    
+    .user-profile {
+        position: relative;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var userProfile = document.querySelector('.user-profile');
+        
+        userProfile.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var dropdown = this.querySelector('.dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        document.addEventListener('click', function() {
+            var dropdown = document.querySelector('.dropdown');
+            if (dropdown) {
+                dropdown.style.display = 'none';
+            }
+        });
+    });
+</script>

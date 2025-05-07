@@ -24,7 +24,27 @@ namespace taskore.Controllers
         // GET: Main
         public ActionResult ExplorePage()
         {
-            return View();
+            try
+            {
+                // Preluăm toate proiectele din baza de date
+                var allProjects = _projectService.GetAllProjects();
+                
+                // Grupăm proiectele după categorie pentru a le afișa organizat
+                var projectsByCategory = allProjects
+                    .GroupBy(p => p.Category)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+                
+                Debug.WriteLine($"Loaded {allProjects.Count} projects from database");
+                
+                // Transmitem proiectele către view
+                return View(projectsByCategory);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading projects: {ex.Message}");
+                // În caz de eroare, afișăm un view gol
+                return View(new Dictionary<string, List<ProjectDBModel>>());
+            }
         }
 
         public ActionResult ChatPage()
@@ -45,9 +65,8 @@ namespace taskore.Controllers
             
             if (ModelState.IsValid)
             {
-                // For demonstration, we'll use a fixed user ID
-                // In a real application, you would get this from the authenticated user
-                int userId = 1; // Replace with your user authentication logic
+                // Pentru demonstrație, putem folosi ID-ul utilizatorului din sesiune
+                int userId = Session["UserId"] != null ? (int)Session["UserId"] : 1;
                 
                 try
                 {
@@ -69,7 +88,9 @@ namespace taskore.Controllers
                     if (isCreated)
                     {
                         TempData["SuccessMessage"] = "Project created successfully!";
-                        return RedirectToAction("MyProfile");
+                        // Reinițializăm modelul pentru a permite crearea unui nou proiect
+                        ModelState.Clear();
+                        return View(new ProjectDBModel());
                     }
                     else
                     {
@@ -89,6 +110,15 @@ namespace taskore.Controllers
         
         public ActionResult MyProfile()
         {
+            // Verificăm dacă utilizatorul este autentificat
+            if (Session["UserId"] == null)
+            {
+                // Dacă nu este autentificat, redirectăm către pagina de login
+                TempData["ErrorMessage"] = "Please login to view your profile.";
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            // Dacă este autentificat, afișăm profilul
             return View();
         }
         
