@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using taskoreBusinessLogic.DBModel;
 using taskoreBusinessLogic.DBModel.Seed;
 using taskoreDomain.Enteties.User;
+using taskoreHelpers;
 
 namespace taskoreBusinessLogic.Core
 {
@@ -24,12 +25,16 @@ namespace taskoreBusinessLogic.Core
             {
                 Debug.WriteLine("Attempting login for: " + data.Email);
                 
+                // Hash the password for comparison with stored hashed password
+                string hashedPassword = HashGenerator.HashGen(data.Password);
+                Debug.WriteLine("Password hashed for comparison");
+                
                 using (var context = new UserContext())
                 {
-                    // Verificăm email-ul și parola
+                    // Compare email and hashed password
                     var user = context.Users.FirstOrDefault(u => 
                         u.Email.ToLower() == data.Email.ToLower() && 
-                        u.Password == data.Password);
+                        u.Password == hashedPassword);
                     
                     if (user != null)
                     {

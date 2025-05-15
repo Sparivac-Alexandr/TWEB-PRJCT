@@ -17,6 +17,7 @@
             @using (Html.BeginForm("SignUp", "Auth", FormMethod.Post, new { id = "signup-form" }))
             {
                 @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 <div class="input-group">
                     @Html.TextBoxFor(m => m.Email, new
                     {
@@ -33,6 +34,7 @@
                         @required = "required",
                         type = "text"
                     })
+                    @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger" })
                 </div>
                 <div class="input-group">
                     @Html.TextBoxFor(m => m.LastName, new
@@ -41,14 +43,15 @@
                         @required = "required",
                         type = "text"
                     })
+                    @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger" })
                 </div>
                 <div class="input-group">
-                    @Html.TextBoxFor(m => m.Password, new
+                    @Html.PasswordFor(m => m.Password, new
                     {
-                        placeholder = "Password",
-                        @required = "required",
-                        type = "password"
+                        placeholder = "Password (minimum 6 characters)",
+                        @required = "required"
                     })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                 </div>
                 <div class="input-group">
                     @Html.DropDownListFor(m => m.Role, new SelectList(new[]
@@ -56,6 +59,7 @@
                         new { Value = "employer", Text = "Freelancer" },
                         new { Value = "customer", Text = "Client" }
                     }, "Value", "Text"), "Select user type", new { @required = "required" })
+                    @Html.ValidationMessageFor(m => m.Role, "", new { @class = "text-danger" })
                 </div>
                 <button type="submit" class="submit-button">Create Account</button>
                 <div class="back-link">
