@@ -258,30 +258,34 @@ namespace taskore.Controllers
                 {
                     return RedirectToAction("AllFreelancers");
                 }
-
-                // Pass user data to the view
-                ViewBag.UserId = user.Id;
-                ViewBag.UserFullName = $"{user.FirstName} {user.LastName}";
-                ViewBag.UserEmail = user.Email;
-                
-                // Pass additional profile fields to the view
-                ViewBag.Headline = user.Headline ?? "Web Developer & UI/UX Designer";
-                ViewBag.About = user.About ?? "A passionate web developer and UI/UX designer with experience in creating responsive websites and user-friendly interfaces that deliver exceptional user experiences.";
-                ViewBag.Skills = user.Skills ?? "HTML5,CSS3,JavaScript,React.js,Node.js,Figma,UI/UX Design,Responsive Design,API Integration,WordPress";
-                ViewBag.Phone = user.Phone ?? "+1 234 567 8900";
-                ViewBag.Location = user.Location ?? "New York, USA";
-                ViewBag.Website = user.Website ?? "www.portfolio.com";
-                ViewBag.PreferredProjectTypes = user.PreferredProjectTypes ?? "Web Development, UI/UX Design, E-commerce";
-                ViewBag.HourlyRate = user.HourlyRate ?? "$45 - $65 per hour";
-                ViewBag.ProjectDuration = user.ProjectDuration ?? "Short to medium-term (1-6 months)";
-                ViewBag.CommunicationStyle = user.CommunicationStyle ?? "Weekly video calls, daily messaging";
-                ViewBag.AvailabilityStatus = user.AvailabilityStatus ?? "Available for work";
-                ViewBag.AvailabilityHours = user.AvailabilityHours ?? "30 hrs/week";
-                ViewBag.Rating = user.Rating ?? 4.8;
-                ViewBag.RatingCount = user.RatingCount ?? 40;
-                ViewBag.CompletedProjects = user.CompletedProjects ?? 23;
             }
-
+            
+            return View();
+        }
+        
+        public ActionResult AdminDashboard()
+        {
+            // Check if user is logged in and is an admin
+            if (Session["UserId"] == null)
+            {
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            // In a production environment, you should check if the user is an admin
+            // Example: if(Session["UserRole"].ToString() != "Admin") { return RedirectToAction("Index", "Home"); }
+            
+            // Get some stats for the dashboard
+            using (var db = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+            {
+                // Count total users
+                ViewBag.TotalUsers = db.Users.Count();
+                
+                // You could add more statistics here
+                // ViewBag.TotalProjects = db.Projects.Count();
+                // ViewBag.CompletedTasks = db.Tasks.Count(t => t.Status == "Completed");
+                // ViewBag.PendingTasks = db.Tasks.Count(t => t.Status == "Pending");
+            }
+            
             return View();
         }
         
@@ -470,6 +474,90 @@ namespace taskore.Controllers
             dealsModel.Add(deal5);
             
             return View(dealsModel);
+        }
+
+        public ActionResult News()
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                return RedirectToAction("SignIn", "Auth");
+            }
+
+            // Create sample news data
+            var newsModel = new List<Dictionary<string, object>>();
+            
+            // News item 1
+            var news1 = new Dictionary<string, object>
+            {
+                { "Id", 1 },
+                { "Title", "Platform Updates: New Features Released" },
+                { "Content", "We're excited to announce several new features that will enhance your experience on our platform. These include improved messaging system, better project search filters, and enhanced notification settings." },
+                { "Author", "Taskore Team" },
+                { "PublishDate", "2023-12-15" },
+                { "Category", "Updates" },
+                { "ImageUrl", "/wwwroot/images/news/update.jpg" },
+                { "Priority", "High" }
+            };
+            newsModel.Add(news1);
+            
+            // News item 2
+            var news2 = new Dictionary<string, object>
+            {
+                { "Id", 2 },
+                { "Title", "Freelancer Success Story: Maria's Journey to Top-Rated" },
+                { "Content", "Learn how Maria went from a beginner freelancer to a top-rated designer on our platform in just 6 months. Her story includes tips on building a strong portfolio and establishing client relationships." },
+                { "Author", "Content Team" },
+                { "PublishDate", "2023-12-10" },
+                { "Category", "Success Stories" },
+                { "ImageUrl", "/wwwroot/images/news/success.jpg" },
+                { "Priority", "Medium" }
+            };
+            newsModel.Add(news2);
+            
+            // News item 3
+            var news3 = new Dictionary<string, object>
+            {
+                { "Id", 3 },
+                { "Title", "Upcoming Webinar: Building Your Freelance Brand" },
+                { "Content", "Join us for an informative session on building your personal brand as a freelancer. Learn from industry experts on December 20th at 2 PM EST." },
+                { "Author", "Events Team" },
+                { "PublishDate", "2023-12-05" },
+                { "Category", "Events" },
+                { "ImageUrl", "/wwwroot/images/news/webinar.jpg" },
+                { "Priority", "High" }
+            };
+            newsModel.Add(news3);
+            
+            // News item 4
+            var news4 = new Dictionary<string, object>
+            {
+                { "Id", 4 },
+                { "Title", "Security Updates: Enhancing Your Account Protection" },
+                { "Content", "We've implemented new security measures to better protect your account. Learn about two-factor authentication and other security features now available." },
+                { "Author", "Security Team" },
+                { "PublishDate", "2023-11-28" },
+                { "Category", "Security" },
+                { "ImageUrl", "/wwwroot/images/news/security.jpg" },
+                { "Priority", "High" }
+            };
+            newsModel.Add(news4);
+            
+            // News item 5
+            var news5 = new Dictionary<string, object>
+            {
+                { "Id", 5 },
+                { "Title", "Market Trends: Top Skills in Demand for 2024" },
+                { "Content", "Our analysis shows growing demand for AI specialists, blockchain developers, and UX researchers. See the complete list of trending skills for the upcoming year." },
+                { "Author", "Research Team" },
+                { "PublishDate", "2023-11-20" },
+                { "Category", "Market Insights" },
+                { "ImageUrl", "/wwwroot/images/news/trends.jpg" },
+                { "Priority", "Medium" }
+            };
+            newsModel.Add(news5);
+            
+            return View(newsModel);
         }
     }
 }

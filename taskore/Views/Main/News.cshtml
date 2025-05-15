@@ -1,0 +1,263 @@
+@{
+    ViewBag.Title = "News & Updates";
+}
+
+<body>
+    @Html.Partial("_Header")
+
+    <div class="projects-container">
+        <div class="projects-header">
+            <div class="back-link">
+                <a href="@Url.Action("MyProfile", "Main")" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Profile
+                </a>
+            </div>
+            <div class="projects-title">
+                <h1>News & Updates</h1>
+            </div>
+        </div>
+
+        <div class="projects-body">
+            <div class="projects-list">
+                @foreach (var news in Model)
+                {
+                    var priority = news["Priority"].ToString();
+                    var priorityClass = priority == "High" ? "high-priority" : (priority == "Medium" ? "medium-priority" : "");
+                    
+                    <div class="project-item @priorityClass">
+                        <div class="project-header">
+                            <div class="project-title">@news["Title"]</div>
+                            <div class="project-date">Published on: @news["PublishDate"]</div>
+                        </div>
+                        <div class="project-details">
+                            <div class="project-description">
+                                <p>@news["Content"]</p>
+                            </div>
+                            <div class="project-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-tag"></i>
+                                    <span>@news["Category"]</span>
+                                </div>
+                                @if (priority == "High")
+                                {
+                                    <div class="meta-item priority-indicator">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>Important</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="project-client">
+                            <div class="client-label">By:</div>
+                            <div class="client-name">@news["Author"]</div>
+                            <div class="read-more-link">
+                                <a href="#">Read More <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                <div class="pagination">
+                    <a href="#" class="active">1</a>
+                    <a href="#">2</a>
+                    <a href="#">3</a>
+                    <a href="#" class="next">Next <i class="fas fa-chevron-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("_Footer")
+</body>
+
+<style>
+    /* Projects Page Styles */
+    .projects-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .projects-header {
+        margin-bottom: 2rem;
+    }
+
+    .back-link {
+        margin-bottom: 1rem;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .back-btn:hover {
+        color: #3b82f6;
+    }
+
+    .projects-title {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .projects-title h1 {
+        font-size: 2rem;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .projects-body {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .projects-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .project-item {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-left: 4px solid transparent;
+    }
+
+    .project-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .high-priority {
+        border-left-color: #ef4444;
+    }
+    
+    .medium-priority {
+        border-left-color: #f59e0b;
+    }
+
+    .project-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        align-items: flex-start;
+    }
+
+    .project-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .project-date {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .project-details {
+        margin-bottom: 1rem;
+    }
+
+    .project-description {
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .project-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #64748b;
+        background-color: #f8fafc;
+        padding: 0.35rem 0.75rem;
+        border-radius: 4px;
+    }
+    
+    .priority-indicator {
+        background-color: #fef2f2;
+        color: #ef4444;
+    }
+
+    .project-client {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+
+    .client-label {
+        font-weight: 600;
+    }
+    
+    .read-more-link {
+        margin-left: auto;
+    }
+    
+    .read-more-link a {
+        color: #3b82f6;
+        font-weight: 600;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: color 0.2s;
+    }
+    
+    .read-more-link a:hover {
+        color: #2563eb;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+    
+    .pagination a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 4px;
+        color: #64748b;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    .pagination a.next {
+        width: auto;
+        padding: 0 0.75rem;
+    }
+    
+    .pagination a.active {
+        background-color: #3b82f6;
+        color: white;
+    }
+    
+    .pagination a:hover:not(.active) {
+        background-color: #f1f5f9;
+    }
+</style> 

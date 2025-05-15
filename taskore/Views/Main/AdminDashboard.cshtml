@@ -1,0 +1,340 @@
+@{
+    ViewBag.Title = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow-x: hidden;
+    }
+
+    .admin-container {
+        display: flex;
+        height: 100vh;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+    }
+
+    .admin-sidebar {
+        width: 250px;
+        background-color: #6c757d;
+        color: #fff;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .admin-content {
+        flex: 1;
+        padding: 20px;
+        background-color: #f5f5f5;
+        overflow-y: auto;
+    }
+
+    .admin-sidebar-header {
+        padding: 20px;
+        background-color: #5a6268;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+
+    .admin-sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .admin-sidebar li {
+        margin-bottom: 0;
+    }
+
+    .admin-sidebar li a {
+        display: block;
+        padding: 15px 20px;
+        color: #fff;
+        text-decoration: none;
+        transition: all 0.3s;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .admin-sidebar li a:hover, .admin-sidebar li a.active {
+        background-color: #495057;
+    }
+
+    .admin-sidebar i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .section-header {
+        margin-bottom: 5px;
+        padding: 10px 20px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        opacity: 0.7;
+    }
+
+    .stats-card {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .stats-card h3 {
+        margin-top: 0;
+        font-size: 1rem;
+        color: #666;
+    }
+
+    .stats-card .value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #1a237e;
+    }
+
+    .chart-container {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    
+    .content-section {
+        display: none;
+    }
+    
+    #manage-users-section {
+        display: block;
+    }
+</style>
+
+<div class="admin-container">
+    <div class="admin-sidebar">
+        <div class="admin-sidebar-header">
+            <i class="fas fa-tachometer-alt"></i> Admin
+        </div>
+        <ul>
+            <li><a href="#" class="active" data-section="manage-users-section"><i class="fas fa-users"></i> Manage Users</a></li>
+            <li><a href="#" data-section="manage-reports-section"><i class="fas fa-chart-bar"></i> Manage Reports</a></li>
+            <li><a href="#" data-section="manage-projects-section"><i class="fas fa-project-diagram"></i> Manage Projects</a></li>
+            <li><a href="#" data-section="add-post-section"><i class="fas fa-plus-circle"></i> Add New Post</a></li>
+            <li><a href="#" data-section="log-page-section"><i class="fas fa-file-alt"></i> Log Page</a></li>
+        </ul>
+    </div>
+    
+    <div class="admin-content">
+        <!-- Manage Users Section - Empty -->
+        <div id="manage-users-section" class="content-section">
+            <h1>Manage Users</h1>
+            <!-- Empty section as requested -->
+        </div>
+        
+        <!-- Manage Reports Section -->
+        <div id="manage-reports-section" class="content-section">
+            <h1>Manage Reports</h1>
+            <p class="text-muted">View and manage system reports.</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <h3>Total Users</h3>
+                        <div class="value">@ViewBag.TotalUsers</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <h3>Active Projects</h3>
+                        <div class="value">24</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <h3>Completed Tasks</h3>
+                        <div class="value">152</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <h3>Pending Tasks</h3>
+                        <div class="value">38</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Manage Projects Section -->
+        <div id="manage-projects-section" class="content-section">
+            <h1>Manage Projects</h1>
+            <p class="text-muted">View and manage all projects.</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-8">
+                    <div class="chart-container">
+                        <h3>User Activity</h3>
+                        <canvas id="usersChart" height="250"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="chart-container">
+                        <h3>Projects Distribution</h3>
+                        <canvas id="projectsChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add New Post Section -->
+        <div id="add-post-section" class="content-section">
+            <h1>Add New Post</h1>
+            <p class="text-muted">Create and publish new content.</p>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="postTitle" class="form-label">Post Title</label>
+                            <input type="text" class="form-control" id="postTitle">
+                        </div>
+                        <div class="mb-3">
+                            <label for="postContent" class="form-label">Content</label>
+                            <textarea class="form-control" id="postContent" rows="5"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Publish</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Log Page Section -->
+        <div id="log-page-section" class="content-section">
+            <h1>Log Page</h1>
+            <p class="text-muted">View system logs and recent activities.</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="chart-container">
+                        <h3>Recent Activities</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Adrian Popescu</td>
+                                    <td>Created a new project</td>
+                                    <td>Aug 12, 2023</td>
+                                    <td><span class="badge bg-success">Complete</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Maria Ionescu</td>
+                                    <td>Added a task</td>
+                                    <td>Aug 11, 2023</td>
+                                    <td><span class="badge bg-warning">In progress</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Ion Popa</td>
+                                    <td>Updated profile</td>
+                                    <td>Aug 10, 2023</td>
+                                    <td><span class="badge bg-info">Info</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Elena Dumitrescu</td>
+                                    <td>Completed task #124</td>
+                                    <td>Aug 09, 2023</td>
+                                    <td><span class="badge bg-success">Complete</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab navigation
+        const navLinks = document.querySelectorAll('.admin-sidebar a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Hide all content sections
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // Remove active class from all links
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Show the corresponding section
+                const sectionId = this.getAttribute('data-section');
+                document.getElementById(sectionId).style.display = 'block';
+            });
+        });
+    
+        // Users activity chart
+        var usersCtx = document.getElementById('usersChart').getContext('2d');
+        var usersChart = new Chart(usersCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                datasets: [{
+                    label: 'New Users',
+                    data: [12, 19, 15, 17, 14, 23, 25, 32],
+                    borderColor: '#1a237e',
+                    backgroundColor: 'rgba(26, 35, 126, 0.1)',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+        
+        // Projects distribution chart
+        var projectsCtx = document.getElementById('projectsChart').getContext('2d');
+        var projectsChart = new Chart(projectsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'In Progress', 'New'],
+                datasets: [{
+                    data: [12, 19, 8],
+                    backgroundColor: [
+                        '#4caf50',
+                        '#ff9800',
+                        '#2196f3'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    });
+</script> 

@@ -17,6 +17,12 @@
         </div>
         
         <nav class="main-nav">
+
+            <a href="@Url.Action("News", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "News" ? "active" : "")">
+                <i class="fas fa-newspaper"></i>
+                <span>News</span>
+            </a>
+
             <a href="@Url.Action("UserStats", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "UserStats" ? "active" : "")">
                 <i class="fas fa-chart-bar"></i>
                 <span>Dashboard</span>
@@ -37,6 +43,7 @@
                 <i class="fas fa-handshake"></i>
                 <span>My Deals</span>
             </a>
+
         </nav>
         
         <div class="header-actions">
@@ -95,6 +102,10 @@
                         <a href="@Url.Action("UserStats", "Main")" class="dropdown-item">
                             <i class="fas fa-chart-bar"></i>
                             <span>My Statistics</span>
+                        </a>
+                        <a href="@Url.Action("AdminDashboard", "Main")" class="dropdown-item">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Admin Dashboard</span>
                         </a>
                         <div class="dropdown-divider"></div>
                         <a href="@Url.Action("SignOut", "Auth")" class="dropdown-item">

@@ -205,6 +205,8 @@
     <Content Include="Views\Main\UserProfile.cshtml" />
     <Content Include="Views\Main\Deals.cshtml" />
     <Content Include="Views\Auth\View.cshtml" />
+    <Content Include="Views\Main\AdminDashboard.cshtml" />
+    <Content Include="Views\Main\News.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
