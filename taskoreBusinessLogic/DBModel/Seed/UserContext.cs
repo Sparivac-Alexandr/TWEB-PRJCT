@@ -11,14 +11,26 @@ using System.Diagnostics;
 
 namespace taskoreBusinessLogic.DBModel.Seed
 {
+    public class CustomDatabaseInitializer : DropCreateDatabaseIfModelChanges<UserContext>
+    {
+        protected override void Seed(UserContext context)
+        {
+            // Seed data if needed
+            base.Seed(context);
+        }
+    }
+
     public class UserContext : DbContext
     {
         public virtual DbSet<UDBModel> Users { get; set; }
         
         public UserContext() : base("name=taskore")
         {
-            // Enable database creation if it doesn't exist
-            Database.SetInitializer(new CreateDatabaseIfNotExists<UserContext>());
+            // Folosim DropCreateDatabaseIfModelChanges pentru a recrea baza de date când modelul se schimbă
+            Database.SetInitializer(new CustomDatabaseInitializer());
+            
+            // Dezactivăm detectarea modificărilor pentru a permite rularea scriptului SQL direct
+            Configuration.AutoDetectChangesEnabled = false;
             
             // Enable logging database operations
             this.Database.Log = s => Debug.WriteLine(s);

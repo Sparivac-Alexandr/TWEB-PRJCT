@@ -1,0 +1,474 @@
+@{
+    ViewBag.Title = "My Statistics";
+    var userId = Request.QueryString["userId"];
+    var username = ViewBag.UserName ?? "User";
+    var userType = ViewBag.UserType ?? "freelancer";
+}
+
+<body>
+    @Html.Partial("_Header")
+
+    <div class="stats-container">
+        <div class="stats-header">
+            <div class="back-link">
+                <a href="@Url.Action("MyProfile", "Main")" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Profile
+                </a>
+            </div>
+            <div class="stats-title">
+                <h1>Statistics Dashboard for @username</h1>
+                <p class="stats-subtitle">Track your performance and growth on taskore</p>
+            </div>
+        </div>
+
+        <div class="stats-body">
+            <div class="stats-overview">
+                <div class="stats-card primary-card">
+                    <div class="card-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>@(userType == "freelancer" ? "Completed Projects" : "Posted Projects")</h3>
+                        <div class="card-value">@ViewBag.TotalProjects</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>5 new this month</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-card">
+                    <div class="card-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>@(userType == "freelancer" ? "Current Projects" : "Active Projects")</h3>
+                        <div class="card-value">@(ViewBag.CurrentProjects ?? 3)</div>
+                        <div class="card-change neutral">
+                            <i class="fas fa-equals"></i>
+                            <span>Same as last month</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-card">
+                    <div class="card-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>On-Time Completion</h3>
+                        <div class="card-value">@(ViewBag.OnTimePercentage ?? 92)%</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>4% increase</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-card">
+                    <div class="card-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Average Rating</h3>
+                        <div class="card-value">@ViewBag.AverageRating</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>0.2 increase</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-sections">
+                <div class="stats-section">
+                    <h2>Performance Metrics</h2>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-header">
+                                <h3>@(userType == "freelancer" ? "Completion Rate" : "Acceptance Rate")</h3>
+                                <div class="metric-value">@(userType == "freelancer" ? ViewBag.CompletionRate : ViewBag.ResponseRate)%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: @(userType == "freelancer" ? ViewBag.CompletionRate : ViewBag.ResponseRate)%"></div>
+                            </div>
+                            <div class="metric-info">
+                                @if (userType == "freelancer")
+                                {
+                                    <p>Percentage of projects completed successfully and on time.</p>
+                                }
+                                else
+                                {
+                                    <p>Percentage of proposals you've reviewed and responded to.</p>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="metric-item">
+                            <div class="metric-header">
+                                <h3>Client Satisfaction</h3>
+                                <div class="metric-value">@(ViewBag.ClientSatisfaction ?? 95)%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: @(ViewBag.ClientSatisfaction ?? 95)%"></div>
+                            </div>
+                            <div class="metric-info">
+                                <p>Percentage of clients who rated your work above 4 stars.</p>
+                            </div>
+                        </div>
+
+                        <div class="metric-item">
+                            <div class="metric-header">
+                                <h3>Project Efficiency</h3>
+                                <div class="metric-value">@(ViewBag.ProjectEfficiency ?? 87)%</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: @(ViewBag.ProjectEfficiency ?? 87)%"></div>
+                            </div>
+                            <div class="metric-info">
+                                <p>How efficiently you complete projects relative to average time.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <h2>Activity Timeline</h2>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-icon completed">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">3 days ago</div>
+                                <div class="timeline-title">Project Completed</div>
+                                <div class="timeline-description">Successfully delivered "E-commerce Website Redesign" project</div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon message">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">1 week ago</div>
+                                <div class="timeline-title">New Review Received</div>
+                                <div class="timeline-description">Received a 5-star review from TechRetail Solutions</div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon started">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">2 weeks ago</div>
+                                <div class="timeline-title">Project Started</div>
+                                <div class="timeline-description">Started working on "Fitness Tracker Mobile App" project</div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon completed">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">1 month ago</div>
+                                <div class="timeline-title">Achievement Unlocked</div>
+                                <div class="timeline-description">Reached 20 completed projects milestone</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("_Footer")
+</body>
+
+<style>
+    /* Stats Page Styles */
+    .stats-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .stats-header {
+        margin-bottom: 2rem;
+    }
+
+    .back-link {
+        margin-bottom: 1rem;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .back-btn:hover {
+        color: #3b82f6;
+    }
+
+    .stats-title {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .stats-title h1 {
+        font-size: 2rem;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .stats-subtitle {
+        color: #64748b;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .stats-body {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    /* Stats Overview Cards */
+    .stats-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .stats-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .primary-card {
+        background-color: #3b82f6;
+        color: white;
+    }
+
+    .primary-card h3, .primary-card .card-value, .primary-card .card-change {
+        color: white;
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .primary-card .card-icon {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .stats-card:not(.primary-card) .card-icon {
+        background-color: #f1f5f9;
+        color: #3b82f6;
+    }
+
+    .card-icon i {
+        font-size: 1.25rem;
+    }
+
+    .card-content {
+        flex: 1;
+    }
+
+    .card-content h3 {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0 0 0.5rem 0;
+        font-weight: 500;
+    }
+
+    .card-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-change {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .card-change.positive {
+        color: #10b981;
+    }
+
+    .card-change.negative {
+        color: #ef4444;
+    }
+
+    .card-change.neutral {
+        color: #a3a3a3;
+    }
+
+    /* Metrics Section */
+    .stats-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .stats-section {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+    }
+
+    .stats-section h2 {
+        font-size: 1.25rem;
+        color: #0f172a;
+        margin: 0 0 1.5rem 0;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .metric-item {
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .metric-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .metric-header h3 {
+        font-size: 1rem;
+        color: #0f172a;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .metric-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .progress-bar {
+        height: 8px;
+        background-color: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+
+    .progress {
+        height: 100%;
+        background-color: #3b82f6;
+    }
+
+    .metric-info {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .metric-info p {
+        margin: 0;
+    }
+
+    /* Timeline */
+    .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .timeline-item {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .timeline-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: white;
+    }
+
+    .timeline-icon.completed {
+        background-color: #10b981;
+    }
+
+    .timeline-icon.message {
+        background-color: #3b82f6;
+    }
+
+    .timeline-icon.payment {
+        background-color: #f59e0b;
+    }
+
+    .timeline-icon.started {
+        background-color: #8b5cf6;
+    }
+
+    .timeline-content {
+        flex: 1;
+        background-color: #f8fafc;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .timeline-date {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+    }
+
+    .timeline-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+    }
+
+    .timeline-description {
+        font-size: 0.875rem;
+        color: #475569;
+    }
+</style> 

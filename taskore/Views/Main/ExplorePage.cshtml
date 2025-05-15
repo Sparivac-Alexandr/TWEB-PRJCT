@@ -4,165 +4,112 @@
     ViewBag.Title = "Explore Projects";
 }
 
-        <body>
-    @Html.Partial("_Header")
-            
-            <div class="container">
-                <div class="projects-content">
+@Html.Partial("_Header")
+
+<div class="container">
+    <div class="projects-content">
         <h1> </h1>
 
-                    <section id="project-filters">
-                        <div class="filters-container">
-                            <div class="search-box">
-                                <input type="text" placeholder="Search projects..." class="search-input">
-                                <button class="search-button">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search">
-                                        <circle cx="11" cy="11" r="8"></circle>
-                                        <path d="m21 21-4.3-4.3"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="filter-options">
-                                <select name="category" id="category-filter" class="filter-select">
-                                    <option value="">All Categories</option>
-                                    <option value="web-development">Web Development</option>
-                                    <option value="graphic-design">Graphic Design</option>
-                                    <option value="content-writing">Content Writing</option>
-                                    <option value="digital-marketing">Digital Marketing</option>
-                                    <option value="mobile-apps">Mobile Apps</option>
-                                </select>
-                                <select name="budget" id="budget-filter" class="filter-select">
-                                    <option value="">All Budgets</option>
-                                    <option value="under-500">Under $500</option>
-                                    <option value="500-1000">$500 - $1,000</option>
-                                    <option value="1000-5000">$1,000 - $5,000</option>
-                                    <option value="over-5000">Over $5,000</option>
-                                </select>
-                                <select name="deadline" id="deadline-filter" class="filter-select">
-                                    <option value="">Any Deadline</option>
-                                    <option value="urgent">Urgent (24h)</option>
-                                    <option value="week">Within a week</option>
-                                    <option value="month">Within a month</option>
-                                    <option value="long-term">Long-term</option>
-                                </select>
-                            </div>
-                        </div>
-                    </section>
-
-                    @if (Model == null || !Model.Any())
-                    {
-                        <div class="no-projects">
-                            <h3>No projects found</h3>
-                            <p>There are currently no projects available. Check back later or <a href="@Url.Action("CreateProjectPage", "Main")">create your own project</a>.</p>
-                        </div>
-                    }
-                    else
-                    {
-                        foreach (var categoryGroup in Model)
-                        {
-                            if (categoryGroup.Value.Any())
-                            {
-                                <section id="category-@categoryGroup.Key.ToLower().Replace(" ", "-")" class="project-category">
-                                    <h2>@(string.IsNullOrEmpty(categoryGroup.Key) ? "Uncategorized" : categoryGroup.Key)</h2>
-                                    <div class="projects-grid">
-                                        @foreach (var project in categoryGroup.Value)
-                                        {
-                                            <div class="project-card">
-                                                <div class="project-header">
-                                                    <h3>@project.Title</h3>
-                                                    <span class="project-budget">@project.Budget</span>
-                                                </div>
-                                                <p class="project-description">@project.Description</p>
-                                                <div class="project-meta">
-                                                    <span class="project-deadline">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock">
-                                                            <circle cx="12" cy="12" r="10"></circle>
-                                                            <polyline points="12 6 12 12 16 14"></polyline>
-                                                        </svg>
-                                                        Deadline: @project.Deadline
-                                                    </span>
-                                                    <span class="project-date">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar">
-                                                            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
-                                                            <line x1="16" x2="16" y1="2" y2="6"></line>
-                                                            <line x1="8" x2="8" y1="2" y2="6"></line>
-                                                            <line x1="3" x2="21" y1="10" y2="10"></line>
-                                                        </svg>
-                                                        Posted: @project.CreatedAt.ToString("MMM dd, yyyy")
-                                                    </span>
-                                                </div>
-                                                <div class="project-skills">
-                                                    @foreach (var skill in project.RequiredSkills.Split(',').Select(s => s.Trim()).Take(4))
-                                                    {
-                                                        <span class="skill-tag">@skill</span>
-                                                    }
-                                                </div>
-                                                <a href="#" class="project-apply-btn">Apply Now</a>
-                                            </div>
-                                        }
-                                    </div>
-                                </section>
-                            }
-                        }
-                    }
+        <section id="project-filters">
+            <div class="filters-container">
+                <div class="search-box">
+                    <input type="text" placeholder="Search projects..." class="search-input">
+                    <button class="search-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="filter-options">
+                    <select name="category" id="category-filter" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="web-development">Web Development</option>
+                        <option value="graphic-design">Graphic Design</option>
+                        <option value="content-writing">Content Writing</option>
+                        <option value="digital-marketing">Digital Marketing</option>
+                        <option value="mobile-apps">Mobile Apps</option>
+                    </select>
+                    <select name="budget" id="budget-filter" class="filter-select">
+                        <option value="">All Budgets</option>
+                        <option value="under-500">Under $500</option>
+                        <option value="500-1000">$500 - $1,000</option>
+                        <option value="1000-5000">$1,000 - $5,000</option>
+                        <option value="over-5000">Over $5,000</option>
+                    </select>
+                    <select name="deadline" id="deadline-filter" class="filter-select">
+                        <option value="">Any Deadline</option>
+                        <option value="urgent">Urgent (24h)</option>
+                        <option value="week">Within a week</option>
+                        <option value="month">Within a month</option>
+                        <option value="long-term">Long-term</option>
+                    </select>
                 </div>
             </div>
+        </section>
 
-    @Html.Partial("_Footer")
-</body>
-
-<script>
-    // JavaScript pentru filtrarea proiectelor
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.querySelector('.search-input');
-        const categoryFilter = document.getElementById('category-filter');
-        const budgetFilter = document.getElementById('budget-filter');
-        const deadlineFilter = document.getElementById('deadline-filter');
-        
-        const projectCards = document.querySelectorAll('.project-card');
-        
-        function filterProjects() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const categoryValue = categoryFilter.value.toLowerCase();
-            const budgetValue = budgetFilter.value.toLowerCase();
-            const deadlineValue = deadlineFilter.value.toLowerCase();
-            
-            projectCards.forEach(card => {
-                const title = card.querySelector('h3').textContent.toLowerCase();
-                const description = card.querySelector('.project-description').textContent.toLowerCase();
-                const skills = Array.from(card.querySelectorAll('.skill-tag')).map(tag => tag.textContent.toLowerCase());
-                
-                const matchesSearch = searchTerm === '' || 
-                    title.includes(searchTerm) || 
-                    description.includes(searchTerm) ||
-                    skills.some(skill => skill.includes(searchTerm));
-                
-                const matchesCategory = categoryValue === '' || 
-                    card.closest('.project-category').id === `category-${categoryValue}`;
-                
-                const budget = card.querySelector('.project-budget').textContent.toLowerCase();
-                const matchesBudget = budgetValue === '' || budget.includes(budgetValue);
-                
-                const deadline = card.querySelector('.project-deadline').textContent.toLowerCase();
-                const matchesDeadline = deadlineValue === '' || deadline.includes(deadlineValue);
-                
-                if (matchesSearch && matchesCategory && matchesBudget && matchesDeadline) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-            
-            // Ascunde secțiunile de categorie care nu au proiecte vizibile
-            document.querySelectorAll('.project-category').forEach(section => {
-                const visibleCards = section.querySelectorAll('.project-card[style="display: block"]').length;
-                section.style.display = visibleCards > 0 ? 'block' : 'none';
-            });
+        @if (Model == null || !Model.Any())
+        {
+            <div class="no-projects">
+                <h3>No projects found</h3>
+                <p>There are currently no projects available. Check back later or <a href="@Url.Action("CreateProjectPage", "Main")">create your own project</a>.</p>
+            </div>
         }
-        
-        searchInput.addEventListener('input', filterProjects);
-        categoryFilter.addEventListener('change', filterProjects);
-        budgetFilter.addEventListener('change', filterProjects);
-        deadlineFilter.addEventListener('change', filterProjects);
-    });
-</script>
+        else
+        {
+            foreach (var categoryGroup in Model)
+            {
+                if (categoryGroup.Value.Any())
+                {
+                    <section id="category-@categoryGroup.Key.ToLower().Replace(" ", "-")" class="project-category">
+                        <h2>@(string.IsNullOrEmpty(categoryGroup.Key) ? "Uncategorized" : categoryGroup.Key)</h2>
+                        <div class="projects-grid">
+                            @foreach (var project in categoryGroup.Value)
+                            {
+                                <div class="project-card">
+                                    <div class="project-header">
+                                        <h3>@project.Title</h3>
+                                        <span class="project-budget">@project.Budget</span>
+                                    </div>
+                                    <p class="project-description">@project.Description</p>
+                                    <div class="project-meta">
+                                        <span class="project-deadline">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <polyline points="12 6 12 12 16 14"></polyline>
+                                            </svg>
+                                            Deadline: @project.Deadline
+                                        </span>
+                                        <span class="project-date">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar">
+                                                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                                                <line x1="16" x2="16" y1="2" y2="6"></line>
+                                                <line x1="8" x2="8" y1="2" y2="6"></line>
+                                                <line x1="3" x2="21" y1="10" y2="10"></line>
+                                            </svg>
+                                            Posted: @project.CreatedAt.ToString("MMM dd, yyyy")
+                                        </span>
+                                    </div>
+                                    <div class="project-creator">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                        <span>Posted by: <strong>@(ViewBag.UserNames != null && ViewBag.UserNames.ContainsKey(project.UserId) ? ViewBag.UserNames[project.UserId] : "Unknown User")</strong></span>
+                                    </div>
+                                    <div class="project-skills">
+                                        @foreach (var skill in project.RequiredSkills.Split(',').Select(s => s.Trim()).Take(4))
+                                        {
+                                            <span class="skill-tag">@skill</span>
+                                        }
+                                    </div>
+                                    <a href="#" class="project-apply-btn">Apply Now</a>
+                                </div>
+                            }
+                        </div>
+                    </section>
+                }
+            }
+        }
+    </div>
+</div>

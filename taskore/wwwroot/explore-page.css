@@ -63,7 +63,7 @@
 /* Project Cards */
 .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
 }
 
@@ -118,11 +118,34 @@
     color: var(--color-text-light);
 }
 
+/* Project Creator */
+.project-creator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-text-light);
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.project-creator svg {
+    color: var(--color-primary);
+}
+
+.project-creator strong {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
 .project-skills {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: 1rem;
+    margin-top: 0.5rem;
 }
 
 .skill-tag {

@@ -32,5 +32,61 @@ namespace taskoreBusinessLogic.DBModel
         [StringLength(255)]
         [Index(IsUnique = true)]
         public string Email { get; set; }
+
+        // Câmpuri adiționale pentru profilul utilizatorului
+        [Column("headline")]
+        [StringLength(255)]
+        public string Headline { get; set; }
+
+        [Column("about")]
+        public string About { get; set; }
+
+        [Column("skills")]
+        public string Skills { get; set; }
+
+        [Column("phone")]
+        [StringLength(50)]
+        public string Phone { get; set; }
+
+        [Column("location")]
+        [StringLength(255)]
+        public string Location { get; set; }
+
+        [Column("website")]
+        [StringLength(255)]
+        public string Website { get; set; }
+
+        [Column("preferred_project_types")]
+        [StringLength(255)]
+        public string PreferredProjectTypes { get; set; }
+
+        [Column("hourly_rate")]
+        [StringLength(50)]
+        public string HourlyRate { get; set; }
+
+        [Column("project_duration")]
+        [StringLength(100)]
+        public string ProjectDuration { get; set; }
+
+        [Column("communication_style")]
+        [StringLength(255)]
+        public string CommunicationStyle { get; set; }
+
+        [Column("availability_status")]
+        [StringLength(50)]
+        public string AvailabilityStatus { get; set; }
+
+        [Column("availability_hours")]
+        [StringLength(50)]
+        public string AvailabilityHours { get; set; }
+
+        [Column("rating")]
+        public double? Rating { get; set; }
+
+        [Column("rating_count")]
+        public int? RatingCount { get; set; }
+
+        [Column("completed_projects")]
+        public int? CompletedProjects { get; set; }
     }
 }

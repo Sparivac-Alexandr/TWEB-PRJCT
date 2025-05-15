@@ -1,0 +1,249 @@
+@{
+    ViewBag.Title = "Completed Projects";
+    var userId = Request.QueryString["userId"];
+    var username = ViewBag.UserName ?? "User";
+    var completedCount = ViewBag.CompletedCount ?? 23;
+    var userType = ViewBag.UserType ?? "freelancer";
+}
+
+<body>
+    @Html.Partial("_Header")
+
+    <div class="projects-container">
+        <div class="projects-header">
+            <div class="back-link">
+                <a href="@Url.Action("MyProfile", "Main")" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Profile
+                </a>
+            </div>
+            <div class="projects-title">
+                <h1>@(userType == "freelancer" ? "Completed Projects" : "Posted Projects") by @username</h1>
+            </div>
+        </div>
+
+        <div class="projects-body">
+            <div class="projects-list">
+                <!-- Example projects - in a real app, these would be loaded from a database -->
+                <div class="project-item">
+                    <div class="project-header">
+                        <div class="project-title">E-commerce Website Redesign</div>
+                        <div class="project-date">Completed on: October 15, 2023</div>
+                    </div>
+                    <div class="project-details">
+                        <div class="project-description">
+                            <p>Completely redesigned the UX/UI of an online retail store, including mobile responsiveness and checkout optimization. Increased conversion rates by 25%.</p>
+                        </div>
+                        <div class="project-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-tag"></i>
+                                <span>Web Development, UI/UX Design</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>$3,800</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>6 weeks</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-client">
+                        <div class="client-label">Client:</div>
+                        <div class="client-name">TechRetail Solutions</div>
+                    </div>
+                </div>
+
+                <div class="project-item">
+                    <div class="project-header">
+                        <div class="project-title">Fitness Tracker Mobile App</div>
+                        <div class="project-date">Completed on: August 28, 2023</div>
+                    </div>
+                    <div class="project-details">
+                        <div class="project-description">
+                            <p>Developed a cross-platform mobile application for tracking workouts, nutrition, and fitness goals. Implemented real-time progress visualization and social features.</p>
+                        </div>
+                        <div class="project-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-tag"></i>
+                                <span>Mobile Development, UI/UX Design</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>$5,500</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>8 weeks</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-client">
+                        <div class="client-label">Client:</div>
+                        <div class="client-name">HealthFit Studios</div>
+                    </div>
+                </div>
+
+                <div class="project-item">
+                    <div class="project-header">
+                        <div class="project-title">Corporate Brand Identity</div>
+                        <div class="project-date">Completed on: July 10, 2023</div>
+                    </div>
+                    <div class="project-details">
+                        <div class="project-description">
+                            <p>Created a comprehensive brand identity package including logo design, color palette, typography guidelines, and marketing materials for a financial consulting firm.</p>
+                        </div>
+                        <div class="project-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-tag"></i>
+                                <span>Graphic Design, Branding</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>$2,200</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>4 weeks</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-client">
+                        <div class="client-label">Client:</div>
+                        <div class="client-name">Apex Financial Advisors</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("_Footer")
+</body>
+
+<style>
+    /* Projects Page Styles */
+    .projects-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .projects-header {
+        margin-bottom: 2rem;
+    }
+
+    .back-link {
+        margin-bottom: 1rem;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .back-btn:hover {
+        color: #3b82f6;
+    }
+
+    .projects-title {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .projects-title h1 {
+        font-size: 2rem;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .projects-body {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .projects-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .project-item {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .project-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .project-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        align-items: flex-start;
+    }
+
+    .project-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .project-date {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .project-details {
+        margin-bottom: 1rem;
+    }
+
+    .project-description {
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .project-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #64748b;
+        background-color: #f8fafc;
+        padding: 0.35rem 0.75rem;
+        border-radius: 4px;
+    }
+
+    .project-client {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+
+    .client-label {
+        font-weight: 600;
+    }
+
+</style> 

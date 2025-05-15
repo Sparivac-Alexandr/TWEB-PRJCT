@@ -1,94 +1,300 @@
 ﻿@{
-    ViewBag.Title = "MyProfile";
+    ViewBag.Title = "My Profile";
+    var userType = Session["UserType"] != null ? Session["UserType"].ToString() : "freelancer"; // "freelancer" or "customer"
 }
 
-
-<body>
+<body data-user-type="@userType">
     @Html.Partial("_Header")
 
- 
-    <div class="container">
-        <div class="profile-card">
-            <div class="profile-header">
-                <div class="avatar">
-                    <img src="/api/placeholder/400/400" alt=" avatar ">
+    <div class="profile-container">
+        <div class="profile-main">
+            <div class="profile-sidebar">
+                <div class="profile-stats-container">
+                    <div class="profile-stat-box">
+                        <div class="stat-label">Rating</div>
+                        <a href="@Url.Action("UserReviews", "Main", new { userId = Session["UserId"] })" class="rating-box">
+                            <span class="rating-value">@(userType == "freelancer" ? "4.8" : "4.9")</span>
+                            <span class="rating-count">(40)</span>
+                            <i class="fas fa-star rating-star"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="stat-divider"></div>
+                    
+                    <div class="profile-stat-box">
+                        <div class="stat-label">@(userType == "freelancer" ? "Completed" : "Projects Posted")</div>
+                        <a href="@Url.Action("CompletedProjects", "Main", new { userId = Session["UserId"] })" class="projects-box">
+                            <span class="projects-count">@(userType == "freelancer" ? "23" : "15")</span>
+                            <i class="fas fa-check-circle projects-icon"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="profile-info">
-                    <h1>
-                        @(Session["UserFullName"] ?? "Guest User")
-                        <span class="rating-container">
-                            ★ 4.8 (324)
-                        </span>
-                    </h1>
-                    <div class="profile-tag">Student</div>
-                    <div class="profile-location">Republic of Moldova, Chisinau</div>
-                    <div class="profile-email">@(Session["UserEmail"] ?? "No email available")</div>
+                
+                <div class="sidebar-section">
+                    <h3>Contact Information</h3>
+                    <div class="sidebar-content contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>@(Session["UserEmail"] ?? "user@example.com")</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+1 234 567 8900</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>New York, USA</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-globe"></i>
+                            <span>www.myportfolio.com</span>
+                        </div>
+                    </div>
+                    <button class="edit-btn" data-section="contact"><i class="fas fa-pencil-alt"></i> Edit</button>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3>@(userType == "freelancer" ? "Availability" : "Budget Range")</h3>
+                    <div class="sidebar-content">
+                        @if (userType == "freelancer") {
+                            <div class="availability-status available">
+                                <span>Available for work</span>
+                            </div>
+                            <div class="availability-hours">
+                                <i class="far fa-clock"></i>
+                                <span>30 hrs/week</span>
+                            </div>
+                        } else {
+                            <div class="budget-range">
+                                <span class="budget-label">Typical Budget:</span>
+                                <span class="budget-value">$1,000 - $5,000</span>
+                            </div>
+                            <div class="budget-preference">
+                                <span class="budget-label">Preferred Payment:</span>
+                                <span class="budget-value">Fixed Price</span>
+                            </div>
+                        }
+                    </div>
+                    <button class="edit-btn" data-section="availability"><i class="fas fa-pencil-alt"></i> Edit</button>
                 </div>
             </div>
 
-            <div class="edit-section" id="about-section">
+            <div class="profile-content">
+                <div class="profile-name-section">
+                    <h1 class="user-name">@(Session["UserFullName"] ?? "Alex Johnson")</h1>
+                    <div class="user-headline">
+                        @if (userType == "freelancer") {
+                            <span>Web Developer & UI/UX Designer</span>
+                        } else {
+                            <span>Project Manager at TechCorp</span>
+                        }
+                    </div>
+                </div>
+                
+                <div class="content-section about-section">
+                    <div class="section-header">
                 <h2>About Me</h2>
-                <button class="edit-button" onclick="toggleEdit('about')">✎ Edit</button>
-                <p class="content-text" id="about-text">
-                    I'm a passionate web developer and UI/UX designer with over 5 years of experience creating beautiful, functional websites and applications. My approach combines clean code with intuitive design to deliver exceptional user experiences.
-                </p>
-                <textarea class="editable-content" id="about-edit" rows="4"></textarea>
-                <div class="edit-controls" style="display: none;">
-                    <button class="save-button" onclick="saveContent('about')">Save</button>
-                    <button class="cancel-button" onclick="cancelEdit('about')">Cancel</button>
+                        <button class="edit-btn" data-section="about"><i class="fas fa-pencil-alt"></i> Edit</button>
+                    </div>
+                    <div class="section-content" id="about-content">
+                        @if (userType == "freelancer") {
+                            <p>I'm a passionate web developer and UI/UX designer with over 5 years of experience. I specialize in creating responsive websites and user-friendly interfaces that deliver exceptional user experiences. My focus is on clean code, intuitive design, and meeting client needs with high-quality deliverables.</p>
+                            <p>I've worked with clients in various industries, from startups to established businesses, helping them achieve their digital goals through creative and technical solutions.</p>
+                        } else {
+                            <p>As a project manager with 7+ years of experience in the tech industry, I oversee development projects from conception to completion. I work with talented freelancers to bring innovative digital solutions to life, focusing on clear communication, realistic timelines, and quality deliverables.</p>
+                            <p>I value collaboration, transparency, and creative problem-solving in all my projects and partnerships.</p>
+                        }
                 </div>
             </div>
 
-            <div class="edit-section" id="skills-section">
-                <h2>My Skills</h2>
-                <button class="edit-button" onclick="toggleEdit('skills')">✎ Edit</button>
-                <div class="content-text" id="skills-text">
-                    <div class="skills-list">
+                <div class="content-section skills-section">
+                    <div class="section-header">
+                        <h2>@(userType == "freelancer" ? "My Skills" : "Skills I'm Looking For")</h2>
+                        <button class="edit-btn" data-section="skills"><i class="fas fa-pencil-alt"></i> Edit</button>
+                    </div>
+                    <div class="section-content" id="skills-content">
+                        <div class="skills-container">
+                            @if (userType == "freelancer") {
                         <span class="skill-tag">HTML5</span>
                         <span class="skill-tag">CSS3</span>
                         <span class="skill-tag">JavaScript</span>
-                        <span class="skill-tag">React</span>
+                                <span class="skill-tag">React.js</span>
                         <span class="skill-tag">Node.js</span>
+                                <span class="skill-tag">Figma</span>
                         <span class="skill-tag">UI/UX Design</span>
-                        <span class="skill-tag">Figma</span>
                         <span class="skill-tag">Responsive Design</span>
+                                <span class="skill-tag">API Integration</span>
+                                <span class="skill-tag">WordPress</span>
+                            } else {
+                                <span class="skill-tag">Web Development</span>
+                                <span class="skill-tag">Mobile App Development</span>
+                                <span class="skill-tag">UI/UX Design</span>
+                                <span class="skill-tag">Database Design</span>
+                                <span class="skill-tag">Cloud Integration</span>
+                                <span class="skill-tag">API Development</span>
+                                <span class="skill-tag">React Native</span>
+                                <span class="skill-tag">E-commerce</span>
+                            }
                     </div>
-                </div>
-                <textarea class="editable-content" id="skills-edit" placeholder="Enter skills separated by commas"></textarea>
-                <div class="edit-controls" style="display: none;">
-                    <button class="save-button" onclick="saveContent('skills')">Save</button>
-                    <button class="cancel-button" onclick="cancelEdit('skills')">Cancel</button>
                 </div>
             </div>
 
-            <div class="edit-section" id="education-section">
-                <h2>Education</h2>
-                <button class="edit-button" onclick="toggleEdit('education')">✎ Edit</button>
-                <div class="content-text" id="education-text">
-                    <div class="education-item">
-                        <h3>Master's Degree in Computer Science</h3>
-                        <p class="institution">New York University</p>
-                        <p class="degree">Specialization in Human-Computer Interaction</p>
-                        <p class="years">2016 - 2018</p>
+                <div class="content-section preferences-section">
+                    <div class="section-header">
+                        <h2>My Preferences</h2>
+                        <button class="edit-btn" data-section="preferences"><i class="fas fa-pencil-alt"></i> Edit</button>
                     </div>
-                    <div class="education-item">
-                        <h3>Bachelor's Degree in Software Engineering</h3>
-                        <p class="institution">Columbia University</p>
-                        <p class="degree">Minor in Graphic Design</p>
-                        <p class="years">2012 - 2016</p>
+                    <div class="section-content" id="preferences-content">
+                        <div class="preferences-container">
+                            @if (userType == "freelancer") {
+                                <div class="preference-item">
+                                    <div class="preference-label">Preferred Project Types:</div>
+                                    <div class="preference-value">Web Development, UI/UX Design, E-commerce</div>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-label">Hourly Rate:</div>
+                                    <div class="preference-value">$45 - $65 per hour</div>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-label">Project Duration:</div>
+                                    <div class="preference-value">Short to medium-term (1-6 months)</div>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-label">Communication Style:</div>
+                                    <div class="preference-value">Weekly video calls, daily messaging</div>
+                                </div>
+                            } else {
+                                <div class="preference-item">
+                                    <div class="preference-label">Project Timeline:</div>
+                                    <div class="preference-value">Medium to long-term (3-12 months)</div>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-label">Preferred Team Size:</div>
+                                    <div class="preference-value">2-5 specialists</div>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-label">Communication Frequency:</div>
+                                    <div class="preference-value">Bi-weekly meetings, weekly reports</div>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-label">Freelancer Experience:</div>
+                                    <div class="preference-value">Mid to senior level (3+ years)</div>
+                                </div>
+                            }
+                        </div>
                     </div>
-                </div>
-                <textarea class="editable-content" id="education-edit" placeholder="Enter education details"></textarea>
-                <div class="edit-controls" style="display: none;">
-                    <button class="save-button" onclick="saveContent('education')">Save</button>
-                    <button class="cancel-button" onclick="cancelEdit('education')">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
 
-
-
     @Html.Partial("_Footer")
+
+    <!-- Edit Modal -->
+    <div class="edit-modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Edit Section</h3>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Content will be dynamically added here -->
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn" id="cancel-edit">Cancel</button>
+                <button class="save-btn" id="save-edit">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/profile.js"></script>
 </body>
+
+<style>
+    .profile-stats-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .profile-stat-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    
+    .rating-box {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: inherit;
+        transition: color 0.2s ease;
+    }
+    
+    .rating-box:hover {
+        color: #3b82f6;
+    }
+    
+    .rating-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    
+    .rating-count {
+        font-size: 0.9rem;
+        margin-left: 4px;
+        color: #64748b;
+    }
+    
+    .rating-star {
+        color: #f59e0b;
+        font-size: 1.2rem;
+        margin-left: 4px;
+    }
+    
+    .projects-box {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: inherit;
+        transition: color 0.2s ease;
+    }
+    
+    .projects-box:hover {
+        color: #3b82f6;
+    }
+    
+    .projects-icon {
+        color: #22c55e;
+        font-size: 1.2rem;
+        margin-left: 4px;
+    }
+    
+    .projects-count {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    
+    .stat-divider {
+        width: 1px;
+        height: 40px;
+        background-color: #e2e8f0;
+        margin: 0 1rem;
+    }
+</style>
 

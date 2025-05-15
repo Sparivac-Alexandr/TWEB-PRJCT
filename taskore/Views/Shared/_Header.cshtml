@@ -5,35 +5,109 @@
 
 @Styles.Render("~/Content/css")
 
-<header class="header">
+<header class="main-header">
     <div class="header-container">
-        <div class="header-logo">
-            <img src="/api/placeholder/50/50" alt="Taskore Logo">
+        <div class="logo-search">
+            <div class="logo">
+                <a href="@Url.Action("Index", "Home")">
+                    <span class="logo-text">taskore</span>
+                    <span class="logo-dot">.</span>
+                </a>
+            </div>
         </div>
-        <nav class="nav-menu">
-            <a href="@Url.Action("Index", "Home")">Home</a>
-            <a href="@Url.Action("ExplorePage", "Main")">Projects</a>
-            <a href="#">Freelancers</a>
-            <a href="@Url.Action("ChatPage", "Main")">Chat's</a>
+        
+        <nav class="main-nav">
+            <a href="@Url.Action("UserStats", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "UserStats" ? "active" : "")">
+                <i class="fas fa-chart-bar"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="@Url.Action("ExplorePage", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "ExplorePage" ? "active" : "")">
+                <i class="fas fa-compass"></i>
+                <span>Projects</span>
+            </a>
+            <a href="@Url.Action("CreateProjectPage", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "CreateProjectPage" ? "active" : "")">
+                <i class="fas fa-plus-circle"></i>
+                <span>New Project</span>
+            </a>
+            <a href="@Url.Action("AllFreelancers", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "AllFreelancers" ? "active" : "")">
+                <i class="fas fa-users"></i>
+                <span>Freelancers</span>
+            </a>
+            <a href="@Url.Action("Deals", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "Deals" ? "active" : "")">
+                <i class="fas fa-handshake"></i>
+                <span>My Deals</span>
+            </a>
         </nav>
+        
         <div class="header-actions">
-            <div class="user-profile">
-                <img src="/api/placeholder/40/40" alt="" class="user-avatar">
+            <div class="user-menu">
                 @if (Session["UserFullName"] != null)
                 {
-                    <span class="user-nickname">@Session["UserFullName"]</span>
-                    <div class="dropdown">
-                        <a href="@Url.Action("MyProfile", "Main")">My Profile</a>
-                        <a href="@Url.Action("CreateProjectPage", "Main")">Create Project</a>
-                        <a href="@Url.Action("SignOut", "Auth")">Sign Out</a>
+                    <div class="user-info">
+                        <span class="user-name">@Session["UserFullName"]</span>
+                    </div>
+                    <div class="user-avatar">
+                        @{
+                            var profileImage = Session["ProfileImageUrl"] != null ? Session["ProfileImageUrl"].ToString() : "";
+                            var userFullName = Session["UserFullName"]?.ToString() ?? "";
+                            var userInitials = "U";
+                            
+                            if (!string.IsNullOrEmpty(userFullName))
+                            {
+                                var nameParts = userFullName.Split(' ');
+                                userInitials = "";
+                                
+                                if (nameParts.Length > 0 && !string.IsNullOrEmpty(nameParts[0]) && nameParts[0].Length > 0)
+                                {
+                                    userInitials += nameParts[0][0];
+                                }
+                                
+                                if (nameParts.Length > 1 && !string.IsNullOrEmpty(nameParts[1]) && nameParts[1].Length > 0)
+                                {
+                                    userInitials += nameParts[1][0];
+                                }
+                                
+                                if (string.IsNullOrEmpty(userInitials))
+                                {
+                                    userInitials = "U";
+                                }
+                            }
+                        }
+                        @if (!string.IsNullOrEmpty(profileImage))
+                        {
+                            <img src="@profileImage" alt="Profile">
+                        }
+                        else
+                        {
+                            <div class="avatar-initials">@userInitials</div>
+                        }
+                    </div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-header">
+                            <span>@Session["UserFullName"]</span>
+                            <span class="user-email">@(Session["UserEmail"] ?? "user@example.com")</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="@Url.Action("MyProfile", "Main")" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            <span>My Profile</span>
+                        </a>
+                        <a href="@Url.Action("UserStats", "Main")" class="dropdown-item">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>My Statistics</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="@Url.Action("SignOut", "Auth")" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Sign Out</span>
+                        </a>
                     </div>
                 }
                 else
                 {
-                    <span class="user-nickname">Guest</span>
-                    <div class="dropdown">
-                        <a href="@Url.Action("SignIn", "Auth")">Sign In</a>
-                        <a href="@Url.Action("SignUp", "Auth")">Sign Up</a>
+                    <div class="auth-buttons">
+                        <a href="@Url.Action("SignIn", "Auth")" class="btn-sign-in">Sign In</a>
+                        <a href="@Url.Action("SignUp", "Auth")" class="btn-sign-up">Sign Up</a>
                     </div>
                 }
             </div>
@@ -42,55 +116,224 @@
 </header>
 
 <style>
-    .dropdown {
-        display: none;
-        position: absolute;
-        background-color: #fff;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
-        border-radius: 5px;
-        padding: 10px 0;
-        margin-top: 5px;
+    /* Header Styles */
+    .main-header {
+        background-color: #ffffff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        position: sticky;
+        top: 0;
+        z-index: 100;
     }
-    
-    .dropdown a {
-        color: black;
-        padding: 12px 16px;
+
+    .header-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* Logo */
+    .logo-search {
+        display: flex;
+        align-items: center;
+    }
+
+    .logo a {
+        display: flex;
+        align-items: center;
         text-decoration: none;
-        display: block;
-        transition: background-color 0.3s;
     }
-    
-    .dropdown a:hover {
-        background-color: #f1f1f1;
+
+    .logo-text {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #333;
     }
-    
-    .user-profile:hover .dropdown {
-        display: block;
+
+    .logo-dot {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #3b82f6;
     }
-    
-    .user-profile {
+
+    /* Navigation */
+    .main-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 4px;
         position: relative;
+        transition: all 0.2s ease;
+    }
+
+    .nav-link i {
+        font-size: 1.1rem;
+    }
+
+    .nav-link:hover, .nav-link.active {
+        color: #3b82f6;
+        background-color: #f1f5f9;
+    }
+
+    /* Header Actions */
+    .header-actions {
+        display: flex;
+        align-items: center;
+    }
+
+    /* User Menu */
+    .user-menu {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
         cursor: pointer;
     }
-</style>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var userProfile = document.querySelector('.user-profile');
-        
-        userProfile.addEventListener('click', function(e) {
-            e.stopPropagation();
-            var dropdown = this.querySelector('.dropdown');
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        });
-        
-        document.addEventListener('click', function() {
-            var dropdown = document.querySelector('.dropdown');
-            if (dropdown) {
-                dropdown.style.display = 'none';
-            }
-        });
-    });
-</script>
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #0f172a;
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #f1f5f9;
+        border: 2px solid #e2e8f0;
+    }
+
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-initials {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #3b82f6;
+        background-color: #f1f5f9;
+    }
+
+    /* Dropdown Menu */
+    .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 0.75rem);
+        right: 0;
+        background-color: white;
+        border-radius: 8px;
+        width: 220px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 101;
+    }
+    
+    /* Show dropdown when the parent has the class */
+    .user-menu.show-dropdown .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .dropdown-header {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-email {
+        margin-top: 0.25rem;
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background-color: #e2e8f0;
+        margin: 0.25rem 0;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: #0f172a;
+        text-decoration: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .dropdown-item i {
+        width: 16px;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f1f5f9;
+    }
+
+    /* Auth Buttons */
+    .auth-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-sign-in, .btn-sign-up {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-sign-in {
+        color: #3b82f6;
+        background-color: transparent;
+        border: 1px solid #3b82f6;
+    }
+
+    .btn-sign-up {
+        color: white;
+        background-color: #3b82f6;
+        border: 1px solid #3b82f6;
+    }
+
+    .btn-sign-in:hover {
+        background-color: #f1f5f9;
+    }
+
+    .btn-sign-up:hover {
+        background-color: #2563eb;
+    }
+</style>

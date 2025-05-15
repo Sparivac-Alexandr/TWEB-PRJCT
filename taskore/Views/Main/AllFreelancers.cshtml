@@ -1,0 +1,312 @@
+@model IEnumerable<taskoreBusinessLogic.DBModel.UDBModel>
+
+@{
+    ViewBag.Title = "Freelancers";
+}
+
+@Html.Partial("_Header")
+
+<div class="freelancers-container">
+    
+    <div class="filters-container">
+        <div class="search-box">
+            <input type="text" id="freelancer-search" placeholder="Search by name or email..." class="search-input">
+            <button class="search-button">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="freelancers-grid">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="no-freelancers">
+                <h3>No users found</h3>
+                <p>There are no users available in the database.</p>
+            </div>
+        }
+        else
+        {
+            foreach (var user in Model)
+            {
+                <div class="freelancer-card" data-name="@user.FirstName.ToLower() @user.LastName.ToLower()" data-email="@user.Email.ToLower()">
+                    <div class="freelancer-header">
+                        <div class="freelancer-avatar">
+                            @{
+                                string initials = "";
+                                if (!string.IsNullOrEmpty(user.FirstName) && user.FirstName.Length > 0) {
+                                    initials += user.FirstName[0];
+                                }
+                                if (!string.IsNullOrEmpty(user.LastName) && user.LastName.Length > 0) {
+                                    initials += user.LastName[0];
+                                }
+                            }
+                            <div class="avatar-initials">@initials</div>
+                        </div>
+                        <div class="freelancer-details">
+                            <h3 class="freelancer-name">@user.FirstName @user.LastName</h3>
+                            <div class="freelancer-email">@user.Email</div>
+                        </div>
+                    </div>
+                    
+                    <div class="freelancer-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-id-badge"></i>
+                            <span>ID: @user.Id</span>
+                        </div>
+                    </div>
+                    
+                    <div class="freelancer-actions">
+                        <a href="@Url.Action("UserProfile", "Main", new { userId = user.Id })" class="view-profile-btn">View Profile</a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@Html.Partial("_Footer")
+
+<style>
+    /* Freelancers Page Styles */
+    .freelancers-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .freelancers-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .freelancers-header h1 {
+        font-size: 2.5rem;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+        color: #64748b;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    /* Filters */
+    .filters-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+    }
+
+    .search-box {
+        display: flex;
+        width: 100%;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px 0 0 4px;
+        font-size: 1rem;
+        outline: none;
+    }
+
+    .search-button {
+        background-color: #3b82f6;
+        color: white;
+        padding: 0.75rem 1rem;
+        border: none;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .search-button:hover {
+        background-color: #2563eb;
+    }
+
+    /* Freelancers Grid */
+    .freelancers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Freelancer Card */
+    .freelancer-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .freelancer-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .freelancer-header {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .freelancer-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #f1f5f9;
+        border: 2px solid #e2e8f0;
+        flex-shrink: 0;
+    }
+
+    .avatar-initials {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.25rem;
+        color: #3b82f6;
+        background-color: #f1f5f9;
+    }
+
+    .freelancer-details {
+        flex: 1;
+    }
+
+    .freelancer-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .freelancer-email {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .freelancer-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    .freelancer-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .view-profile-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 500;
+        text-decoration: none;
+        font-size: 0.9rem;
+        width: 100%;
+        text-align: center;
+        transition: all 0.2s ease;
+        background-color: #3b82f6;
+        color: white;
+        border: 1px solid #3b82f6;
+    }
+
+    .view-profile-btn:hover {
+        background-color: #2563eb;
+    }
+
+    .no-freelancers {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .no-freelancers h3 {
+        font-size: 1.5rem;
+        color: #0f172a;
+        margin-bottom: 1rem;
+    }
+
+    .no-freelancers p {
+        color: #64748b;
+        margin: 0;
+    }
+   
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('freelancer-search');
+        const freelancerCards = document.querySelectorAll('.freelancer-card');
+        
+        // Function to filter freelancers
+        function filterFreelancers() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            // First, hide all cards
+            freelancerCards.forEach(card => {
+                card.style.display = 'none';
+            });
+            
+            // Filter cards
+            const filteredCards = Array.from(freelancerCards).filter(card => {
+                const name = card.dataset.name;
+                const email = card.dataset.email;
+                
+                // Check search term
+                return searchTerm === '' || 
+                       name.includes(searchTerm) || 
+                       email.includes(searchTerm);
+            });
+            
+            // Show filtered cards
+            filteredCards.forEach(card => {
+                card.style.display = 'flex';
+            });
+            
+            // Show message if no results
+            if (filteredCards.length === 0) {
+                const noResultsEl = document.createElement('div');
+                noResultsEl.className = 'no-freelancers';
+                noResultsEl.innerHTML = `
+                    <h3>No users found</h3>
+                    <p>No users match the search criteria.</p>
+                `;
+                
+                const grid = document.querySelector('.freelancers-grid');
+                grid.innerHTML = '';
+                grid.appendChild(noResultsEl);
+            }
+        }
+        
+        // Add event listeners
+        searchInput.addEventListener('input', filterFreelancers);
+    });
+</script> 

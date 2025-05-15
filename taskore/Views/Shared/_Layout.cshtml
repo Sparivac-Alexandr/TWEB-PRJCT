@@ -1,15 +1,74 @@
 ﻿@using System.Web.Optimization
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
-
+    
+    <!-- Render CSS bundles or individual CSS files -->
+    @Styles.Render("~/Content/css")
+    <link rel="stylesheet" href="~/explore-page.css" />
+    
+    <!-- Font Awesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- jQuery for script compatibility -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+    @RenderBody() <!-- Main content of each view -->
+    
+    <!-- Render JavaScript bundles -->
     @Scripts.Render("~/bundles/sitejs")
-    @RenderBody() <!-- Aici se va încărca conținutul fiecărui View -->
-
+    
+    <!-- Header dropdown functionality -->
+    <script src="~/wwwroot/js/header.js"></script>
+    
+    <!-- Inline fallback for dropdown functionality -->
+    <script>
+        // Fallback dropdown functionality in case external script fails to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a second to ensure we don't override the external script
+            setTimeout(function() {
+                // Check if dropdown already has click handlers from external script
+                const userMenu = document.querySelector('.user-menu');
+                if (userMenu) {
+                    // Toggle dropdown on click
+                    userMenu.addEventListener('click', function(e) {
+                        // Don't handle clicks on dropdown items
+                        if (e.target.closest('.dropdown-item')) {
+                            return;
+                        }
+                        
+                        // Stop propagation
+                        e.stopPropagation();
+                        
+                        // Toggle class
+                        userMenu.classList.toggle('show-dropdown');
+                    });
+                    
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', function(e) {
+                        if (!userMenu.contains(e.target)) {
+                            userMenu.classList.remove('show-dropdown');
+                        }
+                    });
+                    
+                    console.log('Fallback dropdown initialized');
+                }
+            }, 1000);
+        });
+    </script>
+    
+    <!-- Render scripts section if defined in the view -->
+    @RenderSection("Scripts", required: false)
+    
+    <!-- Debug script to verify that JavaScript is loading -->
+    <script>
+        console.log('Layout loaded successfully');
+    </script>
 </body>
 </html>
 

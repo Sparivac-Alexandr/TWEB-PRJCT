@@ -24,7 +24,8 @@ namespace taskore.App_Start
 
            //Script Bundle
             bundles.Add(new ScriptBundle("~/bundles/sitejs").Include(
-            "~/wwwroot/taskore.js"));
+            "~/wwwroot/taskore.js",
+            "~/wwwroot/js/header.js"));
 
 
         }

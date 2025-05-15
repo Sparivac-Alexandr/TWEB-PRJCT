@@ -10,24 +10,44 @@
         <a href="@Url.Action("Terms", "Main")">Terms of Service</a>
         <a href="@Url.Action("Privacy", "Main")">Privacy Policy</a>
     </div>
-    <div class="footer-actions">
-        <button class="footer-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" x2="22" y1="12" y2="12"></line>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </svg>
-            English
-        </button>
-        <button class="footer-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon">
-                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
-            </svg>
-            Dark Mode
-        </button>
-    </div>
     <div class="footer-copyright">
         <p>&copy; 2025 taskore. All rights reserved.</p>
     </div>
 </footer>
+
+<style>
+    /* Footer styles */
+    footer {
+        background-color: #f8fafc;
+        padding: 2rem 0;
+        margin-top: 3rem;
+        border-top: 1px solid #e2e8f0;
+        text-align: center;
+    }
+
+    .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        padding: 0 1rem;
+    }
+
+    .footer-links a {
+        color: #64748b;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+        color: #3b82f6;
+    }
+
+    .footer-copyright {
+        color: #94a3b8;
+        font-size: 0.85rem;
+    }
+</style>
 

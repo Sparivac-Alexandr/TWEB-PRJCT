@@ -41,7 +41,8 @@ namespace taskoreDomain.Enteties.User
 
         public URole Level { get; set; }
 
-
+        [StringLength(255)]
+        public string ProfileImageUrl { get; set; }
 
     }
 }
