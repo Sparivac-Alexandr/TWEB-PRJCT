@@ -158,6 +158,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AuthController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\DbUpdateController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MainController.cs" />
@@ -203,6 +204,7 @@
     <Content Include="Views\Main\AllFreelancers.cshtml" />
     <Content Include="Views\Main\UserProfile.cshtml" />
     <Content Include="Views\Main\Deals.cshtml" />
+    <Content Include="Views\Auth\View.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -212,16 +214,21 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />
+    <Folder Include="Views\Base\" />
     <Folder Include="wwwroot\images\avatars\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\taskoreBusinessLogic\taskore.BusinessLogic.csproj">
       <Project>{f1a3c873-3905-4f02-856b-1be46f084f7b}</Project>
-      <Name>taskore.BusinessLogic</Name>
+      <n>taskore.BusinessLogic</n>
     </ProjectReference>
     <ProjectReference Include="..\taskoreDomain\taskore.Domain.csproj">
       <Project>{c0b841cf-477f-4966-ab65-3782a0b9c487}</Project>
-      <Name>taskore.Domain</Name>
+      <n>taskore.Domain</n>
+    </ProjectReference>
+    <ProjectReference Include="..\taskoreHelpers\taskore.Helpers.csproj">
+      <Project>{a9876543-210b-4bcd-9876-543210bcda98}</Project>
+      <n>taskore.Helpers</n>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

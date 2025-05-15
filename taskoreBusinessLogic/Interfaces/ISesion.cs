@@ -12,6 +12,8 @@ namespace taskoreBusinessLogic.Interfaces
       object UserLogin(UserLoginSession data);
       
       bool CheckEmailExists(string email);
+      
+      LoginResult GetUserByCookie(string cookieValue);
     }
 
 }

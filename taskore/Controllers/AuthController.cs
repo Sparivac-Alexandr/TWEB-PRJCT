@@ -8,6 +8,7 @@ using taskore.Models.Auth;
 using taskoreBusinessLogic;
 using taskoreBusinessLogic.Interfaces;
 using taskoreDomain.Enteties.User;
+using taskoreHelpers;
 
 namespace taskore.Controllers
 {
@@ -47,6 +48,13 @@ namespace taskore.Controllers
                     Session["UserFullName"] = $"{userLogin.FirstName} {userLogin.LastName}";
                     Session["UserEmail"] = userLogin.Email;
                     
+                    // Creează și setează cookie-ul pentru autentificare persistentă
+                    string encryptedEmail = taskoreHelpers.CoockieGenerator.Create(userLogin.Email);
+                    HttpCookie authCookie = new HttpCookie("X-KEY", encryptedEmail);
+                    authCookie.Expires = DateTime.Now.AddDays(30); // Cookie valid for 30 days
+                    authCookie.HttpOnly = true; // Makes the cookie accessible only by the web server
+                    Response.Cookies.Add(authCookie);
+                    
                     // Redirect către pagina MyProfile
                     return RedirectToAction("MyProfile", "Main");
                 }
@@ -81,6 +89,16 @@ namespace taskore.Controllers
         {
             // Curățăm datele din sesiune
             Session.Clear();
+            
+            // Șterge cookie-ul de autentificare
+            if (Request.Cookies["X-KEY"] != null)
+            {
+                var cookie = new HttpCookie("X-KEY")
+                {
+                    Expires = DateTime.Now.AddDays(-1)
+                };
+                Response.Cookies.Add(cookie);
+            }
             
             // Redirecționăm către pagina de autentificare
             TempData["SuccessMessage"] = "You have been successfully signed out.";
@@ -134,8 +152,38 @@ namespace taskore.Controllers
 
                 if (isRegistered)
                 {
-                    TempData["SuccessMessage"] = "Account created successfully! Please sign in.";
-                    return RedirectToAction("SignIn");
+                    // Auto login the user after registration
+                    UserLoginSession loginData = new UserLoginSession
+                    {
+                        Email = register.Email,
+                        Password = register.Password,
+                        LoginIp = Request.UserHostAddress,
+                        LoginDataTime = DateTime.Now
+                    };
+
+                    LoginResult userLogin = (LoginResult)_session.UserLogin(loginData);
+                    if (userLogin.Status)
+                    {
+                        // Store user info in session
+                        Session["UserId"] = userLogin.UserId;
+                        Session["UserFullName"] = $"{userLogin.FirstName} {userLogin.LastName}";
+                        Session["UserEmail"] = userLogin.Email;
+                        
+                        // Create and set authentication cookie
+                        string encryptedEmail = taskoreHelpers.CoockieGenerator.Create(userLogin.Email);
+                        HttpCookie authCookie = new HttpCookie("X-KEY", encryptedEmail);
+                        authCookie.Expires = DateTime.Now.AddDays(30); // Cookie valid for 30 days
+                        authCookie.HttpOnly = true;
+                        Response.Cookies.Add(authCookie);
+                        
+                        return RedirectToAction("MyProfile", "Main");
+                    }
+                    else
+                    {
+                        // If auto-login fails, still consider registration successful
+                        TempData["SuccessMessage"] = "Account created successfully! Please sign in.";
+                        return RedirectToAction("SignIn");
+                    }
                 }
                 else
                 {

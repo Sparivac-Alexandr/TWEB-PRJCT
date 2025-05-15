@@ -8,6 +8,7 @@ using taskoreBusinessLogic.DBModel.Seed;
 using taskoreBusinessLogic.Interfaces;
 using taskoreDomain.Enteties.User;
 using System.Diagnostics;
+using taskoreHelpers;
 
 namespace taskoreBusinessLogic
 {
@@ -35,6 +36,52 @@ namespace taskoreBusinessLogic
             {
                 Debug.WriteLine("ERROR checking email existence: " + ex.Message);
                 return false; // Assume email doesn't exist in case of error
+            }
+        }
+        
+        public LoginResult GetUserByCookie(string cookieValue)
+        {
+            try
+            {
+                Debug.WriteLine("Validating cookie: " + cookieValue);
+                
+                // Decrypt the cookie value to get the user identifier (email or id)
+                string decryptedValue = CoockieGenerator.Validate(cookieValue);
+                
+                if (string.IsNullOrEmpty(decryptedValue))
+                {
+                    Debug.WriteLine("Cookie validation failed - invalid or empty value");
+                    return null;
+                }
+                
+                // The decrypted value is expected to be the user's email
+                using (var context = new UserContext())
+                {
+                    var user = context.Users.FirstOrDefault(u => u.Email.ToLower() == decryptedValue.ToLower());
+                    
+                    if (user != null)
+                    {
+                        Debug.WriteLine("Cookie validation successful for user: " + decryptedValue);
+                        return new LoginResult
+                        {
+                            Status = true,
+                            UserId = user.Id,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Email = user.Email
+                        };
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Cookie validation failed - user not found: " + decryptedValue);
+                        return null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("ERROR during cookie validation: " + ex.Message);
+                return null;
             }
         }
     }
