@@ -3,7 +3,16 @@
     var userType = "freelancer"; // Default user type, can be enhanced with database info
     
     // Pregătim skills-urile pentru afișare
-    var skillsList = ViewBag.Skills != null ? ViewBag.Skills.Split(',').ToList() : new List<string>();
+    List<string> skillsList;
+    if (ViewBag.Skills != null)
+    {
+        string[] skillsArray = ViewBag.Skills.Split(',');
+        skillsList = new List<string>(skillsArray);
+    }
+    else
+    {
+        skillsList = new List<string>();
+    }
 }
 
 <body>
@@ -16,7 +25,7 @@
                     <div class="profile-stat-box">
                         <div class="stat-label">Rating</div>
                         <a href="@Url.Action("UserReviews", "Main", new { userId = ViewBag.UserId })" class="rating-box">
-                            <span class="rating-value">@ViewBag.Rating</span>
+                            <span class="rating-value">@(ViewBag.Rating != null ? ((double)ViewBag.Rating).ToString("0.#") : "0")</span>
                             <span class="rating-count">(@ViewBag.RatingCount)</span>
                             <i class="fas fa-star rating-star"></i>
                         </a>

@@ -19,6 +19,7 @@ namespace taskore.Controllers
         private readonly IAuth _authService;
         private readonly ISesion _sessionService;
         private readonly INews _newsService;
+        private readonly IReview _reviewService;
         
         public MainController()
         {
@@ -27,6 +28,7 @@ namespace taskore.Controllers
             _authService = bl.GetAuthBL();
             _sessionService = bl.GetSesionBL();
             _newsService = bl.GetNewsBL();
+            _reviewService = bl.GetReviewBL();
         }
         
         // GET: Main
@@ -339,27 +341,205 @@ namespace taskore.Controllers
                 return RedirectToAction("SignIn", "Auth");
             }
 
-            // In a real application, you would fetch the user data and reviews from a database
-            // Here we're just passing the user ID from the query string
+            int targetUserId;
             if (string.IsNullOrEmpty(userId))
             {
-                userId = Session["UserId"].ToString();
+                targetUserId = (int)Session["UserId"];
+            }
+            else if (!int.TryParse(userId, out targetUserId))
+            {
+                return RedirectToAction("AllFreelancers");
             }
 
-            // Example: Get user details from database based on userId
-            // var user = db.Users.Find(userId);
-            // ViewBag.UserName = user.FullName;
-            // ViewBag.UserRating = user.Rating;
-            // ViewBag.ReviewCount = user.Reviews.Count;
-            // ViewBag.UserType = user.UserType;
+            // Get user details from database
+            UDBModel targetUser = null;
+            using (var context = new UserContext())
+            {
+                targetUser = context.Users.FirstOrDefault(u => u.Id == targetUserId);
+                if (targetUser == null)
+                {
+                    return RedirectToAction("AllFreelancers");
+                }
+            }
 
-            // For demo purposes, we'll use default values
-            ViewBag.UserName = Session["UserFullName"] ?? "User";
-            ViewBag.UserRating = 4.8;
-            ViewBag.ReviewCount = 40;
-            ViewBag.UserType = Session["UserType"] ?? "freelancer";
+            // Get reviews for this user
+            var reviews = _reviewService.GetReviewsForUser(targetUserId);
 
-            return View();
+            // Get sender names for each review
+            Dictionary<int, string> userNames = new Dictionary<int, string>();
+            foreach (var review in reviews)
+            {
+                if (!userNames.ContainsKey(review.SenderId))
+                {
+                    string senderName = FetchUserName(review.SenderId);
+                    userNames[review.SenderId] = senderName;
+                }
+            }
+
+            // Pass data to view
+            ViewBag.UserName = $"{targetUser.FirstName} {targetUser.LastName}";
+            ViewBag.UserRating = targetUser.Rating ?? 0;
+            ViewBag.ReviewCount = targetUser.RatingCount ?? 0;
+            ViewBag.UserType = "freelancer"; // You may want to add this to your user model
+            ViewBag.UserId = targetUser.Id;
+            ViewBag.CurrentUserId = Session["UserId"];
+            ViewBag.UserNames = userNames;
+
+            return View(reviews);
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateReview(ReviewDBModel model)
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "You must be logged in to leave a review." });
+                }
+                
+                TempData["ErrorMessage"] = "You must be logged in to leave a review.";
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            // Set the sender ID to the current user
+            model.SenderId = (int)Session["UserId"];
+            
+            // Ensure created date is set
+            model.CreatedAt = DateTime.Now;
+            
+            // Validate that user isn't reviewing themselves
+            if (model.SenderId == model.ReceiverId)
+            {
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "You cannot review yourself." });
+                }
+                
+                TempData["ErrorMessage"] = "You cannot review yourself.";
+                return RedirectToAction("UserReviews", new { userId = model.ReceiverId });
+            }
+            
+            try
+            {
+                bool isCreated = _reviewService.CreateReview(model);
+                
+                if (isCreated)
+                {
+                    if (Request.IsAjaxRequest())
+                    {
+                        return Json(new { success = true, message = "Review created successfully." });
+                    }
+                    
+                    TempData["SuccessMessage"] = "Review submitted successfully!";
+                }
+                else
+                {
+                    if (Request.IsAjaxRequest())
+                    {
+                        return Json(new { success = false, message = "Failed to create review. Please try again." });
+                    }
+                    
+                    TempData["ErrorMessage"] = "Failed to create review. Please try again.";
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error creating review: " + ex.Message);
+                
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "An error occurred while creating your review." });
+                }
+                
+                TempData["ErrorMessage"] = "An error occurred while creating your review.";
+            }
+            
+            return RedirectToAction("UserReviews", new { userId = model.ReceiverId });
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteReview(int id, int userId)
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "You must be logged in to delete a review." });
+                }
+                
+                TempData["ErrorMessage"] = "You must be logged in to delete a review.";
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            int currentUserId = (int)Session["UserId"];
+            
+            try
+            {
+                // Get the review to check if this user is allowed to delete it
+                var review = _reviewService.GetReviewById(id);
+                
+                if (review == null)
+                {
+                    if (Request.IsAjaxRequest())
+                    {
+                        return Json(new { success = false, message = "Review not found." });
+                    }
+                    
+                    TempData["ErrorMessage"] = "Review not found.";
+                    return RedirectToAction("UserReviews", new { userId = userId });
+                }
+                
+                // Only the review author or the profile owner can delete a review
+                if (review.SenderId != currentUserId && review.ReceiverId != currentUserId)
+                {
+                    if (Request.IsAjaxRequest())
+                    {
+                        return Json(new { success = false, message = "You are not authorized to delete this review." });
+                    }
+                    
+                    TempData["ErrorMessage"] = "You are not authorized to delete this review.";
+                    return RedirectToAction("UserReviews", new { userId = userId });
+                }
+                
+                bool isDeleted = _reviewService.DeleteReview(id);
+                
+                if (isDeleted)
+                {
+                    if (Request.IsAjaxRequest())
+                    {
+                        return Json(new { success = true, message = "Review deleted successfully." });
+                    }
+                    
+                    TempData["SuccessMessage"] = "Review deleted successfully!";
+                }
+                else
+                {
+                    if (Request.IsAjaxRequest())
+                    {
+                        return Json(new { success = false, message = "Failed to delete review. Please try again." });
+                    }
+                    
+                    TempData["ErrorMessage"] = "Failed to delete review. Please try again.";
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error deleting review: " + ex.Message);
+                
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "An error occurred while deleting the review." });
+                }
+                
+                TempData["ErrorMessage"] = "An error occurred while deleting the review.";
+            }
+            
+            return RedirectToAction("UserReviews", new { userId = userId });
         }
         
         public ActionResult CompletedProjects(string userId)
@@ -387,7 +567,7 @@ namespace taskore.Controllers
                 return RedirectToAction("SignIn", "Auth");
             }
 
-            // In a real application, you would fetch user data from the database
+            // If no userId provided, show the user's own profile
             if (string.IsNullOrEmpty(userId))
             {
                 return RedirectToAction("MyProfile");
@@ -401,6 +581,26 @@ namespace taskore.Controllers
                 {
                     return RedirectToAction("AllFreelancers");
                 }
+                
+                // Pass all user data to the view via ViewBag
+                ViewBag.UserId = user.Id;
+                ViewBag.UserFullName = $"{user.FirstName} {user.LastName}";
+                ViewBag.UserEmail = user.Email;
+                ViewBag.Phone = user.Phone ?? "";
+                ViewBag.Location = user.Location ?? "";
+                ViewBag.Website = user.Website ?? "";
+                ViewBag.Headline = user.Headline ?? "";
+                ViewBag.About = user.About ?? "";
+                ViewBag.Skills = user.Skills ?? "";
+                ViewBag.PreferredProjectTypes = user.PreferredProjectTypes ?? "";
+                ViewBag.HourlyRate = user.HourlyRate ?? "";
+                ViewBag.ProjectDuration = user.ProjectDuration ?? "";
+                ViewBag.CommunicationStyle = user.CommunicationStyle ?? "";
+                ViewBag.AvailabilityStatus = user.AvailabilityStatus ?? "Available";
+                ViewBag.AvailabilityHours = user.AvailabilityHours ?? "";
+                ViewBag.Rating = user.Rating ?? 0;
+                ViewBag.RatingCount = user.RatingCount ?? 0;
+                ViewBag.CompletedProjects = user.CompletedProjects ?? 0;
             }
             
             return View();

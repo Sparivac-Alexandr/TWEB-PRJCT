@@ -30,5 +30,10 @@ namespace taskoreBusinessLogic
         {
             return new NewsBL();
         }
+        
+        public IReview GetReviewBL()
+        {
+            return new ReviewBL();
+        }
     }
 }

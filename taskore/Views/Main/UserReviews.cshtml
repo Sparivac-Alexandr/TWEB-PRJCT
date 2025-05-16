@@ -1,545 +1,825 @@
+@model List<taskoreBusinessLogic.DBModel.ReviewDBModel>
+
 @{
-    ViewBag.Title = "User Reviews";
-    var userId = Request.QueryString["userId"];
-    var username = ViewBag.UserName ?? "User";
-    var userRating = ViewBag.UserRating ?? 4.8;
-    var reviewCount = ViewBag.ReviewCount ?? 40;
-    var userType = ViewBag.UserType ?? "freelancer";
+    ViewBag.Title = ViewBag.UserName + " - Reviews";
+    var userRating = ViewBag.UserRating ?? 0;
+    var reviewCount = ViewBag.ReviewCount ?? 0;
+    var userNames = ViewBag.UserNames as Dictionary<int, string>;
+    var currentUserId = ViewBag.CurrentUserId != null ? (int)ViewBag.CurrentUserId : 0;
+    var userId = ViewBag.UserId;
+    var isOwnProfile = currentUserId == userId;
 }
 
 <body>
     @Html.Partial("_Header")
 
     <div class="reviews-container">
-        <div class="reviews-header">
-            <div class="back-link">
-                <a href="@Url.Action("MyProfile", "Main")" class="back-btn">
-                    <i class="fas fa-arrow-left"></i> Back to Profile
-                </a>
-            </div>
-            <div class="reviews-title">
-                <h1>Reviews for @username</h1>
-                <div class="rating-summary">
-                    <div class="rating-value">@userRating</div>
-                    <div class="rating-stars">
+        <div class="profile-header">
+            <div class="user-info">
+                <h1>Reviews for @ViewBag.UserName</h1>
+                <div class="rating-container">
+                    <div class="rating-value">@userRating.ToString("0.#")</div>
+                    <div class="stars">
                         @for (int i = 1; i <= 5; i++)
                         {
-                            if (i <= Math.Floor(Convert.ToDouble(userRating)))
-                            {
-                                <i class="fas fa-star"></i>
-                            }
-                            else if (i - 0.5 <= Convert.ToDouble(userRating))
-                            {
-                                <i class="fas fa-star-half-alt"></i>
-                            }
-                            else
-                            {
-                                <i class="far fa-star"></i>
-                            }
+                            <i class="@(i <= Math.Round(userRating) ? "fas fa-star" : "far fa-star")"></i>
                         }
                     </div>
-                    <div class="rating-count">@reviewCount reviews</div>
+                    <div class="review-count">@reviewCount reviews</div>
                 </div>
+            </div>
+            
+            <div class="back-to-profile">
+                <a href="@Url.Action("UserProfile", "Main", new { userId = userId })">
+                    <i class="fas fa-user"></i> View Profile
+                </a>
             </div>
         </div>
-
-        <div class="reviews-body">
-            <div class="reviews-list">
-                <!-- Example reviews - in a real app, these would be loaded from a database -->
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <div class="reviewer-avatar">
-                                <div class="avatar-initials">JD</div>
-                            </div>
-                            <div class="reviewer-details">
-                                <div class="reviewer-name">John Doe</div>
-                                <div class="review-date">October 15, 2023</div>
-                            </div>
-                        </div>
-                        <div class="review-rating">
-                            <div class="rating-stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div class="rating-value">5.0</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <p>Exceptional work! Delivered the project ahead of schedule and exceeded all expectations. Communication was clear and prompt throughout the project. Would definitely hire again for future projects.</p>
-                    </div>
-                    <div class="review-project">
-                        <span class="project-label">Project:</span>
-                        <span class="project-title">E-commerce Website Redesign</span>
-                    </div>
+        
+        <!-- Always visible review form -->
+        
+        
+      
+        
+        <div class="reviews-list">
+            <h2>@reviewCount Reviews</h2>
+            
+            @if (Model.Count == 0)
+            {
+                <div class="empty-reviews">
+                    <i class="far fa-comment-alt"></i>
+                    <p>No reviews yet.</p>
                 </div>
+            }
+            else
+            {
+                foreach (var review in Model)
+                {
+                    var reviewerName = userNames.ContainsKey(review.SenderId) ? userNames[review.SenderId] : "Unknown User";
+                    var canDelete = currentUserId == review.SenderId || currentUserId == review.ReceiverId;
+                    
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <a href="@Url.Action("UserProfile", "Main", new { userId = review.SenderId })">
+                                    <div class="reviewer-name">@reviewerName</div>
+                                </a>
+                                
+                                @if (review.Rating.HasValue)
+                                {
+                                    <div class="review-rating">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="@(i <= review.Rating.Value ? "fas fa-star" : "far fa-star")"></i>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            
+                            <div class="review-date">
+                                @review.CreatedAt.ToString("MMM dd, yyyy")
+                            </div>
+                        </div>
+                        
+                        <div class="review-content">
+                            @review.Content
+                        </div>
+                        
+                        @if (canDelete)
+                        {
+                            <div class="review-actions">
+                                @using (Html.BeginForm("DeleteReview", "Main", FormMethod.Post, new { @class = "delete-review-form" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@review.Id" />
+                                    <input type="hidden" name="userId" value="@userId" />
+                                    <button type="submit" class="delete-review" onclick="return confirm('Are you sure you want to delete this review?');">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
 
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <div class="reviewer-avatar">
-                                <div class="avatar-initials">AS</div>
-                            </div>
-                            <div class="reviewer-details">
-                                <div class="reviewer-name">Alice Smith</div>
-                                <div class="review-date">September 28, 2023</div>
-                            </div>
-                        </div>
-                        <div class="review-rating">
-                            <div class="rating-stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <div class="rating-value">4.0</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <p>Great work on our mobile app UI. Designs were creative and user-friendly. The only reason for 4 stars instead of 5 is that we had a few revision rounds that could have been avoided with better initial requirements gathering. Overall, still very satisfied with the results.</p>
-                    </div>
-                    <div class="review-project">
-                        <span class="project-label">Project:</span>
-                        <span class="project-title">Mobile App UI Design</span>
-                    </div>
-                </div>
+    <!-- Floating review button (only shown if not own profile) -->
+    @if (!isOwnProfile)
+    {
+        <button id="floating-review-btn" class="floating-review-btn">
+            <i class="fas fa-pencil-alt"></i> Write a Review
+        </button>
+    }
 
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="reviewer-info">
-                            <div class="reviewer-avatar">
-                                <div class="avatar-initials">RJ</div>
-                            </div>
-                            <div class="reviewer-details">
-                                <div class="reviewer-name">Robert Johnson</div>
-                                <div class="review-date">August 15, 2023</div>
-                            </div>
-                        </div>
-                        <div class="review-rating">
-                            <div class="rating-stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                            <div class="rating-value">4.5</div>
-                        </div>
-                    </div>
-                    <div class="review-content">
-                        <p>Highly skilled developer who delivered our website on time and within budget. The code is clean and well-documented, making it easy for our team to maintain. Very professional and responsive throughout the project.</p>
-                    </div>
-                    <div class="review-project">
-                        <span class="project-label">Project:</span>
-                        <span class="project-title">Corporate Website Development</span>
-                    </div>
-                </div>
+    <!-- Review Modal -->
+    <div id="review-modal" class="review-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Write a Review for @ViewBag.UserName</h3>
+                <button class="close-modal">&times;</button>
             </div>
-
-            <!-- Review Form -->
-            <div class="review-form-container">
-                <h2>Leave a Review</h2>
-                <div id="success-message" class="success-message" style="display: none;">
-                    <i class="fas fa-check-circle"></i>
-                    <p>Thank you for your review! It has been submitted and will be published soon.</p>
-                </div>
-                <form id="reviewForm" class="review-form">
+            <div class="modal-body">
+                @using (Html.BeginForm("CreateReview", "Main", FormMethod.Post, new { @class = "modal-review-form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ReceiverId" value="@userId" />
+                    
                     <div class="form-group">
-                        <label>Rating</label>
-                        <div class="rating-selector">
-                            <i class="far fa-star" data-rating="1"></i>
-                            <i class="far fa-star" data-rating="2"></i>
-                            <i class="far fa-star" data-rating="3"></i>
-                            <i class="far fa-star" data-rating="4"></i>
-                            <i class="far fa-star" data-rating="5"></i>
-                            <input type="hidden" name="rating" id="selected-rating" value="0">
-                        </div>
+                        <label>Rating:</label>
+                        <select name="Rating" class="form-control rating-selector" required>
+                            <option value="" selected disabled>Select a rating</option>
+                            <option value="1">1 - Poor</option>
+                            <option value="2">2 - Fair</option>
+                            <option value="3">3 - Good</option>
+                            <option value="4">4 - Very Good</option>
+                            <option value="5">5 - Excellent</option>
+                        </select>
                     </div>
+                    
                     <div class="form-group">
-                        <label for="review-text">Review</label>
-                        <textarea id="review-text" name="review" rows="5" placeholder="Share your experience working with this freelancer..."></textarea>
+                        <label for="modal-review-content">Your Review:</label>
+                        <textarea id="modal-review-content" name="Content" class="form-control" rows="6" required placeholder="Share details of your experience working with this person. What went well? What could have been better?"></textarea>
                     </div>
-                    <div class="form-group">
-                        <label for="project-title">Project Title</label>
-                        <input type="text" id="project-title" name="projectTitle" placeholder="What project did you work on together?">
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="cancel-btn">Cancel</button>
+                        <button type="submit" class="submit-review-modal">Submit Review</button>
                     </div>
-                    <button type="submit" class="submit-review-btn">Submit Review</button>
-                </form>
+                }
             </div>
         </div>
     </div>
 
     @Html.Partial("_Footer")
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Rating selector functionality
-            const ratingStars = document.querySelectorAll('.rating-selector i');
-            const ratingInput = document.getElementById('selected-rating');
-            
-            ratingStars.forEach(star => {
-                star.addEventListener('mouseover', function() {
-                    const rating = parseInt(this.getAttribute('data-rating'));
-                    highlightStars(rating);
-                });
-                
-                star.addEventListener('mouseout', function() {
-                    const currentRating = parseInt(ratingInput.value);
-                    highlightStars(currentRating);
-                });
-                
-                star.addEventListener('click', function() {
-                    const rating = parseInt(this.getAttribute('data-rating'));
-                    ratingInput.value = rating;
-                    highlightStars(rating);
-                });
-            });
-            
-            function highlightStars(rating) {
-                ratingStars.forEach(star => {
-                    const starRating = parseInt(star.getAttribute('data-rating'));
-                    if (starRating <= rating) {
-                        star.classList.remove('far');
-                        star.classList.add('fas');
-                    } else {
-                        star.classList.remove('fas');
-                        star.classList.add('far');
-                    }
-                });
-            }
-            
-            // Form submission
-            const reviewForm = document.getElementById('reviewForm');
-            const successMessage = document.getElementById('success-message');
-            
-            reviewForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const rating = ratingInput.value;
-                const reviewText = document.getElementById('review-text').value;
-                const projectTitle = document.getElementById('project-title').value;
-                
-                if (rating === '0') {
-                    showFormError('Please select a rating.');
-                    return;
-                }
-                
-                if (!reviewText.trim()) {
-                    showFormError('Please write a review.');
-                    return;
-                }
-                
-                if (!projectTitle.trim()) {
-                    showFormError('Please enter a project title.');
-                    return;
-                }
-                
-                // In a real app, you would send this data to the server
-                // Show success message
-                reviewForm.style.display = 'none';
-                successMessage.style.display = 'flex';
-                
-                // Reset form
-                ratingInput.value = '0';
-                highlightStars(0);
-                reviewForm.reset();
-                
-                // Optional: Scroll to the success message
-                successMessage.scrollIntoView({ behavior: 'smooth' });
-            });
-            
-            function showFormError(message) {
-                // Find or create error element
-                let errorElement = document.querySelector('.form-error');
-                if (!errorElement) {
-                    errorElement = document.createElement('div');
-                    errorElement.className = 'form-error';
-                    reviewForm.insertBefore(errorElement, reviewForm.firstChild);
-                }
-                
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-                
-                // Hide error after 3 seconds
-                setTimeout(() => {
-                    errorElement.style.display = 'none';
-                }, 3000);
-            }
-        });
-    </script>
 </body>
 
 <style>
-    /* Reviews Page Styles */
     .reviews-container {
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 0 1rem;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
     }
-
-    .reviews-header {
-        margin-bottom: 2rem;
-    }
-
-    .back-link {
-        margin-bottom: 1rem;
-    }
-
-    .back-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #64748b;
-        text-decoration: none;
-        transition: color 0.2s ease;
-    }
-
-    .back-btn:hover {
-        color: #3b82f6;
-    }
-
-    .reviews-title {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .reviews-title h1 {
-        font-size: 2rem;
-        color: #0f172a;
-        margin: 0;
-    }
-
-    .rating-summary {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .rating-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #0f172a;
-    }
-
-    .rating-stars {
-        color: #f59e0b;
-        font-size: 1.25rem;
-    }
-
-    .rating-count {
-        color: #64748b;
-        font-size: 1rem;
-    }
-
-    .reviews-body {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 2rem;
-    }
-
-    .reviews-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-
-    .review-item {
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        padding: 1.5rem;
-    }
-
-    .review-header {
+    
+    .profile-header {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 1rem;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
     }
-
-    .reviewer-info {
+    
+    .user-info h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+        color: #1a202c;
+    }
+    
+    .rating-container {
         display: flex;
         align-items: center;
-        gap: 1rem;
     }
-
-    .reviewer-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        overflow: hidden;
-        background-color: #f1f5f9;
-        border: 2px solid #e2e8f0;
+    
+    .rating-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-right: 0.5rem;
     }
-
-    .avatar-initials {
-        width: 100%;
-        height: 100%;
-        display: flex;
+    
+    .stars {
+        color: #f59e0b;
+        margin-right: 0.5rem;
+    }
+    
+    .stars i {
+        margin-right: 2px;
+    }
+    
+    .review-count {
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+    
+    .back-to-profile a {
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 1rem;
-        color: #3b82f6;
-        background-color: #f1f5f9;
+        padding: 0.5rem 1rem;
+        background-color: #f3f4f6;
+        color: #4b5563;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
     }
-
-    .reviewer-details {
-        display: flex;
-        flex-direction: column;
+    
+    .back-to-profile a:hover {
+        background-color: #e5e7eb;
     }
-
-    .reviewer-name {
-        font-weight: 600;
-        color: #0f172a;
+    
+    .back-to-profile i {
+        margin-right: 0.5rem;
     }
-
-    .review-date {
-        font-size: 0.875rem;
-        color: #64748b;
-    }
-
-    .review-rating {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .review-content {
-        margin-bottom: 1rem;
-        color: #475569;
-        line-height: 1.6;
-    }
-
-    .review-project {
-        font-size: 0.875rem;
-        color: #64748b;
-    }
-
-    .project-label {
-        font-weight: 600;
-    }
-
-    /* Review Form */
-    .review-form-container {
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    
+    .add-review-section {
+        background-color: #f9fafb;
         padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
-
-    .review-form-container h2 {
-        font-size: 1.5rem;
-        margin-bottom: 1.5rem;
-        color: #0f172a;
+    
+    .add-review-section h2 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        color: #1a202c;
     }
-
+    
     .review-form {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
     }
-
-    .form-group {
+    
+    .rating-input {
         display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 1rem;
     }
-
-    .form-group label {
-        font-weight: 600;
-        color: #0f172a;
+    
+    .rating-input label {
+        margin-right: 1rem;
+        font-weight: 500;
     }
-
-    .rating-selector {
+    
+    .star-rating,
+    .star-rating-modal,
+    .star-rating-main {
         display: flex;
-        gap: 0.5rem;
-        font-size: 1.5rem;
-        color: #cbd5e1;
+        align-items: center;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
     }
-
-    .rating-selector i {
+    
+    .star-rating input,
+    .star-rating-modal input,
+    .star-rating-main input {
+        display: none;
+    }
+    
+    .star-rating label,
+    .star-rating-modal label,
+    .star-rating-main label {
         cursor: pointer;
+        color: #cbd5e0;
+        font-size: 1.5rem;
+        padding: 0 0.2rem;
         transition: color 0.2s ease;
     }
-
-    .rating-selector i:hover {
+    
+    .star-rating-main label {
+        font-size: 2.5rem;
+        padding: 0 0.25rem;
+    }
+    
+    /* CSS for handling hover and selected stars */
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating-modal label:hover,
+    .star-rating-modal label:hover ~ label,
+    .star-rating-main label:hover,
+    .star-rating-main label:hover ~ label {
         color: #f59e0b;
     }
-
-    .rating-selector .fas {
+    
+    .star-rating-main label:hover {
+        transform: scale(1.1);
+    }
+    
+    /* When a radio is checked, all the labels AFTER it should be highlighted */
+    .star-rating input:checked ~ label,
+    .star-rating-modal input:checked ~ label,
+    .star-rating-main input:checked ~ label {
         color: #f59e0b;
     }
-
-    .review-form textarea,
-    .review-form input[type="text"] {
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    
+    .form-control {
+        width: 100%;
         padding: 0.75rem;
         border: 1px solid #e2e8f0;
         border-radius: 4px;
         font-size: 1rem;
-        color: #0f172a;
-        transition: border-color 0.2s ease;
+        resize: vertical;
     }
-
-    .review-form textarea:focus,
-    .review-form input[type="text"]:focus {
+    
+    .form-control:focus {
         outline: none;
         border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
-
-    .submit-review-btn {
-        padding: 0.75rem 1.5rem;
+    
+    .submit-review {
+        align-self: flex-start;
+        padding: 0.5rem 1.5rem;
         background-color: #3b82f6;
         color: white;
         border: none;
         border-radius: 4px;
-        font-weight: 600;
         cursor: pointer;
+        font-weight: 500;
         transition: background-color 0.2s ease;
     }
-
-    .submit-review-btn:hover {
+    
+    .submit-review:hover {
         background-color: #2563eb;
     }
     
-    /* Success Message */
-    .success-message {
+    .reviews-list {
+        margin-top: 2rem;
+    }
+    
+    .reviews-list h2 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        color: #1a202c;
+    }
+    
+    .empty-reviews {
+        text-align: center;
+        padding: 3rem 0;
+        color: #718096;
+    }
+    
+    .empty-reviews i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .review-item {
+        padding: 1.5rem;
+        background-color: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+    
+    .reviewer-info {
         display: flex;
         flex-direction: column;
+    }
+    
+    .reviewer-name {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: #1a202c;
+    }
+    
+    .review-rating {
+        color: #f59e0b;
+    }
+    
+    .review-date {
+        color: #718096;
+        font-size: 0.875rem;
+    }
+    
+    .review-content {
+        color: #4a5568;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .review-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .delete-review {
+        background: none;
+        border: none;
+        color: #e53e3e;
+        cursor: pointer;
+        font-size: 0.875rem;
+        display: flex;
         align-items: center;
-        text-align: center;
-        padding: 2rem 1rem;
-        background-color: #f0fdf4;
+    }
+    
+    .delete-review i {
+        margin-right: 0.3rem;
+    }
+    
+    .delete-review:hover {
+        text-decoration: underline;
+    }
+    
+    /* Always visible review form */
+    .add-review-section.always-visible {
+        background-color: #fff;
+        border: 1px solid #e2e8f0;
         border-radius: 8px;
-        border: 1px solid #dcfce7;
-        margin-bottom: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     }
     
-    .success-message i {
-        font-size: 3rem;
-        color: #22c55e;
-        margin-bottom: 1rem;
+    .add-review-section.always-visible h2 {
+        font-size: 1.5rem;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        text-align: center;
     }
     
-    .success-message p {
-        color: #166534;
+    .star-rating-main {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: center;
+        margin: 1rem 0;
+    }
+    
+    .star-rating-main input {
+        display: none;
+    }
+    
+    .star-rating-main label {
+        cursor: pointer;
+        font-size: 2.5rem;
+        color: #cbd5e0;
+        padding: 0 0.25rem;
+        transition: all 0.2s ease;
+    }
+    
+    .star-rating-main label:hover,
+    .star-rating-main label:hover ~ label,
+    .star-rating-main input:checked ~ label {
+        color: #f59e0b;
+        transform: scale(1.1);
+    }
+    
+    .rating-description {
+        text-align: center;
+        margin: 0.5rem 0 1.5rem;
+    }
+    
+    .rating-text-main {
+        font-size: 1rem;
+        color: #64748b;
         font-weight: 500;
     }
     
-    /* Form Error */
-    .form-error {
-        background-color: #fef2f2;
-        color: #b91c1c;
-        padding: 0.75rem;
+    .primary-btn {
+        background-color: #3b82f6;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: block;
+        margin: 1.5rem auto 0;
+    }
+    
+    .primary-btn:hover {
+        background-color: #2563eb;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .primary-btn:active {
+        transform: translateY(0);
+    }
+    
+    /* Floating button styles */
+    .floating-review-btn {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: transform 0.2s, background-color 0.2s;
+        z-index: 100;
+    }
+    
+    .floating-review-btn i {
+        margin-right: 0.5rem;
+    }
+    
+    .floating-review-btn:hover {
+        background-color: #2563eb;
+        transform: translateY(-2px);
+    }
+    
+    .floating-review-btn:active {
+        transform: translateY(0);
+    }
+    
+    /* Modal styles */
+    .review-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .review-modal.show {
+        display: flex;
+    }
+    
+    .modal-content {
+        background-color: white;
+        border-radius: 8px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a202c;
+        margin: 0;
+    }
+    
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #718096;
+        cursor: pointer;
+        line-height: 1;
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .submit-review-modal {
+        padding: 0.5rem 1.5rem;
+        background-color: #3b82f6;
+        color: white;
+        border: none;
         border-radius: 4px;
-        margin-bottom: 1rem;
+        cursor: pointer;
         font-weight: 500;
-        border-left: 4px solid #ef4444;
+        transition: background-color 0.2s ease;
     }
+    
+    .submit-review-modal:hover {
+        background-color: #2563eb;
+    }
+    
+    .cancel-btn {
+        padding: 0.5rem 1.5rem;
+        background-color: #f3f4f6;
+        color: #4b5563;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+    }
+    
+    .cancel-btn:hover {
+        background-color: #e5e7eb;
+    }
+    
+    .star-rating-modal {
+        margin: 0.5rem 0;
+        justify-content: flex-start;
+    }
+    
+    .star-rating-modal label {
+        font-size: 2rem;
+        padding: 0 0.3rem;
+    }
+    
+    .rating-text {
+        color: #718096;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .rating-selector {
+        padding: 10px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 4px;
+        background-color: white;
+        transition: border-color 0.2s;
+    }
+    
+    .rating-selector:hover {
+        border-color: #4a5568;
+    }
+    
+    .rating-selector:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+</style>
 
-</style> 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Star rating functionality for inline form
+        setupStarRating('.star-rating');
+        
+        // Star rating functionality for modal form
+        setupStarRating('.star-rating-modal');
+        
+        // Star rating functionality for main form
+        setupStarRating('.star-rating-main', '.rating-text-main');
+        
+        // Modal functionality
+        const modal = document.getElementById('review-modal');
+        const floatingBtn = document.getElementById('floating-review-btn');
+        const closeBtn = document.querySelector('.close-modal');
+        const cancelBtn = document.querySelector('.cancel-btn');
+        
+        if (floatingBtn) {
+            floatingBtn.addEventListener('click', function() {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+            });
+        }
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeModal);
+        }
+        
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', closeModal);
+        }
+        
+        // Close modal when clicking outside content
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        function closeModal() {
+            modal.classList.remove('show');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+        
+        function setupStarRating(selector, ratingTextSelector) {
+            const container = document.querySelector(selector);
+            if (!container) return;
+            
+            const stars = container.querySelectorAll('label i');
+            const inputs = container.querySelectorAll('input');
+            const labels = container.querySelectorAll('label');
+            const ratingText = ratingTextSelector ? 
+                document.querySelector(ratingTextSelector) : 
+                container.parentElement.querySelector('.rating-text');
+            
+            // Reset any existing stars
+            stars.forEach(star => {
+                star.className = 'far fa-star';
+            });
+            
+            // Set up click event for each label
+            labels.forEach((label, index) => {
+                label.addEventListener('click', function() {
+                    const value = parseInt(this.getAttribute('title'));
+                    const inputId = this.getAttribute('for');
+                    const input = document.getElementById(inputId);
+                    
+                    if (input) {
+                        input.checked = true;
+                        
+                        // Update stars based on selection
+                        for (let i = 0; i < stars.length; i++) {
+                            if (i <= index) {
+                                stars[i].className = 'fas fa-star';
+                            } else {
+                                stars[i].className = 'far fa-star';
+                            }
+                        }
+                        
+                        // Update rating text
+                        if (ratingText) {
+                            updateRatingText(value, ratingText);
+                        }
+                    }
+                });
+                
+                // Handle hover effect
+                label.addEventListener('mouseenter', function() {
+                    const hoverIndex = Array.from(labels).indexOf(this);
+                    
+                    // Highlight stars on hover
+                    for (let i = 0; i < stars.length; i++) {
+                        if (i <= hoverIndex) {
+                            stars[i].className = 'fas fa-star';
+                        } else {
+                            stars[i].className = 'far fa-star';
+                        }
+                    }
+                    
+                    // Update hover text
+                    if (ratingText) {
+                        const value = parseInt(this.getAttribute('title'));
+                        updateRatingText(value, ratingText, true);
+                    }
+                });
+            });
+            
+            // Handle mouseleave for the container
+            container.addEventListener('mouseleave', function() {
+                // Find currently selected value
+                const selectedInput = Array.from(inputs).find(input => input.checked);
+                const selectedIndex = selectedInput ? 
+                    Array.from(inputs).indexOf(selectedInput) : -1;
+                
+                // Reset stars to selected state
+                stars.forEach((star, i) => {
+                    star.className = (i <= selectedIndex && selectedIndex >= 0) ? 
+                        'fas fa-star' : 'far fa-star';
+                });
+                
+                // Reset text
+                if (ratingText) {
+                    if (selectedInput) {
+                        const value = parseInt(selectedInput.value);
+                        updateRatingText(value, ratingText);
+                    } else {
+                        ratingText.textContent = "Select a rating";
+                    }
+                }
+            });
+        }
+        
+        function updateRatingText(rating, textElement, isHover = false) {
+            const ratingTexts = [
+                "Select a rating",
+                "Poor - Not satisfied",
+                "Fair - Below expectations",
+                "Good - Met expectations",
+                "Very Good - Above expectations",
+                "Excellent - Exceptional work"
+            ];
+            
+            textElement.textContent = ratingTexts[rating] || ratingTexts[0];
+            
+            if (isHover) {
+                textElement.classList.add('hover');
+            } else {
+                textElement.classList.remove('hover');
+            }
+        }
+    });
+</script>
