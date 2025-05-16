@@ -29,8 +29,8 @@ namespace taskoreBusinessLogic.DBModel.Seed
             // Folosim DropCreateDatabaseIfModelChanges pentru a recrea baza de date când modelul se schimbă
             Database.SetInitializer(new CustomDatabaseInitializer());
             
-            // Dezactivăm detectarea modificărilor pentru a permite rularea scriptului SQL direct
-            Configuration.AutoDetectChangesEnabled = false;
+            // Enable change detection for entity updates
+            Configuration.AutoDetectChangesEnabled = true;
             
             // Enable logging database operations
             this.Database.Log = s => Debug.WriteLine(s);

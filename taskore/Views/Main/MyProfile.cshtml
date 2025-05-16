@@ -1,20 +1,38 @@
 ﻿@{
     ViewBag.Title = "My Profile";
     var userType = Session["UserType"] != null ? Session["UserType"].ToString() : "freelancer"; // "freelancer" or "customer"
+    var userData = ViewBag.UserData as taskoreBusinessLogic.DBModel.UDBModel;
+    var isUserLoggedIn = Session["UserId"] != null;
 }
 
 <body data-user-type="@userType">
     @Html.Partial("_Header")
 
     <div class="profile-container">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                <button type="button" class="close" onclick="this.parentElement.style.display='none'">&times;</button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                <button type="button" class="close" onclick="this.parentElement.style.display='none'">&times;</button>
+            </div>
+        }
+
         <div class="profile-main">
             <div class="profile-sidebar">
                 <div class="profile-stats-container">
                     <div class="profile-stat-box">
                         <div class="stat-label">Rating</div>
                         <a href="@Url.Action("UserReviews", "Main", new { userId = Session["UserId"] })" class="rating-box">
-                            <span class="rating-value">@(userType == "freelancer" ? "4.8" : "4.9")</span>
-                            <span class="rating-count">(40)</span>
+                            <span class="rating-value">@(userData?.Rating?.ToString("0.0") ?? "4.8")</span>
+                            <span class="rating-count">(@(userData?.RatingCount ?? 40))</span>
                             <i class="fas fa-star rating-star"></i>
                         </a>
                     </div>
@@ -24,7 +42,7 @@
                     <div class="profile-stat-box">
                         <div class="stat-label">@(userType == "freelancer" ? "Completed" : "Projects Posted")</div>
                         <a href="@Url.Action("CompletedProjects", "Main", new { userId = Session["UserId"] })" class="projects-box">
-                            <span class="projects-count">@(userType == "freelancer" ? "23" : "15")</span>
+                            <span class="projects-count">@(userData?.CompletedProjects ?? 23)</span>
                             <i class="fas fa-check-circle projects-icon"></i>
                         </a>
                     </div>
@@ -32,156 +50,258 @@
                 
                 <div class="sidebar-section">
                     <h3>Contact Information</h3>
-                    <div class="sidebar-content contact-info">
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <span>@(Session["UserEmail"] ?? "user@example.com")</span>
+                    @if (isUserLoggedIn) {
+                        <div class="sidebar-content contact-info">
+                            <form id="contact-form" class="editable-form" action="@Url.Action("UpdateUserProfile", "Main")" method="post">
+                                @Html.AntiForgeryToken()
+                                <div class="form-group">
+                                    <label><i class="fas fa-envelope"></i> Email:</label>
+                                    <input type="email" class="form-control" name="Email" value="@(userData?.Email ?? Session["UserEmail"] ?? "")" placeholder="Enter your email">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-phone"></i> Phone:</label>
+                                    <input type="tel" class="form-control" name="Phone" value="@(userData?.Phone ?? "")" placeholder="Enter your phone number">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-map-marker-alt"></i> Location:</label>
+                                    <input type="text" class="form-control" name="Location" value="@(userData?.Location ?? "")" placeholder="Enter your location">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-globe"></i> Website:</label>
+                                    <input type="url" class="form-control" name="Website" value="@(userData?.Website ?? "")" placeholder="Enter your website URL">
+                                </div>
+                                <button type="submit" class="save-form-btn">Save</button>
+                            </form>
                         </div>
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <span>+1 234 567 8900</span>
+                    } else {
+                        <div class="sidebar-content contact-info">
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>@(userData?.Email ?? Session["UserEmail"] ?? "user@example.com")</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <span>@(userData?.Phone ?? "+1 234 567 8900")</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>@(userData?.Location ?? "New York, USA")</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-globe"></i>
+                                <span>@(userData?.Website ?? "www.myportfolio.com")</span>
+                            </div>
                         </div>
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>New York, USA</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-globe"></i>
-                            <span>www.myportfolio.com</span>
-                        </div>
-                    </div>
-                    <button class="edit-btn" data-section="contact"><i class="fas fa-pencil-alt"></i> Edit</button>
+                        <button class="edit-btn" data-section="contact"><i class="fas fa-pencil-alt"></i> Edit</button>
+                    }
                 </div>
                 
                 <div class="sidebar-section">
-                    <h3>@(userType == "freelancer" ? "Availability" : "Budget Range")</h3>
-                    <div class="sidebar-content">
-                        @if (userType == "freelancer") {
-                            <div class="availability-status available">
-                                <span>Available for work</span>
+                    <h3>Availability</h3>
+                    @if (isUserLoggedIn) {
+                        <div class="sidebar-content">
+                            <form id="availability-form" class="editable-form" action="@Url.Action("UpdateUserProfile", "Main")" method="post">
+                                @Html.AntiForgeryToken()
+                                <div class="form-group">
+                                    <label>Status:</label>
+                                    <select class="form-control" name="AvailabilityStatus">
+                                        <option value="available" @(userData?.AvailabilityStatus == "available" ? "selected" : "")>Available for work</option>
+                                        <option value="limited" @(userData?.AvailabilityStatus == "limited" ? "selected" : "")>Limited availability</option>
+                                        <option value="unavailable" @(userData?.AvailabilityStatus == "unavailable" ? "selected" : "")>Not available</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Hours per week:</label>
+                                    <input type="number" class="form-control" name="AvailabilityHours" value="@(userData?.AvailabilityHours?.Replace(" hrs/week", "") ?? "40")" min="1" max="60">
+                                </div>
+                                <button type="submit" class="save-form-btn">Save</button>
+                            </form>
+                        </div>
+                    } else {
+                        <div class="sidebar-content">
+                            <div class="availability-status @(userData?.AvailabilityStatus ?? "available")">
+                                @(userData?.AvailabilityStatus == "available" ? "Available for work" : 
+                                  userData?.AvailabilityStatus == "limited" ? "Limited availability" : 
+                                  userData?.AvailabilityStatus == "unavailable" ? "Not available" : "Available for work")
                             </div>
                             <div class="availability-hours">
                                 <i class="far fa-clock"></i>
-                                <span>30 hrs/week</span>
+                                <span>@(userData?.AvailabilityHours ?? "40 hrs/week")</span>
                             </div>
-                        } else {
-                            <div class="budget-range">
-                                <span class="budget-label">Typical Budget:</span>
-                                <span class="budget-value">$1,000 - $5,000</span>
-                            </div>
-                            <div class="budget-preference">
-                                <span class="budget-label">Preferred Payment:</span>
-                                <span class="budget-value">Fixed Price</span>
-                            </div>
-                        }
-                    </div>
-                    <button class="edit-btn" data-section="availability"><i class="fas fa-pencil-alt"></i> Edit</button>
+                        </div>
+                        <button class="edit-btn" data-section="availability"><i class="fas fa-pencil-alt"></i> Edit</button>
+                    }
                 </div>
             </div>
 
             <div class="profile-content">
                 <div class="profile-name-section">
                     <h1 class="user-name">@(Session["UserFullName"] ?? "Alex Johnson")</h1>
-                    <div class="user-headline">
-                        @if (userType == "freelancer") {
-                            <span>Web Developer & UI/UX Designer</span>
-                        } else {
-                            <span>Project Manager at TechCorp</span>
-                        }
-                    </div>
+                    @if (isUserLoggedIn) {
+                        <div class="user-headline-edit">
+                            <form id="headline-form" class="editable-form" action="@Url.Action("UpdateUserProfile", "Main")" method="post">
+                                @Html.AntiForgeryToken()
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="Headline" value="@(userData?.Headline ?? "")" placeholder="Add your professional headline here...">
+                                </div>
+                                <button type="submit" class="save-form-btn">Save</button>
+                            </form>
+                        </div>
+                    } else {
+                        <div class="user-headline">
+                            <span>@(userData?.Headline ?? (userType == "freelancer" ? "Web Developer & UI/UX Designer" : "Project Manager at TechCorp"))</span>
+                        </div>
+                    }
                 </div>
                 
                 <div class="content-section about-section">
                     <div class="section-header">
-                <h2>About Me</h2>
-                        <button class="edit-btn" data-section="about"><i class="fas fa-pencil-alt"></i> Edit</button>
+                        <h2>About Me</h2>
+                        @if (!isUserLoggedIn) {
+                            <button class="edit-btn" data-section="about"><i class="fas fa-pencil-alt"></i> Edit</button>
+                        }
                     </div>
                     <div class="section-content" id="about-content">
-                        @if (userType == "freelancer") {
-                            <p>I'm a passionate web developer and UI/UX designer with over 5 years of experience. I specialize in creating responsive websites and user-friendly interfaces that deliver exceptional user experiences. My focus is on clean code, intuitive design, and meeting client needs with high-quality deliverables.</p>
-                            <p>I've worked with clients in various industries, from startups to established businesses, helping them achieve their digital goals through creative and technical solutions.</p>
+                        @if (isUserLoggedIn) {
+                            <form id="about-form" class="editable-form" action="@Url.Action("UpdateUserProfile", "Main")" method="post">
+                                @Html.AntiForgeryToken()
+                                <div class="form-group">
+                                    <textarea class="form-control" name="About" rows="6">@(userData?.About ?? "")</textarea>
+                                </div>
+                                <button type="submit" class="save-form-btn">Save</button>
+                            </form>
                         } else {
-                            <p>As a project manager with 7+ years of experience in the tech industry, I oversee development projects from conception to completion. I work with talented freelancers to bring innovative digital solutions to life, focusing on clear communication, realistic timelines, and quality deliverables.</p>
-                            <p>I value collaboration, transparency, and creative problem-solving in all my projects and partnerships.</p>
+                            if (!string.IsNullOrEmpty(userData?.About)) {
+                                <p>@userData.About</p>
+                            } else {
+                                <p>I am a skilled professional with over 10 years of experience in my field. I specialize in delivering high-quality solutions that meet and exceed client expectations. My approach combines technical expertise with creativity to solve complex problems efficiently.</p>
+                            }
                         }
+                    </div>
                 </div>
-            </div>
-
+                
                 <div class="content-section skills-section">
                     <div class="section-header">
                         <h2>@(userType == "freelancer" ? "My Skills" : "Skills I'm Looking For")</h2>
-                        <button class="edit-btn" data-section="skills"><i class="fas fa-pencil-alt"></i> Edit</button>
+                        @if (!isUserLoggedIn) {
+                            <button class="edit-btn" data-section="skills"><i class="fas fa-pencil-alt"></i> Edit</button>
+                        }
                     </div>
                     <div class="section-content" id="skills-content">
-                        <div class="skills-container">
-                            @if (userType == "freelancer") {
-                        <span class="skill-tag">HTML5</span>
-                        <span class="skill-tag">CSS3</span>
-                        <span class="skill-tag">JavaScript</span>
-                                <span class="skill-tag">React.js</span>
-                        <span class="skill-tag">Node.js</span>
-                                <span class="skill-tag">Figma</span>
-                        <span class="skill-tag">UI/UX Design</span>
-                        <span class="skill-tag">Responsive Design</span>
-                                <span class="skill-tag">API Integration</span>
-                                <span class="skill-tag">WordPress</span>
-                            } else {
-                                <span class="skill-tag">Web Development</span>
-                                <span class="skill-tag">Mobile App Development</span>
-                                <span class="skill-tag">UI/UX Design</span>
-                                <span class="skill-tag">Database Design</span>
-                                <span class="skill-tag">Cloud Integration</span>
-                                <span class="skill-tag">API Development</span>
-                                <span class="skill-tag">React Native</span>
-                                <span class="skill-tag">E-commerce</span>
-                            }
+                        @if (isUserLoggedIn) {
+                            <form id="skills-form" class="editable-form" action="@Url.Action("UpdateUserProfile", "Main")" method="post">
+                                @Html.AntiForgeryToken()
+                                <div class="form-group">
+                                    <label>Enter your skills (comma separated):</label>
+                                    <textarea class="form-control" name="Skills" rows="3" placeholder="e.g. JavaScript, HTML, CSS, React">@(userData?.Skills ?? "")</textarea>
+                                </div>
+                                <button type="submit" class="save-form-btn">Save</button>
+                            </form>
+                        } else {
+                            <div class="skills-container">
+                                @{
+                                    var skillsList = !string.IsNullOrEmpty(userData?.Skills) ? 
+                                        userData.Skills.Split(',').Select(s => s.Trim()).ToList() : 
+                                        new List<string> { "JavaScript", "React", "Node.js", "HTML/CSS", "UI/UX Design" };
+                                }
+                                @foreach (var skill in skillsList) {
+                                    <span class="skill-tag">@skill</span>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
-            </div>
-
+                
                 <div class="content-section preferences-section">
                     <div class="section-header">
                         <h2>My Preferences</h2>
-                        <button class="edit-btn" data-section="preferences"><i class="fas fa-pencil-alt"></i> Edit</button>
+                        @if (!isUserLoggedIn) {
+                            <button class="edit-btn" data-section="preferences"><i class="fas fa-pencil-alt"></i> Edit</button>
+                        }
                     </div>
                     <div class="section-content" id="preferences-content">
-                        <div class="preferences-container">
-                            @if (userType == "freelancer") {
-                                <div class="preference-item">
-                                    <div class="preference-label">Preferred Project Types:</div>
-                                    <div class="preference-value">Web Development, UI/UX Design, E-commerce</div>
+                        @if (isUserLoggedIn) {
+                            <form id="preferences-form" class="editable-form" action="@Url.Action("UpdateUserProfile", "Main")" method="post">
+                                @Html.AntiForgeryToken()
+                                <div class="preferences-container">
+                                    @if (userType == "freelancer") {
+                                        <div class="form-group">
+                                            <label>Preferred Project Types:</label>
+                                            <input type="text" class="form-control" name="PreferredProjectTypes" value="@(userData?.PreferredProjectTypes ?? "")" placeholder="e.g. Web Development, UI/UX Design">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Hourly Rate:</label>
+                                            <input type="text" class="form-control" name="HourlyRate" value="@(userData?.HourlyRate ?? "")" placeholder="e.g. $45 - $65 per hour">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Project Duration:</label>
+                                            <input type="text" class="form-control" name="ProjectDuration" value="@(userData?.ProjectDuration ?? "")" placeholder="e.g. Short to medium-term (1-6 months)">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Communication Style:</label>
+                                            <input type="text" class="form-control" name="CommunicationStyle" value="@(userData?.CommunicationStyle ?? "")" placeholder="e.g. Weekly video calls, daily messaging">
+                                        </div>
+                                    } else {
+                                        <div class="form-group">
+                                            <label>Preferred Project Types:</label>
+                                            <input type="text" class="form-control" name="PreferredProjectTypes" value="@(userData?.PreferredProjectTypes ?? "")" placeholder="e.g. Mobile App Development, E-commerce Website">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Budget Range:</label>
+                                            <input type="text" class="form-control" name="HourlyRate" value="@(userData?.HourlyRate ?? "")" placeholder="e.g. $1000 - $5000">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Project Timeline:</label>
+                                            <input type="text" class="form-control" name="ProjectDuration" value="@(userData?.ProjectDuration ?? "")" placeholder="e.g. 2-3 months">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Communication Frequency:</label>
+                                            <input type="text" class="form-control" name="CommunicationStyle" value="@(userData?.CommunicationStyle ?? "")" placeholder="e.g. Weekly updates, milestone reviews">
+                                        </div>
+                                    }
                                 </div>
-                                <div class="preference-item">
-                                    <div class="preference-label">Hourly Rate:</div>
-                                    <div class="preference-value">$45 - $65 per hour</div>
-                                </div>
-                                <div class="preference-item">
-                                    <div class="preference-label">Project Duration:</div>
-                                    <div class="preference-value">Short to medium-term (1-6 months)</div>
-                                </div>
-                                <div class="preference-item">
-                                    <div class="preference-label">Communication Style:</div>
-                                    <div class="preference-value">Weekly video calls, daily messaging</div>
-                                </div>
-                            } else {
-                                <div class="preference-item">
-                                    <div class="preference-label">Project Timeline:</div>
-                                    <div class="preference-value">Medium to long-term (3-12 months)</div>
-                                </div>
-                                <div class="preference-item">
-                                    <div class="preference-label">Preferred Team Size:</div>
-                                    <div class="preference-value">2-5 specialists</div>
-                                </div>
-                                <div class="preference-item">
-                                    <div class="preference-label">Communication Frequency:</div>
-                                    <div class="preference-value">Bi-weekly meetings, weekly reports</div>
-                                </div>
-                                <div class="preference-item">
-                                    <div class="preference-label">Freelancer Experience:</div>
-                                    <div class="preference-value">Mid to senior level (3+ years)</div>
-                                </div>
-                            }
-                        </div>
+                                <button type="submit" class="save-form-btn">Save</button>
+                            </form>
+                        } else {
+                            <div class="preferences-container">
+                                @if (userType == "freelancer") {
+                                    <div class="preference-item">
+                                        <div class="preference-label">Preferred Project Types:</div>
+                                        <div class="preference-value">@(userData?.PreferredProjectTypes ?? "Web Development, UI/UX Design, E-commerce")</div>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-label">Hourly Rate:</div>
+                                        <div class="preference-value">@(userData?.HourlyRate ?? "$45 - $65 per hour")</div>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-label">Project Duration:</div>
+                                        <div class="preference-value">@(userData?.ProjectDuration ?? "Short to medium-term (1-6 months)")</div>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-label">Communication Style:</div>
+                                        <div class="preference-value">@(userData?.CommunicationStyle ?? "Weekly video calls, daily messaging")</div>
+                                    </div>
+                                }
+                                else {
+                                    <div class="preference-item">
+                                        <div class="preference-label">Project Types:</div>
+                                        <div class="preference-value">@(userData?.PreferredProjectTypes ?? "Mobile App Development, E-commerce Solutions")</div>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-label">Budget Range:</div>
+                                        <div class="preference-value">@(userData?.HourlyRate ?? "$1000 - $5000 per project")</div>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-label">Project Timeline:</div>
+                                        <div class="preference-value">@(userData?.ProjectDuration ?? "2-3 months")</div>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="preference-label">Communication Frequency:</div>
+                                        <div class="preference-value">@(userData?.CommunicationStyle ?? "Weekly updates, milestone reviews")</div>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -206,6 +326,8 @@
             </div>
         </div>
     </div>
+    
+    @Html.AntiForgeryToken()
 
     <script src="~/js/profile.js"></script>
 </body>
@@ -295,6 +417,52 @@
         height: 40px;
         background-color: #e2e8f0;
         margin: 0 1rem;
+    }
+    
+    /* Additional styles for forms */
+    .editable-form {
+        width: 100%;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.2s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #3b82f6;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+    }
+    
+    .save-form-btn {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+    }
+    
+    .save-form-btn:hover {
+        background-color: #2563eb;
     }
 </style>
 

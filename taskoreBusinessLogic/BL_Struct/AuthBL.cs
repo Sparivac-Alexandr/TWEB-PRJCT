@@ -48,7 +48,23 @@ namespace taskoreBusinessLogic.BL_Struct
                     Email = data.Email,
                     FirstName = data.FirstName,
                     Password = hashedPassword,
-                    LastName = data.LastName
+                    LastName = data.LastName,
+                    // Add default values for all fields that would be NULL
+                    Headline = $"{data.FirstName}'s Professional Profile",
+                    About = "Tell others about your professional background and experience.",
+                    Skills = "Add your skills here",
+                    Phone = "Add your phone number",
+                    Location = "Add your location",
+                    Website = "Add your website URL",
+                    PreferredProjectTypes = "Web Development, UI/UX Design",
+                    HourlyRate = "$20 - $50 per hour",
+                    ProjectDuration = "1-3 months",
+                    CommunicationStyle = "Email, Video calls",
+                    AvailabilityStatus = "available",
+                    AvailabilityHours = "40 hrs/week",
+                    Rating = 0,
+                    RatingCount = 0,
+                    CompletedProjects = 0
                     // Not setting Id manually as it will be auto-generated
                 };
                 

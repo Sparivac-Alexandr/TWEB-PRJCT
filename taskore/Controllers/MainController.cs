@@ -187,7 +187,148 @@ namespace taskore.Controllers
                 return RedirectToAction("SignIn", "Auth");
             }
 
+            int userId = (int)Session["UserId"];
+            
+            // Get user data from database
+            using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+            {
+                var user = context.Users.FirstOrDefault(u => u.Id == userId);
+                
+                // Pass user data to the view using ViewBag
+                ViewBag.UserData = user;
+                
+                // If user data doesn't exist in database yet, we'll use session data
+                // The profile page already handles null user data gracefully
+            }
+
             return View();
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateUserProfile(taskoreBusinessLogic.DBModel.UDBModel model)
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                // For AJAX requests
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "You must be logged in to update your profile." });
+                }
+                // For standard form submissions
+                TempData["ErrorMessage"] = "You must be logged in to update your profile.";
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            int userId = (int)Session["UserId"];
+            
+            try
+            {
+                using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+                {
+                    // Find the existing user in the database
+                    var existingUser = context.Users.FirstOrDefault(u => u.Id == userId);
+                    
+                    if (existingUser == null)
+                    {
+                        // Create a new user if one doesn't exist
+                        existingUser = new taskoreBusinessLogic.DBModel.UDBModel
+                        {
+                            Id = userId,
+                            Email = Session["UserEmail"]?.ToString(),
+                            FirstName = Session["UserFullName"]?.ToString().Split(' ')[0],
+                            LastName = Session["UserFullName"]?.ToString().Split(' ')[1] ?? "",
+                            // Set default password - this should be changed in a real application
+                            Password = "default-password-hash"
+                        };
+                        context.Users.Add(existingUser);
+                    }
+                    
+                    // Update user fields only if they are provided in the form
+                    // Basic information
+                    if (!string.IsNullOrEmpty(model.Headline))
+                        existingUser.Headline = model.Headline;
+                    
+                    if (!string.IsNullOrEmpty(model.About))
+                        existingUser.About = model.About;
+                    
+                    if (!string.IsNullOrEmpty(model.Skills))
+                        existingUser.Skills = model.Skills;
+                    
+                    // Contact information
+                    if (!string.IsNullOrEmpty(model.Email))
+                        existingUser.Email = model.Email;
+                    
+                    if (!string.IsNullOrEmpty(model.Phone))
+                        existingUser.Phone = model.Phone;
+                    
+                    if (!string.IsNullOrEmpty(model.Location))
+                        existingUser.Location = model.Location;
+                    
+                    if (!string.IsNullOrEmpty(model.Website))
+                        existingUser.Website = model.Website;
+                    
+                    // Preferences
+                    if (!string.IsNullOrEmpty(model.PreferredProjectTypes))
+                        existingUser.PreferredProjectTypes = model.PreferredProjectTypes;
+                    
+                    if (!string.IsNullOrEmpty(model.HourlyRate))
+                        existingUser.HourlyRate = model.HourlyRate;
+                    
+                    if (!string.IsNullOrEmpty(model.ProjectDuration))
+                        existingUser.ProjectDuration = model.ProjectDuration;
+                    
+                    if (!string.IsNullOrEmpty(model.CommunicationStyle))
+                        existingUser.CommunicationStyle = model.CommunicationStyle;
+                    
+                    // Availability
+                    if (!string.IsNullOrEmpty(model.AvailabilityStatus))
+                        existingUser.AvailabilityStatus = model.AvailabilityStatus;
+                    
+                    if (!string.IsNullOrEmpty(model.AvailabilityHours))
+                    {
+                        // Add hrs/week if it's not already included
+                        if (!model.AvailabilityHours.Contains("hrs/week"))
+                            existingUser.AvailabilityHours = model.AvailabilityHours + " hrs/week";
+                        else
+                            existingUser.AvailabilityHours = model.AvailabilityHours;
+                    }
+                    
+                    // Save changes to database
+                    context.SaveChanges();
+                    
+                    // Update session data if needed
+                    if (!string.IsNullOrEmpty(model.Email))
+                    {
+                        Session["UserEmail"] = model.Email;
+                    }
+                    
+                    // For AJAX requests
+                    if (Request.IsAjaxRequest())
+                    {
+                        return Json(new { success = true, message = "Profile updated successfully" });
+                    }
+                    
+                    // For standard form submissions
+                    TempData["SuccessMessage"] = "Profile updated successfully!";
+                    return RedirectToAction("MyProfile");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error updating user profile: " + ex.Message);
+                
+                // For AJAX requests
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "An error occurred while updating your profile: " + ex.Message });
+                }
+                
+                // For standard form submissions
+                TempData["ErrorMessage"] = "An error occurred while updating your profile: " + ex.Message;
+                return RedirectToAction("MyProfile");
+            }
         }
         
         public ActionResult UserReviews(string userId)
