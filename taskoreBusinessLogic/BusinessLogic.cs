@@ -25,5 +25,10 @@ namespace taskoreBusinessLogic
         {
             return new ProjectBL();
         }
+        
+        public INews GetNewsBL()
+        {
+            return new NewsBL();
+        }
     }
 }

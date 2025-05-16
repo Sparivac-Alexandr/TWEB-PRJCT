@@ -14,13 +14,12 @@ namespace taskoreDomain.Enums
         FraudlesUser = 2,
         Deleted = 3,
 
-        User = 100,
-        User1 = 101,
-        User2 = 102,
-
         Moderator = 200,
         Vip = 300,
         Administrator = 400,
-
+            
+        Client = 50,
+        Freelancer = 51,
+        User = 401,
     }
 }

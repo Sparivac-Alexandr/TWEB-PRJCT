@@ -51,8 +51,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BL_Struct\NewsBL.cs" />
     <Compile Include="BL_Struct\ProjectBL.cs" />
+    <Compile Include="DBModel\NewsDBModel.cs" />
     <Compile Include="DBModel\ProjectDBModel.cs" />
+    <Compile Include="DBModel\Seed\NewsContext.cs" />
     <Compile Include="DBModel\Seed\ProjectContext.cs" />
     <Compile Include="DBModel\Seed\UserContext.cs" />
     <Compile Include="BL_Struct\AuthBL.cs" />
@@ -61,6 +64,7 @@
     <Compile Include="Core\UserApi.cs" />
     <Compile Include="DBModel\UDBModel.cs" />
     <Compile Include="Interfaces\IAuth.cs" />
+    <Compile Include="Interfaces\INews.cs" />
     <Compile Include="Interfaces\IProject.cs" />
     <Compile Include="Interfaces\ISesion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

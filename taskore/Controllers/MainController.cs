@@ -18,6 +18,7 @@ namespace taskore.Controllers
         private readonly IProject _projectService;
         private readonly IAuth _authService;
         private readonly ISesion _sessionService;
+        private readonly INews _newsService;
         
         public MainController()
         {
@@ -25,6 +26,7 @@ namespace taskore.Controllers
             _projectService = bl.GetProjectBL();
             _authService = bl.GetAuthBL();
             _sessionService = bl.GetSesionBL();
+            _newsService = bl.GetNewsBL();
         }
         
         // GET: Main
@@ -285,6 +287,35 @@ namespace taskore.Controllers
                 // ViewBag.CompletedTasks = db.Tasks.Count(t => t.Status == "Completed");
                 // ViewBag.PendingTasks = db.Tasks.Count(t => t.Status == "Pending");
             }
+
+            // Get news stats
+            try
+            {
+                using (var newsContext = new taskoreBusinessLogic.DBModel.Seed.NewsContext())
+                {
+                    ViewBag.TotalNews = newsContext.News.Count();
+                    ViewBag.HighPriorityNews = newsContext.News.Count(n => n.Priority == "High");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error getting news stats: " + ex.Message);
+                ViewBag.TotalNews = 0;
+                ViewBag.HighPriorityNews = 0;
+            }
+            
+            // Create empty model for the news form
+            ViewBag.NewsModel = new NewsDBModel
+            {
+                PublishDate = DateTime.Now,
+                Author = Session["UserFullName"]?.ToString() ?? "Admin"
+            };
+            
+            // Based on TempData, show the correct section
+            if (TempData["SuccessMessage"] != null || TempData["ErrorMessage"] != null)
+            {
+                ViewBag.ActiveSection = "add-post-section";
+            }
             
             return View();
         }
@@ -484,80 +515,331 @@ namespace taskore.Controllers
                 return RedirectToAction("SignIn", "Auth");
             }
 
-            // Create sample news data
+            try
+            {
+                // Get news from database using the News service
+                var allNews = _newsService.GetAllNews();
+                
+                // Convert to the format expected by the view
+                var newsModel = allNews.Select(n => new Dictionary<string, object>
+                {
+                    { "Id", n.Id },
+                    { "Title", n.Title },
+                    { "Content", n.Content },
+                    { "Author", n.Author },
+                    { "PublishDate", n.PublishDate.ToString("yyyy-MM-dd") },
+                    { "Category", n.Category },
+                    { "ImageUrl", n.ImageUrl ?? "/wwwroot/images/news/default.jpg" },
+                    { "Priority", n.Priority }
+                }).ToList();
+                
+                // If no news found in database, create some sample news
+                if (!newsModel.Any())
+                {
+                    // Create sample news data
+                    newsModel = CreateSampleNewsData();
+                }
+                
+                return View(newsModel);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading news: {ex.Message}");
+                // In case of error, create some sample news
+                var newsModel = CreateSampleNewsData();
+                return View(newsModel);
+            }
+        }
+        
+        private List<Dictionary<string, object>> CreateSampleNewsData()
+        {
             var newsModel = new List<Dictionary<string, object>>();
+           
             
-            // News item 1
-            var news1 = new Dictionary<string, object>
+            return newsModel;
+        }
+        
+        [HttpGet]
+        public ActionResult CreateNewsPage()
+        {
+            // Check if user is logged in and is an admin
+            if (Session["UserId"] == null)
             {
-                { "Id", 1 },
-                { "Title", "Platform Updates: New Features Released" },
-                { "Content", "We're excited to announce several new features that will enhance your experience on our platform. These include improved messaging system, better project search filters, and enhanced notification settings." },
-                { "Author", "Taskore Team" },
-                { "PublishDate", "2023-12-15" },
-                { "Category", "Updates" },
-                { "ImageUrl", "/wwwroot/images/news/update.jpg" },
-                { "Priority", "High" }
-            };
-            newsModel.Add(news1);
+                TempData["ErrorMessage"] = "You need to be logged in to create news.";
+                return RedirectToAction("SignIn", "Auth");
+            }
             
-            // News item 2
-            var news2 = new Dictionary<string, object>
+            // In production, check if user is admin
+            // if (Session["UserRole"] == null || Session["UserRole"].ToString() != "Admin") 
+            // {
+            //     return RedirectToAction("News", "Main");
+            // }
+            
+            return View(new NewsDBModel { 
+                PublishDate = DateTime.Now,
+                Author = Session["UserFullName"]?.ToString() ?? "Admin"
+            });
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateNewsPage(NewsDBModel model, string returnUrl = null)
+        {
+            Debug.WriteLine("News creation request received: " + model.Title);
+            
+            // Verify user is logged in
+            if (Session["UserId"] == null)
             {
-                { "Id", 2 },
-                { "Title", "Freelancer Success Story: Maria's Journey to Top-Rated" },
-                { "Content", "Learn how Maria went from a beginner freelancer to a top-rated designer on our platform in just 6 months. Her story includes tips on building a strong portfolio and establishing client relationships." },
-                { "Author", "Content Team" },
-                { "PublishDate", "2023-12-10" },
-                { "Category", "Success Stories" },
-                { "ImageUrl", "/wwwroot/images/news/success.jpg" },
-                { "Priority", "Medium" }
-            };
-            newsModel.Add(news2);
+                TempData["ErrorMessage"] = "You need to be logged in to create news.";
+                return RedirectToAction("SignIn", "Auth");
+            }
             
-            // News item 3
-            var news3 = new Dictionary<string, object>
+            if (ModelState.IsValid)
             {
-                { "Id", 3 },
-                { "Title", "Upcoming Webinar: Building Your Freelance Brand" },
-                { "Content", "Join us for an informative session on building your personal brand as a freelancer. Learn from industry experts on December 20th at 2 PM EST." },
-                { "Author", "Events Team" },
-                { "PublishDate", "2023-12-05" },
-                { "Category", "Events" },
-                { "ImageUrl", "/wwwroot/images/news/webinar.jpg" },
-                { "Priority", "High" }
-            };
-            newsModel.Add(news3);
+                try
+                {
+                    // Set the publish date to now if not already set
+                    if (model.PublishDate == default(DateTime))
+                    {
+                        model.PublishDate = DateTime.Now;
+                    }
+                    
+                    bool isCreated = _newsService.CreateNews(model);
+                    
+                    if (isCreated)
+                    {
+                        TempData["SuccessMessage"] = "News created successfully!";
+                        // Reset the model for creating a new news item
+                        ModelState.Clear();
+                        
+                        // If the request came from admin dashboard, return there
+                        if (Request.UrlReferrer != null && Request.UrlReferrer.AbsolutePath.Contains("AdminDashboard"))
+                        {
+                            return RedirectToAction("AdminDashboard");
+                        }
+                        
+                        // Otherwise go to News page
+                        return RedirectToAction("News");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "News creation failed. Please try again.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Error creating news: " + ex.Message);
+                    ModelState.AddModelError("", "News creation failed. Please try again.");
+                }
+            }
             
-            // News item 4
-            var news4 = new Dictionary<string, object>
+            // If we got this far, something failed
+            // If coming from admin dashboard, redirect there with error message
+            if (Request.UrlReferrer != null && Request.UrlReferrer.AbsolutePath.Contains("AdminDashboard"))
             {
-                { "Id", 4 },
-                { "Title", "Security Updates: Enhancing Your Account Protection" },
-                { "Content", "We've implemented new security measures to better protect your account. Learn about two-factor authentication and other security features now available." },
-                { "Author", "Security Team" },
-                { "PublishDate", "2023-11-28" },
-                { "Category", "Security" },
-                { "ImageUrl", "/wwwroot/images/news/security.jpg" },
-                { "Priority", "High" }
-            };
-            newsModel.Add(news4);
+                TempData["ErrorMessage"] = "News creation failed. Please check the form and try again.";
+                return RedirectToAction("AdminDashboard");
+            }
             
-            // News item 5
-            var news5 = new Dictionary<string, object>
+            // Otherwise redisplay form
+            return View(model);
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteNews(int id)
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
             {
-                { "Id", 5 },
-                { "Title", "Market Trends: Top Skills in Demand for 2024" },
-                { "Content", "Our analysis shows growing demand for AI specialists, blockchain developers, and UX researchers. See the complete list of trending skills for the upcoming year." },
-                { "Author", "Research Team" },
-                { "PublishDate", "2023-11-20" },
-                { "Category", "Market Insights" },
-                { "ImageUrl", "/wwwroot/images/news/trends.jpg" },
-                { "Priority", "Medium" }
-            };
-            newsModel.Add(news5);
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "You need to be logged in to delete news." });
+                }
+                
+                TempData["ErrorMessage"] = "You need to be logged in to delete news.";
+                return RedirectToAction("AdminDashboard");
+            }
             
-            return View(newsModel);
+            bool isDeleted = false;
+            
+            try
+            {
+                isDeleted = _newsService.DeleteNews(id);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error deleting news {id}: " + ex.Message);
+            }
+            
+            if (Request.IsAjaxRequest())
+            {
+                if (isDeleted)
+                {
+                    return Json(new { success = true, message = "News deleted successfully." });
+                }
+                return Json(new { success = false, message = "Failed to delete news. News not found or already deleted." });
+            }
+            
+            if (isDeleted)
+            {
+                TempData["SuccessMessage"] = "News deleted successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Failed to delete news. News not found or already deleted.";
+            }
+            
+            ViewBag.ActiveSection = "manage-posts-section";
+            return RedirectToAction("AdminDashboard");
+        }
+
+        [HttpGet]
+        public ActionResult GetNewsById(int id)
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                return Json(new { success = false, message = "You need to be logged in to get news details." }, JsonRequestBehavior.AllowGet);
+            }
+            
+            try
+            {
+                var news = _newsService.GetNewsById(id);
+                
+                if (news != null)
+                {
+                    return Json(new { 
+                        success = true, 
+                        Id = news.Id,
+                        Title = news.Title,
+                        Content = news.Content,
+                        Category = news.Category,
+                        Priority = news.Priority,
+                        Author = news.Author,
+                        PublishDate = news.PublishDate.ToString("yyyy-MM-dd"),
+                        ImageUrl = news.ImageUrl
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(new { success = false, message = "News not found." }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error getting news {id}: " + ex.Message);
+                return Json(new { success = false, message = "An error occurred while getting the news." }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditNews(NewsDBModel model)
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                return Json(new { success = false, message = "You need to be logged in to edit news." });
+            }
+            
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data submitted." });
+            }
+            
+            try
+            {
+                // Get the existing news item
+                var existingNews = _newsService.GetNewsById(model.Id);
+                
+                if (existingNews == null)
+                {
+                    return Json(new { success = false, message = "News not found." });
+                }
+                
+                // Update the fields
+                existingNews.Title = model.Title;
+                existingNews.Content = model.Content;
+                existingNews.Category = model.Category;
+                existingNews.Priority = model.Priority;
+                existingNews.Author = model.Author;
+                existingNews.ImageUrl = model.ImageUrl;
+                
+                // Save the changes
+                bool isUpdated = _newsService.UpdateNews(existingNews);
+                
+                if (isUpdated)
+                {
+                    return Json(new { success = true, message = "News updated successfully." });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Failed to update news." });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error updating news {model.Id}: " + ex.Message);
+                return Json(new { success = false, message = "An error occurred while updating the news." });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteUser(int id)
+        {
+            // Check if user is logged in with admin privileges
+            if (Session["UserId"] == null)
+            {
+                return Json(new { success = false, message = "You need to be logged in to delete users." });
+            }
+            
+            // In a real application, check if user is an admin
+            // if (Session["UserRole"] == null || Session["UserRole"].ToString() != "Admin") 
+            // {
+            //     return Json(new { success = false, message = "You do not have permission to delete users." });
+            // }
+            
+            try
+            {
+                using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+                {
+                    // Don't allow deletion of the current user
+                    if (Session["UserId"] != null)
+                    {
+                        int currentUserId;
+                        if (int.TryParse(Session["UserId"].ToString(), out currentUserId) && currentUserId == id)
+                        {
+                            return Json(new { success = false, message = "You cannot delete your own account." });
+                        }
+                    }
+                    
+                    var user = context.Users.Find(id);
+                    if (user == null)
+                    {
+                        return Json(new { success = false, message = "User not found." });
+                    }
+                    
+                    // Delete the user
+                    context.Users.Remove(user);
+                    int rowsAffected = context.SaveChanges();
+                    
+                    if (rowsAffected > 0)
+                    {
+                        return Json(new { success = true, message = "User deleted successfully." });
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = "Failed to delete user. Please try again." });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error deleting user {id}: " + ex.Message);
+                return Json(new { success = false, message = "An error occurred while deleting the user." });
+            }
         }
     }
 }

@@ -1,0 +1,323 @@
+@model taskoreBusinessLogic.DBModel.NewsDBModel
+
+@{
+    ViewBag.Title = "Create News";
+    
+    // Get the current user's name from session
+    string userFullName = Session["UserFullName"] as string ?? "Admin";
+    int userId = Session["UserId"] != null ? (int)Session["UserId"] : 1;
+}
+
+@Html.Partial("_Header")
+
+
+<div class="container">
+    <div class="create-project-content">
+        @if (!string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
+        {
+            <div class="success-message">
+                <i class="fas fa-check-circle"></i>
+                <span>@TempData["SuccessMessage"]</span>
+            </div>
+        }
+        
+        @using (Html.BeginForm("CreateNewsPage", "Main", FormMethod.Post, new { id = "news-form", @class = "create-form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "validation-summary" })
+            
+            <div class="form-card">
+                <div class="card-header">
+                    <i class="fas fa-newspaper"></i>
+                    <div class="card-creator">
+                        <span class="creator-label">News Creator</span>
+                        <span class="creator-name">@userFullName</span>
+                    </div>
+                </div>
+                
+                <div class="form-sections">
+                    <div class="form-section">
+                        <h2><i class="fas fa-info-circle"></i> Basic Information</h2>
+                        
+                        <div class="form-group">
+                            <label for="Title">News Title <span class="required">*</span></label>
+                            @Html.TextBoxFor(m => m.Title, new { @class = "form-input", placeholder = "Enter the title of the news item" })
+                            @Html.ValidationMessageFor(m => m.Title, "", new { @class = "error-message" })
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="Content">News Content <span class="required">*</span></label>
+                            <div class="input-hint">Provide detailed information for this news item</div>
+                            @Html.TextAreaFor(m => m.Content, new { @class = "form-input", placeholder = "Write the news content in detail...", rows = "6" })
+                            @Html.ValidationMessageFor(m => m.Content, "", new { @class = "error-message" })
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h2><i class="fas fa-cog"></i> News Details</h2>
+                        
+                        <div class="form-group">
+                            <label for="Category">Category <span class="required">*</span></label>
+                            @Html.DropDownListFor(m => m.Category, 
+                                new List<SelectListItem>
+                                {
+                                    new SelectListItem { Text = "Select a category", Value = "", Selected = true },
+                                    new SelectListItem { Text = "Updates", Value = "Updates" },
+                                    new SelectListItem { Text = "Events", Value = "Events" },
+                                    new SelectListItem { Text = "Market Insights", Value = "Market Insights" },
+                                    new SelectListItem { Text = "Success Stories", Value = "Success Stories" },
+                                    new SelectListItem { Text = "Security", Value = "Security" }
+                                }, 
+                                new { @class = "form-input" })
+                            @Html.ValidationMessageFor(m => m.Category, "", new { @class = "error-message" })
+                        </div>
+                        
+                        <div class="form-flex">
+                            <div class="form-group">
+                                <label for="Priority">Priority <span class="required">*</span></label>
+                                @Html.DropDownListFor(m => m.Priority,
+                                    new List<SelectListItem>
+                                    {
+                                        new SelectListItem { Text = "Select a priority", Value = "", Selected = true },
+                                        new SelectListItem { Text = "High", Value = "High" },
+                                        new SelectListItem { Text = "Medium", Value = "Medium" },
+                                        new SelectListItem { Text = "Low", Value = "Low" }
+                                    },
+                                    new { @class = "form-input" })
+                                @Html.ValidationMessageFor(m => m.Priority, "", new { @class = "error-message" })
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="Author">Author <span class="required">*</span></label>
+                                @Html.TextBoxFor(m => m.Author, new { @class = "form-input", Value = userFullName })
+                                @Html.ValidationMessageFor(m => m.Author, "", new { @class = "error-message" })
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="ImageUrl">Image URL</label>
+                            <div class="input-hint">Enter the URL for the news image (optional)</div>
+                            @Html.TextBoxFor(m => m.ImageUrl, new { @class = "form-input", placeholder = "https://example.com/image.jpg" })
+                            @Html.ValidationMessageFor(m => m.ImageUrl, "", new { @class = "error-message" })
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="@Url.Action("News", "Main")" class="cancel-btn">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-plus"></i> Publish News
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@Html.Partial("_Footer")
+
+<style>
+    body {
+        background-color: #f8fafc;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+        color: #1e293b;
+        line-height: 1.5;
+    }
+    
+    /* Container */
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 1.5rem 4rem;
+    }
+    
+    /* Form Card */
+    .form-card {
+        background-color: #ffffff;
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    
+    .card-header {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+        background-color: #f1f5f9;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .card-header i {
+        font-size: 2rem;
+        color: #3b82f6;
+        margin-right: 1rem;
+    }
+    
+    .card-creator {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .creator-label {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+    
+    .creator-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    /* Form Sections */
+    .form-sections {
+        padding: 2rem;
+    }
+    
+    .form-section {
+        margin-bottom: 2.5rem;
+    }
+    
+    .form-section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-section h2 i {
+        margin-right: 0.75rem;
+        color: #3b82f6;
+    }
+    
+    /* Form Groups */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-flex {
+        display: flex;
+        gap: 1.5rem;
+    }
+    
+    .form-flex .form-group {
+        flex: 1;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .required {
+        color: #ef4444;
+        margin-left: 0.25rem;
+    }
+    
+    .input-hint {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.375rem;
+        font-size: 0.9375rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .form-input:focus {
+        border-color: #3b82f6;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    textarea.form-input {
+        resize: vertical;
+    }
+    
+    /* Error Messages */
+    .error-message {
+        display: block;
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+    
+    .validation-summary {
+        color: #ef4444;
+        background-color: #fee2e2;
+        border: 1px solid #fecaca;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Success Message */
+    .success-message {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: #ecfdf5;
+        border: 1px solid #d1fae5;
+        color: #059669;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .success-message i {
+        font-size: 1.25rem;
+    }
+    
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding: 1.5rem 2rem;
+        border-top: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+    }
+    
+    .cancel-btn, .submit-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        font-weight: 500;
+        font-size: 0.9375rem;
+        border-radius: 0.375rem;
+        transition: all 0.15s ease-in-out;
+    }
+    
+    .cancel-btn {
+        color: #64748b;
+        background-color: white;
+        border: 1px solid #e2e8f0;
+        text-decoration: none;
+    }
+    
+    .cancel-btn:hover {
+        background-color: #f1f5f9;
+    }
+    
+    .submit-btn {
+        color: white;
+        background-color: #3b82f6;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .submit-btn:hover {
+        background-color: #2563eb;
+    }
+</style> 

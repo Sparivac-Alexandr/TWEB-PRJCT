@@ -7,14 +7,10 @@
 
     <div class="projects-container">
         <div class="projects-header">
-            <div class="back-link">
-                <a href="@Url.Action("MyProfile", "Main")" class="back-btn">
-                    <i class="fas fa-arrow-left"></i> Back to Profile
-                </a>
-            </div>
             <div class="projects-title">
                 <h1>News & Updates</h1>
             </div>
+           
         </div>
 
         <div class="projects-body">
@@ -50,19 +46,9 @@
                         <div class="project-client">
                             <div class="client-label">By:</div>
                             <div class="client-name">@news["Author"]</div>
-                            <div class="read-more-link">
-                                <a href="#">Read More <i class="fas fa-arrow-right"></i></a>
-                            </div>
                         </div>
                     </div>
                 }
-                
-                <div class="pagination">
-                    <a href="#" class="active">1</a>
-                    <a href="#">2</a>
-                    <a href="#">3</a>
-                    <a href="#" class="next">Next <i class="fas fa-chevron-right"></i></a>
-                </div>
             </div>
         </div>
     </div>
@@ -80,10 +66,15 @@
 
     .projects-header {
         margin-bottom: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .back-link {
         margin-bottom: 1rem;
+        flex: 1 0 100%;
     }
 
     .back-btn {
@@ -109,6 +100,27 @@
         font-size: 2rem;
         color: #0f172a;
         margin: 0;
+    }
+    
+    .create-news-btn {
+        margin-left: auto;
+    }
+    
+    .btn-create-news {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background-color: #3b82f6;
+        color: white;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background-color 0.2s ease;
+    }
+    
+    .btn-create-news:hover {
+        background-color: #2563eb;
     }
 
     .projects-body {
@@ -208,56 +220,5 @@
 
     .client-label {
         font-weight: 600;
-    }
-    
-    .read-more-link {
-        margin-left: auto;
-    }
-    
-    .read-more-link a {
-        color: #3b82f6;
-        font-weight: 600;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: color 0.2s;
-    }
-    
-    .read-more-link a:hover {
-        color: #2563eb;
-    }
-    
-    .pagination {
-        display: flex;
-        justify-content: center;
-        gap: 0.5rem;
-        margin-top: 2rem;
-    }
-    
-    .pagination a {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border-radius: 4px;
-        color: #64748b;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-    
-    .pagination a.next {
-        width: auto;
-        padding: 0 0.75rem;
-    }
-    
-    .pagination a.active {
-        background-color: #3b82f6;
-        color: white;
-    }
-    
-    .pagination a:hover:not(.active) {
-        background-color: #f1f5f9;
     }
 </style> 
