@@ -5,6 +5,28 @@
     // Get the current user's name from session
     string userFullName = Session["UserFullName"] as string ?? "Admin";
     int userId = Session["UserId"] != null ? (int)Session["UserId"] : 1;
+    
+    // Declare projectService
+    var _projectService = new taskoreBusinessLogic.BL_Struct.ProjectBL();
+}
+
+// Add helper method for fetching user names
+@functions {
+    public string FetchUserName(int userId)
+    {
+        try
+        {
+            using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+            {
+                var user = context.Users.FirstOrDefault(u => u.Id == userId);
+                return user != null ? string.Format("{0} {1}", user.FirstName, user.LastName) : "Unknown User";
+            }
+        }
+        catch
+        {
+            return "Unknown User";
+        }
+    }
 }
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -437,9 +459,6 @@
                                                             <td>N/A</td>
                                                             <td>
                                                                 <div class="btn-group">
-                                                                    <button type="button" class="btn btn-sm btn-outline-primary edit-user" data-id="@user.Id" title="Edit">
-                                                                        <i class="fas fa-edit"></i>
-                                                                    </button>
                                                                     <button type="button" class="btn btn-sm btn-outline-danger delete-user" data-id="@user.Id" title="Delete" onclick="confirmDeleteUser(@user.Id)">
                                                                         <i class="fas fa-trash-alt"></i>
                                                                     </button>
@@ -517,82 +536,224 @@
             <h1>Manage Projects</h1>
             <p class="text-muted">View and manage all projects.</p>
             
-            <div class="row mt-4">
-                <div class="col-md-8">
-                    <div class="chart-container">
-                        <h3>User Activity</h3>
-                        <canvas id="usersChart" height="250"></canvas>
-                    </div>
+            @if (!string.IsNullOrEmpty(TempData["ProjectSuccessMessage"]?.ToString()))
+            {
+                <div class="custom-alert custom-alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span>@TempData["ProjectSuccessMessage"]</span>
+                    <button type="button" class="custom-alert-close" onclick="this.parentElement.remove()">&times;</button>
                 </div>
-                <div class="col-md-4">
+            }
+            
+            @if (!string.IsNullOrEmpty(TempData["ProjectErrorMessage"]?.ToString()))
+            {
+                <div class="custom-alert custom-alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span>@TempData["ProjectErrorMessage"]</span>
+                    <button type="button" class="custom-alert-close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            }
+            
+            <div class="row mt-4">
+                <div class="col-md-12">
                     <div class="chart-container">
-                        <h3>Projects Distribution</h3>
-                        <canvas id="projectsChart" height="250"></canvas>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3>All Projects</h3>
+                            <div class="d-flex gap-2">
+                                <select class="form-select form-select-sm" id="filterCategory">
+                                    <option value="">All Categories</option>
+                                    <option value="Web Development">Web Development</option>
+                                    <option value="Graphic Design">Graphic Design</option>
+                                    <option value="Content Writing">Content Writing</option>
+                                    <option value="Digital Marketing">Digital Marketing</option>
+                                    <option value="Mobile Apps">Mobile Apps</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline-secondary" id="resetProjectFilter">
+                                    <i class="fas fa-sync-alt"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="projectsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Budget</th>
+                                        <th>Deadline</th>
+                                        <th>Created By</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        try
+                                        {
+                                            var projectService = _projectService ?? new taskoreBusinessLogic.BL_Struct.ProjectBL();
+                                            var allProjects = projectService.GetAllProjects();
+                                            
+                                            if (allProjects != null && allProjects.Any())
+                                            {
+                                                foreach (var project in allProjects)
+                                                {
+                                                    <tr data-category="@project.Category">
+                                                        <td>@project.Id</td>
+                                                        <td>
+                                                            <div class="text-truncate" style="max-width: 250px;" title="@project.Title">
+                                                                @project.Title
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-secondary">@project.Category</span>
+                                                        </td>
+                                                        <td>@project.Budget</td>
+                                                        <td>@(!string.IsNullOrEmpty(project.Deadline) ? project.Deadline : "No deadline")</td>
+                                                        <td>@FetchUserName(project.UserId)</td>
+                                                        <td>
+                                                            <div class="btn-group">
+                                                                <button type="button" class="btn btn-sm btn-outline-primary edit-project" data-id="@project.Id" title="Edit" onclick="editProjectItem(@project.Id)">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </button>
+                                                                <button type="button" class="btn btn-sm btn-outline-danger delete-project" data-id="@project.Id" title="Delete" onclick="confirmDeleteProject(@project.Id)">
+                                                                    <i class="fas fa-trash-alt"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="7" class="text-center py-4">
+                                                        <div class="text-muted">
+                                                            <i class="fas fa-info-circle me-2"></i> No projects found
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        catch (Exception error)
+                                        {
+                                            <tr>
+                                                <td colspan="7" class="text-center py-4">
+                                                    <div class="text-danger">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i> Error loading projects: @error.Message
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Edit Project Modal -->
+            <div id="editProjectModal" class="custom-modal">
+                <div class="custom-modal-dialog">
+                    <div class="custom-modal-content">
+                        <div class="custom-modal-header">
+                            <h5 class="custom-modal-title">Edit Project</h5>
+                            <button type="button" class="custom-modal-close" onclick="closeModal('editProjectModal')">&times;</button>
+                        </div>
+                        <div class="custom-modal-body">
+                            <form id="editProjectForm">
+                                <input type="hidden" id="editProjectId" name="Id" />
+                                
+                                <div class="mb-3">
+                                    <label for="editProjectTitle" class="form-label">Title</label>
+                                    <input type="text" class="form-control" id="editProjectTitle" name="Title" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="editProjectDescription" class="form-label">Description</label>
+                                    <textarea class="form-control" id="editProjectDescription" name="Description" rows="4" required></textarea>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="editProjectCategory" class="form-label">Category</label>
+                                            <select class="form-control" id="editProjectCategory" name="Category" required>
+                                                <option value="Web Development">Web Development</option>
+                                                <option value="Graphic Design">Graphic Design</option>
+                                                <option value="Content Writing">Content Writing</option>
+                                                <option value="Digital Marketing">Digital Marketing</option>
+                                                <option value="Mobile Apps">Mobile Apps</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="editProjectBudget" class="form-label">Budget</label>
+                                            <input type="text" class="form-control" id="editProjectBudget" name="Budget" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="editProjectDeadline" class="form-label">Deadline</label>
+                                            <select class="form-control" id="editProjectDeadline" name="Deadline">
+                                                <option value="">No deadline</option>
+                                                <option value="Urgent (24h)">Urgent (24h)</option>
+                                                <option value="Within a week">Within a week</option>
+                                                <option value="Within a month">Within a month</option>
+                                                <option value="Long-term">Long-term</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="editProjectRequiredSkills" class="form-label">Required Skills</label>
+                                            <input type="text" class="form-control" id="editProjectRequiredSkills" name="RequiredSkills" placeholder="Skills separated by commas">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="custom-modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('editProjectModal')">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="saveProjectChanges">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- End of Edit Project Modal -->
         </div>
         
         <!-- Add New Post Section -->
         <div id="add-post-section" class="content-section">
-            <h1>Add News Post</h1>
-            <p class="text-muted">Create and publish new content to the news section.</p>
+            <h1>Add New Post</h1>
+            <p class="text-muted">Create a new news post.</p>
             
-            @if (!string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
-            {
-                <div class="success-message">
-                    <i class="fas fa-check-circle"></i>
-                    <span>@TempData["SuccessMessage"]</span>
-                </div>
-            }
-            
-            @if (!string.IsNullOrEmpty(TempData["ErrorMessage"]?.ToString()))
-            {
-                <div class="alert alert-danger d-flex align-items-center" role="alert">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <span>@TempData["ErrorMessage"]</span>
-                </div>
-            }
-            
-            @using (Html.BeginForm("CreateNewsPage", "Main", FormMethod.Post, new { id = "news-form" }))
-            {
-                @Html.AntiForgeryToken()
-                @Html.ValidationSummary(true, "", new { @class = "validation-summary" })
-                
-                <div class="form-card">
-                    <div class="card-header">
-                        <i class="fas fa-newspaper"></i>
-                        <div class="card-creator">
-                            <span class="creator-label">News Author</span>
-                            <span class="creator-name">@userFullName</span>
-                        </div>
-                    </div>
-                    
-                    <div class="form-sections">
-                        <div class="form-section">
-                            <h2><i class="fas fa-info-circle"></i> News Content</h2>
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="chart-container">
+                        <form id="addNewsForm" action="@Url.Action("AddNews", "Main")" method="post">
+                            @Html.AntiForgeryToken()
                             
-                            <div class="form-group">
-                                <label for="Title">Title <span class="required">*</span></label>
-                                <input type="text" class="form-control" id="Title" name="Title" placeholder="Enter news title" required>
+                            <div class="mb-3">
+                                <label for="Title" class="form-label">Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="Title" name="Title" required>
                             </div>
                             
-                            <div class="form-group">
-                                <label for="Content">Content <span class="required">*</span></label>
-                                <div class="input-hint">Provide detailed information for this news item</div>
-                                <textarea class="form-control" id="Content" name="Content" rows="6" placeholder="Write the news content..." required></textarea>
+                            <div class="mb-3">
+                                <label for="Content" class="form-label">Content <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="Content" name="Content" rows="6" required></textarea>
                             </div>
-                        </div>
-                        
-                        <div class="form-section">
-                            <h2><i class="fas fa-cog"></i> Publishing Details</h2>
                             
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="Category">Category <span class="required">*</span></label>
+                                    <div class="mb-3">
+                                        <label for="Category" class="form-label">Category <span class="text-danger">*</span></label>
                                         <select class="form-control" id="Category" name="Category" required>
-                                            <option value="" selected disabled>Select a category</option>
                                             <option value="Updates">Updates</option>
                                             <option value="Events">Events</option>
                                             <option value="Market Insights">Market Insights</option>
@@ -602,10 +763,9 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="Priority">Priority <span class="required">*</span></label>
+                                    <div class="mb-3">
+                                        <label for="Priority" class="form-label">Priority <span class="text-danger">*</span></label>
                                         <select class="form-control" id="Priority" name="Priority" required>
-                                            <option value="" selected disabled>Select priority level</option>
                                             <option value="High">High</option>
                                             <option value="Medium">Medium</option>
                                             <option value="Low">Low</option>
@@ -614,36 +774,29 @@
                                 </div>
                             </div>
                             
-                            <div class="row mt-3">
+                            <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="Author">Author <span class="required">*</span></label>
-                                        <input type="text" class="form-control" id="Author" name="Author" value="@userFullName" required>
+                                    <div class="mb-3">
+                                        <label for="Author" class="form-label">Author <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="Author" name="Author" required value="@userFullName">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="ImageUrl">Image URL</label>
+                                    <div class="mb-3">
+                                        <label for="ImageUrl" class="form-label">Image URL</label>
                                         <input type="text" class="form-control" id="ImageUrl" name="ImageUrl" placeholder="https://example.com/image.jpg">
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Hidden PublishDate field -->
-                            <input type="hidden" name="PublishDate" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")" />
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-outline-secondary" onclick="clearForm()">
-                            <i class="fas fa-times"></i> Clear
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i> Publish News
-                        </button>
+                            <div class="text-end mt-4">
+                                <button type="button" class="btn btn-secondary me-2" onclick="clearForm()">Clear Form</button>
+                                <button type="submit" class="btn btn-primary">Publish Post</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            }
+            </div>
         </div>
         
         <!-- Manage Posts Section -->
@@ -939,14 +1092,27 @@
     
     // Wait for the DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM ready, initializing dashboard functions');
+        
         // Initialize all functionality
         initTabNavigation();
         initCharts();
         initNewsManagement();
         initUserManagement();
+        initProjectManagement();
+        
+        console.log('Project management initialized');
         
         // Set up form clearing button
         document.querySelector('button[onclick="clearForm()"]')?.addEventListener('click', clearForm);
+        
+        // Add click handlers for modal close buttons
+        document.querySelectorAll('.custom-modal-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modalId = btn.closest('.custom-modal').id;
+                closeModal(modalId);
+            });
+        });
         
         // Check if we need to show a specific section (from ViewBag)
         @if (!string.IsNullOrEmpty(ViewBag.ActiveSection as string))
@@ -975,6 +1141,8 @@
             }
             </text>
         }
+        
+        console.log('Dashboard initialization complete');
     });
     
     // Custom modal functions
@@ -1266,10 +1434,22 @@
             contentField.value = 'Loading content...';
             
             // Select the correct category
-            for (let i = 0; i < categorySelect.options.length; i++) {
-                if (categorySelect.options[i].value === category) {
-                    categorySelect.selectedIndex = i;
-                    break;
+            if (categorySelect && category) {
+                // Find the matching option
+                const categories = ["Web Development", "Graphic Design", "Content Writing", "Digital Marketing", "Mobile Apps"];
+                const categoryIndex = categories.indexOf(category);
+                
+                if (categoryIndex >= 0) {
+                    // If we found a match in our known categories
+                    categorySelect.selectedIndex = categoryIndex + 1; // +1 because the first option is empty/default
+                } else {
+                    // Try to match directly by value
+                    for (let i = 0; i < categorySelect.options.length; i++) {
+                        if (categorySelect.options[i].value === category) {
+                            categorySelect.selectedIndex = i;
+                            break;
+                        }
+                    }
                 }
             }
             
@@ -1323,13 +1503,14 @@
             
             xhr.onerror = function() {
                 console.error('Network error while fetching news content');
-                contentField.value = 'Error: Network error while fetching content.';
                 
                 // Reset button
                 if (button) {
                     button.disabled = false;
                     button.innerHTML = '<i class="fas fa-edit"></i>';
                 }
+                
+                showNotification('error', 'Network error while fetching news content.');
             };
             
             xhr.send();
@@ -1385,9 +1566,12 @@
             const data = new URLSearchParams();
             for (const [key, value] of formData.entries()) {
                 data.append(key, value);
+                console.log(`${key}: ${value}`); // Debug: log the form values
             }
             
             const saveUrl = '@Url.Action("EditNews", "Main")';
+            console.log('Saving news to URL:', saveUrl); // Debug: log the save URL
+            
             const xhr = new XMLHttpRequest();
             xhr.open('POST', saveUrl, true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -1405,6 +1589,7 @@
                     
                     if (xhr.status === 200) {
                         try {
+                            console.log('Server response:', xhr.responseText); // Debug: log the server response
                             const response = JSON.parse(xhr.responseText);
                             if (response.success) {
                                 showNotification('success', 'News item updated successfully.');
@@ -1412,30 +1597,36 @@
                                 // Update the row in the table with new values
                                 const newsId = formData.get('Id');
                                 const row = document.querySelector(`.edit-news[data-id="${newsId}"]`)?.closest('tr');
+                                
+                                console.log('Found row:', row); // Debug: verify we found the row
+                                
                                 if (row) {
                                     // Update data attributes
                                     row.setAttribute('data-category', formData.get('Category'));
                                     row.setAttribute('data-priority', formData.get('Priority'));
                                     
                                     // Update visible fields
-                                    row.querySelector('td:nth-child(2)').textContent = formData.get('Title');
+                                    row.querySelector('td:nth-child(2)').innerHTML = `
+                                        <div class="text-truncate" style="max-width: 250px;" title="${formData.get('Title')}">
+                                            ${formData.get('Title')}
+                                        </div>
+                                    `;
                                     
                                     // Update category badge
                                     const categoryCell = row.querySelector('td:nth-child(3)');
                                     categoryCell.innerHTML = `<span class="badge bg-secondary">${formData.get('Category')}</span>`;
                                     
-                                    // Update priority badge
-                                    const priorityCell = row.querySelector('td:nth-child(4)');
-                                    let badgeClass = 'bg-info text-dark';
-                                    if (formData.get('Priority') === 'High') {
-                                        badgeClass = 'bg-danger';
-                                    } else if (formData.get('Priority') === 'Medium') {
-                                        badgeClass = 'bg-warning text-dark';
-                                    }
-                                    priorityCell.innerHTML = `<span class="badge ${badgeClass}">${formData.get('Priority')}</span>`;
+                                    // Update budget
+                                    row.querySelector('td:nth-child(4)').textContent = formData.get('Budget');
                                     
-                                    // Update author
-                                    row.querySelector('td:nth-child(5)').textContent = formData.get('Author');
+                                    // Update deadline if provided
+                                    const deadlineCell = row.querySelector('td:nth-child(5)');
+                                    const deadlineValue = formData.get('Deadline');
+                                    deadlineCell.textContent = deadlineValue || 'No deadline';
+                                    
+                                    console.log('Row updated successfully'); // Debug: confirm the update completed
+                                } else {
+                                    console.error('Could not find row to update'); // Debug: log error finding the row
                                 }
                             } else {
                                 showNotification('error', response.message || 'Failed to update news post.');
@@ -1620,6 +1811,411 @@
         } catch (e) {
             console.error('Error in delete operation:', e);
             showNotification('error', 'Error: ' + e.message);
+        }
+    }
+    
+    // Initialize project management functionality
+    function initProjectManagement() {
+        console.log('Initializing project management');
+        
+        // Set up filter functionality
+        const filterCategory = document.getElementById('filterCategory');
+        const resetProjectFilter = document.getElementById('resetProjectFilter');
+        const projectsTable = document.getElementById('projectsTable');
+        
+        if (filterCategory && resetProjectFilter && projectsTable) {
+            // Apply filters function
+            function applyProjectFilters() {
+                const categoryValue = filterCategory.value;
+                
+                const rows = projectsTable.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const rowCategory = row.getAttribute('data-category');
+                    
+                    const categoryMatch = !categoryValue || rowCategory === categoryValue;
+                    
+                    if (categoryMatch) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Add filter event listeners
+            filterCategory.addEventListener('change', applyProjectFilters);
+            resetProjectFilter.addEventListener('click', function() {
+                filterCategory.value = '';
+                applyProjectFilters();
+            });
+        }
+        
+        // Set up edit button functionality
+        const saveProjectButton = document.getElementById('saveProjectChanges');
+        if (saveProjectButton) {
+            console.log('Found save project button, adding event listener');
+            saveProjectButton.addEventListener('click', function() {
+                console.log('Save project button clicked');
+                saveProjectChanges();
+            });
+        } else {
+            console.error('Save project button not found in the DOM');
+        }
+    }
+    
+    // Function to delete a project
+    function confirmDeleteProject(projectId) {
+        if (!projectId) {
+            console.error('Project ID is required');
+            return;
+        }
+        
+        try {
+            // Create the request URL
+            const deleteUrl = '@Url.Action("DeleteProject", "Main")';
+            
+            // Show loading state on the button
+            const button = document.querySelector(`.delete-project[data-id="${projectId}"]`);
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            }
+            
+            // Create XHR request
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', deleteUrl, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            
+            // Prepare data
+            const data = 'id=' + encodeURIComponent(projectId) + 
+                        '&__RequestVerificationToken=' + encodeURIComponent(antiForgeryToken);
+            
+            // Set up response handler
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    // Remove the row
+                    try {
+                        const row = button ? button.closest('tr') : document.querySelector(`.delete-project[data-id="${projectId}"]`)?.closest('tr');
+                        if (row) {
+                            row.remove();
+                            showNotification('success', 'Project deleted successfully.');
+                            
+                            // Check if there are no more rows and add empty message if needed
+                            const remainingRows = document.querySelectorAll('#projectsTable tbody tr').length;
+                            if (remainingRows === 0) {
+                                const tbody = document.querySelector('#projectsTable tbody');
+                                if (tbody) {
+                                    const emptyRow = document.createElement('tr');
+                                    emptyRow.innerHTML = `
+                                        <td colspan="7" class="text-center py-4">
+                                            <div class="text-muted">
+                                                <i class="fas fa-info-circle me-2"></i> No projects found
+                                            </div>
+                                        </td>
+                                    `;
+                                    tbody.appendChild(emptyRow);
+                                }
+                            }
+                        } else {
+                            console.error('Could not find row to delete');
+                            showNotification('error', 'Could not find the project to remove from the table.');
+                        }
+                    } catch (e) {
+                        console.error('Error removing row:', e);
+                        showNotification('error', 'Error removing row: ' + e.message);
+                    }
+                }
+            };
+            
+            // Error handler
+            xhr.onerror = function() {
+                console.error('Network error during delete operation');
+                showNotification('error', 'Network error during delete operation.');
+                
+                // Reset button
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                }
+            };
+            
+            // Send the request
+            xhr.send(data);
+        } catch (e) {
+            console.error('Error in delete operation:', e);
+            showNotification('error', 'Error: ' + e.message);
+        }
+    }
+    
+    // Function to edit project
+    function editProjectItem(projectId) {
+        if (!projectId) {
+            console.error('Project ID is required');
+            return;
+        }
+        
+        try {
+            // Find the row for this project item
+            const row = document.querySelector(`.edit-project[data-id="${projectId}"]`)?.closest('tr');
+            if (!row) {
+                console.error('Row not found for project ID', projectId);
+                return;
+            }
+            
+            // Show loading state on the button
+            const button = document.querySelector(`.edit-project[data-id="${projectId}"]`);
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            }
+            
+            // Find form elements
+            const editForm = document.getElementById('editProjectForm');
+            const idField = document.getElementById('editProjectId');
+            const titleField = document.getElementById('editProjectTitle');
+            const descriptionField = document.getElementById('editProjectDescription');
+            const categorySelect = document.getElementById('editProjectCategory');
+            const budgetField = document.getElementById('editProjectBudget');
+            const deadlineField = document.getElementById('editProjectDeadline');
+            const skillsField = document.getElementById('editProjectRequiredSkills');
+            
+            if (!editForm || !idField || !titleField || !descriptionField || !categorySelect || !budgetField) {
+                console.error('Required edit form elements not found');
+                showNotification('error', 'Required edit form elements not found.');
+                return;
+            }
+            
+            // Get data from the server for this project
+            const getProjectUrl = '@Url.Action("GetProjectById", "Main")';
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `${getProjectUrl}?id=${projectId}`, true);
+            
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    // Reset button state
+                    if (button) {
+                        button.disabled = false;
+                        button.innerHTML = '<i class="fas fa-edit"></i>';
+                    }
+                    
+                    if (xhr.status === 200) {
+                        try {
+                            const projectData = JSON.parse(xhr.responseText);
+                            if (projectData.success) {
+                                // Set values in the form
+                                idField.value = projectData.Id;
+                                titleField.value = projectData.Title || '';
+                                descriptionField.value = projectData.Description || '';
+                                budgetField.value = projectData.Budget || '';
+                                
+                                if (deadlineField && projectData.Deadline) {
+                                    // Set the deadline dropdown
+                                    for (let i = 0; i < deadlineField.options.length; i++) {
+                                        if (deadlineField.options[i].value === projectData.Deadline) {
+                                            deadlineField.selectedIndex = i;
+                                            break;
+                                        }
+                                    }
+                                } else if (deadlineField) {
+                                    deadlineField.selectedIndex = 0; // default to "No deadline"
+                                }
+                                
+                                if (skillsField) {
+                                    skillsField.value = projectData.RequiredSkills || '';
+                                }
+                                
+                                // Select the correct category
+                                if (categorySelect && projectData.Category) {
+                                    // Find the matching option
+                                    const categories = ["Web Development", "Graphic Design", "Content Writing", "Digital Marketing", "Mobile Apps"];
+                                    const categoryIndex = categories.indexOf(projectData.Category);
+                                    
+                                    if (categoryIndex >= 0) {
+                                        // If we found a match in our known categories
+                                        categorySelect.selectedIndex = categoryIndex + 1; // +1 because the first option is empty/default
+                                    } else {
+                                        // Try to match directly by value
+                                        for (let i = 0; i < categorySelect.options.length; i++) {
+                                            if (categorySelect.options[i].value === projectData.Category) {
+                                                categorySelect.selectedIndex = i;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                // Show the modal
+                                showModal('editProjectModal');
+                            } else {
+                                showNotification('error', projectData.message || 'Could not load project data.');
+                            }
+                        } catch (e) {
+                            console.error('Error parsing project data:', e);
+                            showNotification('error', 'Error parsing server response.');
+                        }
+                    } else {
+                        console.error('Server error:', xhr.status);
+                        showNotification('error', 'Server error: ' + xhr.status);
+                    }
+                }
+            };
+            
+            xhr.onerror = function() {
+                console.error('Network error while fetching project data');
+                
+                // Reset button
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-edit"></i>';
+                }
+                
+                showNotification('error', 'Network error while fetching project data.');
+            };
+            
+            xhr.send();
+        } catch (e) {
+            console.error('Error preparing edit form:', e);
+            showNotification('error', 'Error preparing edit form: ' + e.message);
+        }
+    }
+    
+    // Function to save project changes
+    function saveProjectChanges() {
+        try {
+            const saveButton = document.getElementById('saveProjectChanges');
+            const editForm = document.getElementById('editProjectForm');
+            
+            if (!editForm) {
+                console.error('Edit form not found');
+                return;
+            }
+            
+            // Validate form fields
+            const requiredFields = ['editProjectTitle', 'editProjectDescription', 'editProjectCategory', 'editProjectBudget'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field || !field.value.trim()) {
+                    isValid = false;
+                    if (field) {
+                        field.classList.add('is-invalid');
+                    }
+                } else if (field) {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            if (!isValid) {
+                showNotification('error', 'Please fill in all required fields.');
+                return;
+            }
+            
+            // Disable save button and show loading
+            if (saveButton) {
+                saveButton.disabled = true;
+                saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            }
+            
+            // Create FormData
+            const formData = new FormData(editForm);
+            formData.append('__RequestVerificationToken', antiForgeryToken);
+            
+            // Convert FormData to URL encoded string
+            const data = new URLSearchParams();
+            for (const [key, value] of formData.entries()) {
+                data.append(key, value);
+                console.log(`${key}: ${value}`); // Debug: log the form values
+            }
+            
+            const saveUrl = '@Url.Action("EditProject", "Main")';
+            console.log('Saving project to URL:', saveUrl); // Debug: log the save URL
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', saveUrl, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    // Enable button
+                    if (saveButton) {
+                        saveButton.disabled = false;
+                        saveButton.innerHTML = 'Save Changes';
+                    }
+                    
+                    // Hide modal
+                    closeModal('editProjectModal');
+                    
+                    if (xhr.status === 200) {
+                        try {
+                            console.log('Server response:', xhr.responseText); // Debug: log the server response
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.success) {
+                                showNotification('success', 'Project updated successfully.');
+                                
+                                // Update the row in the table with new values
+                                const projectId = formData.get('Id');
+                                const row = document.querySelector(`.edit-project[data-id="${projectId}"]`)?.closest('tr');
+                                
+                                console.log('Found row:', row); // Debug: verify we found the row
+                                
+                                if (row) {
+                                    // Update data attributes
+                                    row.setAttribute('data-category', formData.get('Category'));
+                                    
+                                    // Update visible fields
+                                    row.querySelector('td:nth-child(2)').innerHTML = `
+                                        <div class="text-truncate" style="max-width: 250px;" title="${formData.get('Title')}">
+                                            ${formData.get('Title')}
+                                        </div>
+                                    `;
+                                    
+                                    // Update category badge
+                                    const categoryCell = row.querySelector('td:nth-child(3)');
+                                    categoryCell.innerHTML = `<span class="badge bg-secondary">${formData.get('Category')}</span>`;
+                                    
+                                    // Update budget
+                                    row.querySelector('td:nth-child(4)').textContent = formData.get('Budget');
+                                    
+                                    // Update deadline if provided
+                                    const deadlineCell = row.querySelector('td:nth-child(5)');
+                                    const deadlineValue = formData.get('Deadline');
+                                    deadlineCell.textContent = deadlineValue || 'No deadline';
+                                    
+                                    console.log('Row updated successfully'); // Debug: confirm the update completed
+                                } else {
+                                    console.error('Could not find row to update'); // Debug: log error finding the row
+                                }
+                            } else {
+                                showNotification('error', response.message || 'Failed to update project.');
+                            }
+                        } catch (e) {
+                            console.error('Error parsing response:', e);
+                            showNotification('error', 'Error parsing server response.');
+                        }
+                    } else {
+                        console.error('Server error:', xhr.status);
+                        showNotification('error', 'Server error: ' + xhr.status);
+                    }
+                }
+            };
+            
+            xhr.onerror = function() {
+                console.error('Network error during save operation');
+                
+                // Enable button
+                if (saveButton) {
+                    saveButton.disabled = false;
+                    saveButton.innerHTML = 'Save Changes';
+                }
+                
+                showNotification('error', 'Network error during save operation.');
+            };
+            
+            xhr.send(data.toString());
+        } catch (e) {
+            console.error('Error saving project:', e);
+            showNotification('error', 'Error saving project: ' + e.message);
         }
     }
 </script> 

@@ -82,5 +82,102 @@ namespace taskoreBusinessLogic.BL_Struct
                 return new List<ProjectDBModel>();
             }
         }
+        
+        public bool DeleteProject(int id)
+        {
+            try
+            {
+                Debug.WriteLine($"Deleting project with ID: {id}");
+                
+                using (var context = new ProjectContext())
+                {
+                    var project = context.Projects.Find(id);
+                    if (project != null)
+                    {
+                        context.Projects.Remove(project);
+                        int rowsAffected = context.SaveChanges();
+                        Debug.WriteLine($"Project deletion completed. Rows affected: {rowsAffected}");
+                        return rowsAffected > 0;
+                    }
+                    Debug.WriteLine($"Project with ID {id} not found for deletion");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ERROR in DeleteProject for ID {id}: " + ex.Message);
+                if (ex.InnerException != null)
+                {
+                    Debug.WriteLine("Inner exception: " + ex.InnerException.Message);
+                }
+                Debug.WriteLine("Stack trace: " + ex.StackTrace);
+                return false;
+            }
+        }
+        
+        public ProjectDBModel GetProjectById(int id)
+        {
+            try
+            {
+                Debug.WriteLine($"Getting project with ID: {id}");
+                
+                using (var context = new ProjectContext())
+                {
+                    return context.Projects.FirstOrDefault(p => p.Id == id);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ERROR in GetProjectById for ID {id}: " + ex.Message);
+                if (ex.InnerException != null)
+                {
+                    Debug.WriteLine("Inner exception: " + ex.InnerException.Message);
+                }
+                Debug.WriteLine("Stack trace: " + ex.StackTrace);
+                return null;
+            }
+        }
+        
+        public bool UpdateProject(ProjectDBModel project)
+        {
+            try
+            {
+                Debug.WriteLine($"Updating project with ID: {project.Id}");
+                
+                using (var context = new ProjectContext())
+                {
+                    var existingProject = context.Projects.Find(project.Id);
+                    
+                    if (existingProject == null)
+                    {
+                        Debug.WriteLine($"Project with ID {project.Id} not found for update");
+                        return false;
+                    }
+                    
+                    // Update the fields
+                    existingProject.Title = project.Title;
+                    existingProject.Description = project.Description;
+                    existingProject.Category = project.Category;
+                    existingProject.Budget = project.Budget;
+                    existingProject.Deadline = project.Deadline;
+                    existingProject.RequiredSkills = project.RequiredSkills;
+                    
+                    // Save changes
+                    int rowsAffected = context.SaveChanges();
+                    Debug.WriteLine($"Project update completed. Rows affected: {rowsAffected}");
+                    return rowsAffected > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ERROR in UpdateProject for ID {project.Id}: " + ex.Message);
+                if (ex.InnerException != null)
+                {
+                    Debug.WriteLine("Inner exception: " + ex.InnerException.Message);
+                }
+                Debug.WriteLine("Stack trace: " + ex.StackTrace);
+                return false;
+            }
+        }
     }
 } 

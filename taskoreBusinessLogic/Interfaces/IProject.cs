@@ -12,5 +12,8 @@ namespace taskoreBusinessLogic.Interfaces
         bool CreateProject(ProjectDBModel data);
         List<ProjectDBModel> GetUserProjects(int userId);
         List<ProjectDBModel> GetAllProjects();
+        bool DeleteProject(int id);
+        ProjectDBModel GetProjectById(int id);
+        bool UpdateProject(ProjectDBModel project);
     }
 } 

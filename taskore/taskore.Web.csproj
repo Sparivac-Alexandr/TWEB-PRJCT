@@ -217,6 +217,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\" />
+    <Folder Include="Scripts\Admin\" />
     <Folder Include="Views\Base\" />
     <Folder Include="wwwroot\images\avatars\" />
   </ItemGroup>

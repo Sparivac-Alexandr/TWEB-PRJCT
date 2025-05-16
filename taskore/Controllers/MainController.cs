@@ -647,6 +647,56 @@ namespace taskore.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public ActionResult AddNews(NewsDBModel model)
+        {
+            Debug.WriteLine("News creation request received from Admin Dashboard: " + model.Title);
+            
+            // Verify user is logged in
+            if (Session["UserId"] == null)
+            {
+                TempData["ErrorMessage"] = "You need to be logged in to create news.";
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Set the publish date to now
+                    model.PublishDate = DateTime.Now;
+                    
+                    bool isCreated = _newsService.CreateNews(model);
+                    
+                    if (isCreated)
+                    {
+                        TempData["SuccessMessage"] = "News post created successfully!";
+                        ViewBag.ActiveSection = "manage-posts-section";
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "News creation failed. Please try again.";
+                        ViewBag.ActiveSection = "add-post-section";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Error creating news: " + ex.Message);
+                    TempData["ErrorMessage"] = "News creation failed: " + ex.Message;
+                    ViewBag.ActiveSection = "add-post-section";
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Please fill in all required fields correctly.";
+                ViewBag.ActiveSection = "add-post-section";
+            }
+            
+            // Return to the admin dashboard
+            return RedirectToAction("AdminDashboard");
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteNews(int id)
         {
             // Check if user is logged in
@@ -837,8 +887,130 @@ namespace taskore.Controllers
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error deleting user {id}: " + ex.Message);
+                Debug.WriteLine("Error deleting user: " + ex.Message);
                 return Json(new { success = false, message = "An error occurred while deleting the user." });
+            }
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteProject(int id)
+        {
+            // Check if user is logged in with admin privileges
+            if (Session["UserId"] == null)
+            {
+                return Json(new { success = false, message = "You need to be logged in to delete projects." });
+            }
+            
+            try
+            {
+                bool isDeleted = _projectService.DeleteProject(id);
+                
+                if (isDeleted)
+                {
+                    return Json(new { success = true, message = "Project deleted successfully." });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Failed to delete project. Project not found or already deleted." });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error deleting project: " + ex.Message);
+                return Json(new { success = false, message = "An error occurred while deleting the project." });
+            }
+        }
+        
+        [HttpGet]
+        public ActionResult GetProjectById(int id)
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                return Json(new { success = false, message = "You need to be logged in to get project details." }, JsonRequestBehavior.AllowGet);
+            }
+            
+            try
+            {
+                var project = _projectService.GetProjectById(id);
+                
+                if (project != null)
+                {
+                    return Json(new { 
+                        success = true, 
+                        Id = project.Id,
+                        Title = project.Title,
+                        Description = project.Description,
+                        Category = project.Category,
+                        Budget = project.Budget,
+                        Deadline = project.Deadline,
+                        RequiredSkills = project.RequiredSkills,
+                        UserId = project.UserId,
+                        CreatedAt = project.CreatedAt.ToString("yyyy-MM-dd")
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Project not found." }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error getting project {id}: " + ex.Message);
+                return Json(new { success = false, message = "An error occurred while getting the project details." }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditProject(ProjectDBModel model)
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                return Json(new { success = false, message = "You need to be logged in to edit projects." });
+            }
+            
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data submitted." });
+            }
+            
+            try
+            {
+                // Get the existing project
+                var existingProject = _projectService.GetProjectById(model.Id);
+                
+                if (existingProject == null)
+                {
+                    return Json(new { success = false, message = "Project not found." });
+                }
+                
+                // Update the fields
+                existingProject.Title = model.Title;
+                existingProject.Description = model.Description;
+                existingProject.Category = model.Category;
+                existingProject.Budget = model.Budget;
+                existingProject.Deadline = model.Deadline;
+                existingProject.RequiredSkills = model.RequiredSkills;
+                
+                // Save the changes
+                bool isUpdated = _projectService.UpdateProject(existingProject);
+                
+                if (isUpdated)
+                {
+                    return Json(new { success = true, message = "Project updated successfully." });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Failed to update project." });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error updating project {model.Id}: " + ex.Message);
+                return Json(new { success = false, message = "An error occurred while updating the project." });
             }
         }
     }
