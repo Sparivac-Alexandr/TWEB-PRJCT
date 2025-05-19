@@ -1372,9 +1372,14 @@ namespace taskore.Controllers
                 return RedirectToAction("SignIn", "Auth");
 
             int currentUserId = (int)Session["UserId"];
+            DateTime lastVisit = Session["LastChatVisit"] != null ? (DateTime)Session["LastChatVisit"] : DateTime.MinValue;
 
             using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
             {
+                // Actualizez prezența online
+                var me = context.Users.FirstOrDefault(u => u.Id == currentUserId);
+                if (me != null) { me.LastActiveAt = DateTime.Now; context.SaveChanges(); }
+
                 // Userii cu care ai mesaje
                 var userIdsWithMessages = context.ChatMessages
                     .Where(m => m.SenderId == currentUserId || m.ReceiverId == currentUserId)
@@ -1384,7 +1389,18 @@ namespace taskore.Controllers
                 var users = context.Users.Where(u => userIdsWithMessages.Contains(u.Id)).ToList();
                 ViewBag.ChatUsers = users;
 
-                // Dacă userId nu e selectat, dar există newUserId, îl selectăm pentru inițiere chat
+                // Pentru badge per user în lista de chats
+                var newMessagesPerUser = users.ToDictionary(
+                    u => u.Id,
+                    u => context.ChatMessages.Count(m => m.ReceiverId == currentUserId && m.SenderId == u.Id && m.SentAt > lastVisit)
+                );
+                ViewBag.NewMessagesPerUser = newMessagesPerUser;
+
+                // Badge global = suma badge-urilor individuale (mesaje noi de la fiecare user)
+                var newMessagesCount = newMessagesPerUser.Values.Sum();
+                ViewBag.NewMessagesCount = newMessagesCount;
+
+                // Selectare user pentru chat
                 var selectedUser = userId.HasValue
                     ? context.Users.FirstOrDefault(u => u.Id == userId.Value)
                     : (newUserId.HasValue ? context.Users.FirstOrDefault(u => u.Id == newUserId.Value) : null);
@@ -1401,6 +1417,8 @@ namespace taskore.Controllers
                 }
                 ViewBag.Messages = messages;
             }
+            // Actualizez ultima vizită la chat
+            Session["LastChatVisit"] = DateTime.Now;
             return View();
         }
 
@@ -1419,6 +1437,10 @@ namespace taskore.Controllers
             }
             using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
             {
+                // Actualizez prezența online
+                var me = context.Users.FirstOrDefault(u => u.Id == fromUserId);
+                if (me != null) { me.LastActiveAt = DateTime.Now; context.SaveChanges(); }
+
                 var toUser = context.Users.FirstOrDefault(u => u.Id == ToUserId);
                 if (toUser == null)
                 {

@@ -89,6 +89,9 @@ namespace taskoreBusinessLogic.DBModel
         [Column("completed_projects")]
         public int? CompletedProjects { get; set; }
 
+        [Column("last_active_at")]
+        public DateTime? LastActiveAt { get; set; }
+
         // Not mapped to database, used for form submission
         [NotMapped]
         public string FullName { get; set; }

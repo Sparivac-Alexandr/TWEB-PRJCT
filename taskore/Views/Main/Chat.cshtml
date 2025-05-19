@@ -4,6 +4,7 @@
     var selectedUser = ViewBag.SelectedUser as taskoreBusinessLogic.DBModel.UDBModel;
     var messages = ViewBag.Messages as List<taskoreBusinessLogic.DBModel.ChatMessageDBModel> ?? new List<taskoreBusinessLogic.DBModel.ChatMessageDBModel>();
     int currentUserId = Session["UserId"] != null ? (int)Session["UserId"] : 0;
+    var newMessagesPerUser = ViewBag.NewMessagesPerUser as Dictionary<int, int> ?? new Dictionary<int, int>();
 }
 
 @Html.Partial("_Header")
@@ -16,8 +17,11 @@
             <ul class="chat-user-list">
                 @foreach (var user in chatUsers)
                 {
+                    var newCount = newMessagesPerUser.ContainsKey(user.Id) ? newMessagesPerUser[user.Id] : 0;
                     <li class="chat-user-item @(selectedUser != null && user.Id == selectedUser.Id ? "active" : "")">
-                        <a href="@Url.Action("Chat", "Main", new { userId = user.Id })">@user.FirstName @user.LastName</a>
+                        <a href="@Url.Action("Chat", "Main", new { userId = user.Id })">
+                            @user.FirstName @user.LastName
+                        </a>
                     </li>
                 }
             </ul>
@@ -35,6 +39,7 @@
                         var userName = isMine ? "Me" : (selectedUser != null ? selectedUser.FirstName + " " + selectedUser.LastName : "");
                         <div class="chat-message @(isMine ? "mine" : "theirs")">
                             <span class="msg-text">@msg.Content</span>
+                            <span class="msg-time">@msg.SentAt.ToString("HH:mm")</span>
                         </div>
                     }
                 }
@@ -129,9 +134,12 @@
 .chat-message {
     padding: 0.5rem 1rem;
     border-radius: 16px;
-    max-width: 60%;
+    max-width: 75%;
+    min-width: 120px;
+    padding-bottom: 1.2em;
     word-break: break-word;
     margin-bottom: 0.25rem;
+    position: relative;
 }
 .chat-message.mine {
     background: #3b82f6;
@@ -186,5 +194,17 @@
     background: #e5e7eb;
     margin: 0.7rem 0 1.2rem 0;
     border: none;
+}
+.msg-time {
+    position: absolute;
+    right: 1.1rem;
+    bottom: 0.25rem;
+    font-size: 0.75rem;
+    color: #64748b;
+    opacity: 0.85;
+}
+.chat-message.mine .msg-time {
+    color: #fff;
+    opacity: 0.85;
 }
 </style> 
