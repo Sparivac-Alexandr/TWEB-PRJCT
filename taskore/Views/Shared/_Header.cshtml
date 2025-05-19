@@ -43,6 +43,10 @@
                 <i class="fas fa-handshake"></i>
                 <span>My Deals</span>
             </a>
+            <a href="@Url.Action("Chat", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "Chat" ? "active" : "")">
+                <i class="fas fa-comments"></i>
+                <span>Chat</span>
+            </a>
 
         </nav>
         

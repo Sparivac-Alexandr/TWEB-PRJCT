@@ -196,7 +196,6 @@
     <Content Include="Views\Main\Terms.cshtml" />
     <Content Include="Views\Main\AboutUs.cshtml" />
     <Content Include="Views\Shared\_Background.cshtml" />
-    <Content Include="Views\Home\teststtstst.cshtml" />
     <Content Include="Views\Shared\_Footer_guest.cshtml" />
     <Content Include="Views\Main\UserReviews.cshtml" />
     <Content Include="Views\Main\CompletedProjects.cshtml" />
@@ -208,7 +207,7 @@
     <Content Include="Views\Main\AdminDashboard.cshtml" />
     <Content Include="Views\Main\News.cshtml" />
     <Content Include="Views\Main\CreateNewsPage.cshtml" />
-    <Content Include="Views\Home\test.cshtml" />
+    <Content Include="Views\Main\Chat.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

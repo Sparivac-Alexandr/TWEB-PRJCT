@@ -1,0 +1,162 @@
+@{
+    ViewBag.Title = "Chat";
+    var chatUsers = ViewBag.ChatUsers as List<taskoreBusinessLogic.DBModel.UDBModel> ?? new List<taskoreBusinessLogic.DBModel.UDBModel>();
+    var selectedUser = ViewBag.SelectedUser as taskoreBusinessLogic.DBModel.UDBModel;
+    var messages = ViewBag.Messages as List<dynamic> ?? new List<dynamic>();
+}
+
+<div class="chat-page-container">
+    <div class="chat-sidebar">
+        <h3>Chats</h3>
+        <ul class="chat-user-list">
+            @foreach (var user in chatUsers)
+            {
+                <li class="chat-user-item @(selectedUser != null && user.Id == selectedUser.Id ? "active" : "")">
+                    <a href="@Url.Action("Chat", "Main", new { userId = user.Id })">@user.FirstName @user.LastName</a>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="chat-main">
+        <div class="chat-header">
+            <h2>@(selectedUser != null ? ($"{selectedUser.FirstName} {selectedUser.LastName}") : "Select a chat")</h2>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            @if (messages.Any())
+            {
+                foreach (var msg in messages)
+                {
+                    <div class="chat-message @(msg.IsMine ? "mine" : "theirs")">
+                        <span class="msg-user">@msg.UserName:</span>
+                        <span class="msg-text">@msg.Text</span>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-messages">No messages yet.</div>
+            }
+        </div>
+        <form class="chat-input-form" action="@Url.Action("SendMessage", "Main")" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="ToUserId" value="@(selectedUser?.Id ?? 0)" />
+            <div class="chat-input-row">
+                <input type="text" name="Message" class="chat-input" placeholder="Type your message..." autocomplete="off" required />
+                <button type="submit" class="chat-send-btn">Send</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.chat-page-container {
+    display: flex;
+    height: 80vh;
+    background: #f8fafc;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+    margin: 2rem auto;
+    max-width: 900px;
+}
+.chat-sidebar {
+    width: 220px;
+    background: #fff;
+    border-right: 1px solid #e2e8f0;
+    padding: 1rem;
+}
+.chat-user-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.chat-user-item {
+    margin-bottom: 0.5rem;
+}
+.chat-user-item.active a {
+    font-weight: bold;
+    color: #3b82f6;
+}
+.chat-user-item a {
+    color: #334155;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.chat-user-item a:hover {
+    color: #2563eb;
+}
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+}
+.chat-header {
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fff;
+}
+.chat-messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.chat-message {
+    padding: 0.5rem 1rem;
+    border-radius: 16px;
+    max-width: 60%;
+    word-break: break-word;
+    margin-bottom: 0.25rem;
+}
+.chat-message.mine {
+    background: #3b82f6;
+    color: #fff;
+    align-self: flex-end;
+}
+.chat-message.theirs {
+    background: #e2e8f0;
+    color: #334155;
+    align-self: flex-start;
+}
+.msg-user {
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+.chat-input-form {
+    padding: 1rem;
+    background: #fff;
+    border-top: 1px solid #e2e8f0;
+}
+.chat-input-row {
+    display: flex;
+    gap: 0.5rem;
+}
+.chat-input {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    font-size: 1rem;
+}
+.chat-send-btn {
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.chat-send-btn:hover {
+    background: #2563eb;
+}
+.no-messages {
+    color: #64748b;
+    text-align: center;
+    margin-top: 2rem;
+}
+</style> 
