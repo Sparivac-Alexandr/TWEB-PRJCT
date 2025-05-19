@@ -12,6 +12,7 @@
     <div class="chat-page-container">
         <div class="chat-sidebar">
             <h3>Chats</h3>
+            <div class="chat-sidebar-divider"></div>
             <ul class="chat-user-list">
                 @foreach (var user in chatUsers)
                 {
@@ -33,7 +34,6 @@
                         var isMine = msg.SenderId == currentUserId;
                         var userName = isMine ? "Me" : (selectedUser != null ? selectedUser.FirstName + " " + selectedUser.LastName : "");
                         <div class="chat-message @(isMine ? "mine" : "theirs")">
-                            <span class="msg-user">@userName:</span>
                             <span class="msg-text">@msg.Content</span>
                         </div>
                     }
@@ -86,18 +86,26 @@
 }
 .chat-user-item {
     margin-bottom: 0.5rem;
+    padding: 0.7rem 1rem;
+    border-radius: 6px;
+    background: #fff;
+    transition: background 0.2s;
 }
-.chat-user-item.active a {
-    font-weight: bold;
-    color: #3b82f6;
+.chat-user-item.active {
+    background: #e5e7eb;
+}
+.chat-user-item:not(:last-child) {
+    margin-bottom: 0.7rem;
 }
 .chat-user-item a {
     color: #334155;
     text-decoration: none;
     transition: color 0.2s;
+    display: block;
 }
-.chat-user-item a:hover {
-    color: #2563eb;
+.chat-user-item:hover {
+    background: #f1f5f9;
+    border-color: #bcd0ee;
 }
 .chat-main {
     flex: 1;
@@ -172,5 +180,11 @@
     color: #64748b;
     text-align: center;
     margin-top: 2rem;
+}
+.chat-sidebar-divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 0.7rem 0 1.2rem 0;
+    border: none;
 }
 </style> 
