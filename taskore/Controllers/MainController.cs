@@ -247,6 +247,17 @@ namespace taskore.Controllers
                         context.Users.Add(existingUser);
                     }
                     
+                    // Handle name update if provided
+                    if (!string.IsNullOrEmpty(model.FullName))
+                    {
+                        var nameParts = model.FullName.Split(new[] { ' ' }, 2);
+                        existingUser.FirstName = nameParts[0];
+                        existingUser.LastName = nameParts.Length > 1 ? nameParts[1] : "";
+                        
+                        // Update session data
+                        Session["UserFullName"] = model.FullName;
+                    }
+                    
                     // Update user fields only if they are provided in the form
                     // Basic information
                     if (!string.IsNullOrEmpty(model.Headline))

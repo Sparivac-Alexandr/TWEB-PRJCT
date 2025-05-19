@@ -208,6 +208,7 @@
     <Content Include="Views\Main\AdminDashboard.cshtml" />
     <Content Include="Views\Main\News.cshtml" />
     <Content Include="Views\Main\CreateNewsPage.cshtml" />
+    <Content Include="Views\Home\test.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

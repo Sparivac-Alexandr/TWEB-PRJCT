@@ -88,5 +88,9 @@ namespace taskoreBusinessLogic.DBModel
 
         [Column("completed_projects")]
         public int? CompletedProjects { get; set; }
+
+        // Not mapped to database, used for form submission
+        [NotMapped]
+        public string FullName { get; set; }
     }
 }

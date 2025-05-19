@@ -136,7 +136,17 @@
 
             <div class="profile-content">
                 <div class="profile-name-section">
-                    <h1 class="user-name">@(Session["UserFullName"] ?? "Alex Johnson")</h1>
+                    @if (isUserLoggedIn) {
+                        <form id="name-form" class="editable-form" action="@Url.Action("UpdateUserProfile", "Main")" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="form-group">
+                                <input type="text" class="form-control user-name-input" name="FullName" value="@(Session["UserFullName"] ?? "")" placeholder="Enter your full name">
+                            </div>
+                            <button type="submit" class="save-form-btn">Save Name</button>
+                        </form>
+                    } else {
+                        <h1 class="user-name">@(Session["UserFullName"] ?? "Alex Johnson")</h1>
+                    }
                     @if (isUserLoggedIn) {
                         <div class="user-headline-edit">
                             <form id="headline-form" class="editable-form" action="@Url.Action("UpdateUserProfile", "Main")" method="post">
@@ -463,6 +473,31 @@
     
     .save-form-btn:hover {
         background-color: #2563eb;
+    }
+
+    /* Styles for name editing */
+    #name-form {
+        margin-bottom: 1rem;
+    }
+
+    .user-name-input {
+        font-size: 1.5rem;
+        font-weight: 700;
+        padding: 0.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .user-name-input:focus {
+        border-color: #3b82f6;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    #name-form .save-form-btn {
+        margin-top: 0.5rem;
     }
 </style>
 
