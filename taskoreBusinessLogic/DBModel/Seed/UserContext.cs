@@ -23,6 +23,7 @@ namespace taskoreBusinessLogic.DBModel.Seed
     public class UserContext : DbContext
     {
         public virtual DbSet<UDBModel> Users { get; set; }
+        public virtual DbSet<ChatMessageDBModel> ChatMessages { get; set; }
         
         public UserContext() : base("name=taskore")
         {

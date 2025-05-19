@@ -2,7 +2,8 @@
     ViewBag.Title = "Chat";
     var chatUsers = ViewBag.ChatUsers as List<taskoreBusinessLogic.DBModel.UDBModel> ?? new List<taskoreBusinessLogic.DBModel.UDBModel>();
     var selectedUser = ViewBag.SelectedUser as taskoreBusinessLogic.DBModel.UDBModel;
-    var messages = ViewBag.Messages as List<dynamic> ?? new List<dynamic>();
+    var messages = ViewBag.Messages as List<taskoreBusinessLogic.DBModel.ChatMessageDBModel> ?? new List<taskoreBusinessLogic.DBModel.ChatMessageDBModel>();
+    int currentUserId = Session["UserId"] != null ? (int)Session["UserId"] : 0;
 }
 
 @Html.Partial("_Header")
@@ -29,9 +30,11 @@
                 {
                     foreach (var msg in messages)
                     {
-                        <div class="chat-message @(msg.IsMine ? "mine" : "theirs")">
-                            <span class="msg-user">@msg.UserName:</span>
-                            <span class="msg-text">@msg.Text</span>
+                        var isMine = msg.SenderId == currentUserId;
+                        var userName = isMine ? "Me" : (selectedUser != null ? selectedUser.FirstName + " " + selectedUser.LastName : "");
+                        <div class="chat-message @(isMine ? "mine" : "theirs")">
+                            <span class="msg-user">@userName:</span>
+                            <span class="msg-text">@msg.Content</span>
                         </div>
                     }
                 }

@@ -54,6 +54,7 @@
     <Compile Include="BL_Struct\NewsBL.cs" />
     <Compile Include="BL_Struct\ProjectBL.cs" />
     <Compile Include="BL_Struct\ReviewBL.cs" />
+    <Compile Include="DBModel\ChatMessageDBModel.cs" />
     <Compile Include="DBModel\NewsDBModel.cs" />
     <Compile Include="DBModel\ProjectDBModel.cs" />
     <Compile Include="DBModel\ReviewDBModel.cs" />

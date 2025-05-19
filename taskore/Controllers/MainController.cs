@@ -1368,7 +1368,60 @@ namespace taskore.Controllers
 
         public ActionResult Chat(int? userId)
         {
+            if (Session["UserId"] == null)
+                return RedirectToAction("SignIn", "Auth");
+
+            int currentUserId = (int)Session["UserId"];
+
+            using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+            {
+                // Selectez doar userii cu care există cel puțin un mesaj cu userul curent
+                var userIdsWithMessages = context.ChatMessages
+                    .Where(m => m.SenderId == currentUserId || m.ReceiverId == currentUserId)
+                    .Select(m => m.SenderId == currentUserId ? m.ReceiverId : m.SenderId)
+                    .Distinct()
+                    .ToList();
+                var users = context.Users.Where(u => userIdsWithMessages.Contains(u.Id)).ToList();
+                ViewBag.ChatUsers = users;
+
+                var selectedUser = userId.HasValue ? users.FirstOrDefault(u => u.Id == userId.Value) : null;
+                ViewBag.SelectedUser = selectedUser;
+
+                List<taskoreBusinessLogic.DBModel.ChatMessageDBModel> messages = new List<taskoreBusinessLogic.DBModel.ChatMessageDBModel>();
+                if (selectedUser != null)
+                {
+                    messages = context.ChatMessages
+                        .Where(m => (m.SenderId == currentUserId && m.ReceiverId == selectedUser.Id) ||
+                                    (m.SenderId == selectedUser.Id && m.ReceiverId == currentUserId))
+                        .OrderBy(m => m.SentAt)
+                        .ToList();
+                }
+                ViewBag.Messages = messages;
+            }
             return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SendMessage(int ToUserId, string Message)
+        {
+            if (Session["UserId"] == null)
+                return RedirectToAction("SignIn", "Auth");
+
+            int fromUserId = (int)Session["UserId"];
+            using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+            {
+                var chatMsg = new taskoreBusinessLogic.DBModel.ChatMessageDBModel
+                {
+                    SenderId = fromUserId,
+                    ReceiverId = ToUserId,
+                    Content = Message,
+                    SentAt = DateTime.Now
+                };
+                context.ChatMessages.Add(chatMsg);
+                context.SaveChanges();
+            }
+            return RedirectToAction("Chat", new { userId = ToUserId });
         }
     }
 }
