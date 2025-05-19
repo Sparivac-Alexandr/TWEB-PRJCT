@@ -1366,7 +1366,7 @@ namespace taskore.Controllers
             }
         }
 
-        public ActionResult Chat(int? userId)
+        public ActionResult Chat(int? userId, int? newUserId)
         {
             if (Session["UserId"] == null)
                 return RedirectToAction("SignIn", "Auth");
@@ -1375,7 +1375,7 @@ namespace taskore.Controllers
 
             using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
             {
-                // Selectez doar userii cu care există cel puțin un mesaj cu userul curent
+                // Userii cu care ai mesaje
                 var userIdsWithMessages = context.ChatMessages
                     .Where(m => m.SenderId == currentUserId || m.ReceiverId == currentUserId)
                     .Select(m => m.SenderId == currentUserId ? m.ReceiverId : m.SenderId)
@@ -1384,7 +1384,10 @@ namespace taskore.Controllers
                 var users = context.Users.Where(u => userIdsWithMessages.Contains(u.Id)).ToList();
                 ViewBag.ChatUsers = users;
 
-                var selectedUser = userId.HasValue ? users.FirstOrDefault(u => u.Id == userId.Value) : null;
+                // Dacă userId nu e selectat, dar există newUserId, îl selectăm pentru inițiere chat
+                var selectedUser = userId.HasValue
+                    ? context.Users.FirstOrDefault(u => u.Id == userId.Value)
+                    : (newUserId.HasValue ? context.Users.FirstOrDefault(u => u.Id == newUserId.Value) : null);
                 ViewBag.SelectedUser = selectedUser;
 
                 List<taskoreBusinessLogic.DBModel.ChatMessageDBModel> messages = new List<taskoreBusinessLogic.DBModel.ChatMessageDBModel>();
@@ -1409,8 +1412,19 @@ namespace taskore.Controllers
                 return RedirectToAction("SignIn", "Auth");
 
             int fromUserId = (int)Session["UserId"];
+            if (ToUserId <= 0 || string.IsNullOrWhiteSpace(Message))
+            {
+                // Nu trimite mesaj dacă nu e selectat userul sau mesajul e gol
+                return RedirectToAction("Chat");
+            }
             using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
             {
+                var toUser = context.Users.FirstOrDefault(u => u.Id == ToUserId);
+                if (toUser == null)
+                {
+                    // Nu există destinatarul
+                    return RedirectToAction("Chat");
+                }
                 var chatMsg = new taskoreBusinessLogic.DBModel.ChatMessageDBModel
                 {
                     SenderId = fromUserId,

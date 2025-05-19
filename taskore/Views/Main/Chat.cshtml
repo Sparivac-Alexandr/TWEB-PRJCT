@@ -47,8 +47,8 @@
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="ToUserId" value="@(selectedUser?.Id ?? 0)" />
                 <div class="chat-input-row">
-                    <input type="text" name="Message" class="chat-input" placeholder="Type your message..." autocomplete="off" required />
-                    <button type="submit" class="chat-send-btn">Send</button>
+                    <input type="text" name="Message" class="chat-input" placeholder="Type your message..." autocomplete="off" required @(selectedUser == null ? "disabled" : "") />
+                    <button type="submit" class="chat-send-btn" @(selectedUser == null ? "disabled" : "")>Send</button>
                 </div>
             </form>
         </div>
