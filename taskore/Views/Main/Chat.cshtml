@@ -5,62 +5,73 @@
     var messages = ViewBag.Messages as List<dynamic> ?? new List<dynamic>();
 }
 
-<div class="chat-page-container">
-    <div class="chat-sidebar">
-        <h3>Chats</h3>
-        <ul class="chat-user-list">
-            @foreach (var user in chatUsers)
-            {
-                <li class="chat-user-item @(selectedUser != null && user.Id == selectedUser.Id ? "active" : "")">
-                    <a href="@Url.Action("Chat", "Main", new { userId = user.Id })">@user.FirstName @user.LastName</a>
-                </li>
-            }
-        </ul>
-    </div>
-    <div class="chat-main">
-        <div class="chat-header">
-            <h2>@(selectedUser != null ? ($"{selectedUser.FirstName} {selectedUser.LastName}") : "Select a chat")</h2>
-        </div>
-        <div class="chat-messages" id="chat-messages">
-            @if (messages.Any())
-            {
-                foreach (var msg in messages)
+@Html.Partial("_Header")
+
+<div class="main-content-container">
+    <div class="chat-page-container">
+        <div class="chat-sidebar">
+            <h3>Chats</h3>
+            <ul class="chat-user-list">
+                @foreach (var user in chatUsers)
                 {
-                    <div class="chat-message @(msg.IsMine ? "mine" : "theirs")">
-                        <span class="msg-user">@msg.UserName:</span>
-                        <span class="msg-text">@msg.Text</span>
-                    </div>
+                    <li class="chat-user-item @(selectedUser != null && user.Id == selectedUser.Id ? "active" : "")">
+                        <a href="@Url.Action("Chat", "Main", new { userId = user.Id })">@user.FirstName @user.LastName</a>
+                    </li>
                 }
-            }
-            else
-            {
-                <div class="no-messages">No messages yet.</div>
-            }
+            </ul>
         </div>
-        <form class="chat-input-form" action="@Url.Action("SendMessage", "Main")" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="ToUserId" value="@(selectedUser?.Id ?? 0)" />
-            <div class="chat-input-row">
-                <input type="text" name="Message" class="chat-input" placeholder="Type your message..." autocomplete="off" required />
-                <button type="submit" class="chat-send-btn">Send</button>
+        <div class="chat-main">
+            <div class="chat-header">
+                <h2>@(selectedUser != null ? ($"{selectedUser.FirstName} {selectedUser.LastName}") : "Select a chat")</h2>
             </div>
-        </form>
+            <div class="chat-messages" id="chat-messages">
+                @if (messages.Any())
+                {
+                    foreach (var msg in messages)
+                    {
+                        <div class="chat-message @(msg.IsMine ? "mine" : "theirs")">
+                            <span class="msg-user">@msg.UserName:</span>
+                            <span class="msg-text">@msg.Text</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-messages">No messages yet.</div>
+                }
+            </div>
+            <form class="chat-input-form" action="@Url.Action("SendMessage", "Main")" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ToUserId" value="@(selectedUser?.Id ?? 0)" />
+                <div class="chat-input-row">
+                    <input type="text" name="Message" class="chat-input" placeholder="Type your message..." autocomplete="off" required />
+                    <button type="submit" class="chat-send-btn">Send</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
+@Html.Partial("_Footer")
+
 <style>
+.main-content-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
 .chat-page-container {
     display: flex;
-    height: 80vh;
+    height: 85vh;
     background: #f8fafc;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     overflow: hidden;
-    margin: 2rem auto;
-    max-width: 900px;
+    margin: 0 auto 1rem auto;
+    max-width: 1200px;
 }
 .chat-sidebar {
-    width: 220px;
+    width: 280px;
     background: #fff;
     border-right: 1px solid #e2e8f0;
     padding: 1rem;

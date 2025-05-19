@@ -1365,5 +1365,10 @@ namespace taskore.Controllers
                 return Json(new { success = false, message = "An error occurred while updating the project." });
             }
         }
+
+        public ActionResult Chat(int? userId)
+        {
+            return View();
+        }
     }
 }
