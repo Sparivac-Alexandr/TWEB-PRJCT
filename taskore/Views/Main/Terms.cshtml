@@ -1,21 +1,21 @@
 ﻿@{
     ViewBag.Title = "Terms and Conditions";
 }
-@Html.Partial("_Header_guest")
+@Html.Partial("_Header")
 
 <div class="container">
     <div class="terms-content">
-        <h1>Terms and Conditions</h1>
+        <h1 class="page-title">Terms and Conditions</h1>
         <p class="last-updated">Last updated: February 20, 2025</p>
 
-        <section id="introduction">
-            <h2>1. Introduction</h2>
-            <p>Welcome to taskore! These Terms and Conditions ("Terms") govern your use of the taskore platform ("Platform", "we", "us") and all associated services. By accessing or using the Platform, you agree to comply with these Terms.</p>
+        <section id="introduction" class="content-section">
+            <h2 class="section-title">1. Introduction</h2>
+            <p class="section-text">Welcome to taskore! These Terms and Conditions ("Terms") govern your use of the taskore platform ("Platform", "we", "us") and all associated services. By accessing or using the Platform, you agree to comply with these Terms.</p>
         </section>
 
-        <section id="definitions">
-            <h2>2. Definitions</h2>
-            <ul>
+        <section id="definitions" class="content-section">
+            <h2 class="section-title">2. Definitions</h2>
+            <ul class="terms-list">
                 <li><strong>User</strong> - any person who accesses or uses the Platform</li>
                 <li><strong>Freelancer</strong> - user who offers services through the Platform</li>
                 <li><strong>Client</strong> - user who purchases services through the Platform</li>
@@ -23,10 +23,10 @@
             </ul>
         </section>
 
-        <section id="eligibility">
-            <h2>3. Eligibility</h2>
-            <p>To use the Platform, you must:</p>
-            <ul>
+        <section id="eligibility" class="content-section">
+            <h2 class="section-title">3. Eligibility</h2>
+            <p class="section-text">To use the Platform, you must:</p>
+            <ul class="terms-list">
                 <li>Be at least 18 years old</li>
                 <li>Have full legal capacity</li>
                 <li>Maintain a valid account</li>
@@ -34,35 +34,35 @@
             </ul>
         </section>
 
-        <section id="accounts">
-            <h2>4. Accounts and Security</h2>
+        <section id="accounts" class="content-section">
+            <h2 class="section-title">4. Accounts and Security</h2>
 
-            <h3>4.1 Account Creation</h3>
-            <ul>
+            <h3 class="subsection-title">4.1 Account Creation</h3>
+            <ul class="terms-list">
                 <li>You are responsible for maintaining the confidentiality of your login credentials</li>
                 <li>You must notify us immediately of any unauthorized use of your account</li>
                 <li>Only one account per user is permitted</li>
             </ul>
 
-            <h3>4.2 Security</h3>
-            <ul>
+            <h3 class="subsection-title">4.2 Security</h3>
+            <ul class="terms-list">
                 <li>You agree not to share your login credentials</li>
                 <li>You are responsible for all activities that occur under your account</li>
             </ul>
         </section>
 
-        <section id="freelancer-rules">
-            <h2>5. Rules for Freelancers</h2>
+        <section id="freelancer-rules" class="content-section">
+            <h2 class="section-title">5. Rules for Freelancers</h2>
 
-            <h3>5.1 Service Offering and Delivery</h3>
-            <ul>
+            <h3 class="subsection-title">5.1 Service Offering and Delivery</h3>
+            <ul class="terms-list">
                 <li>You must provide services as described and within agreed terms</li>
                 <li>Maintain professional communication with clients</li>
                 <li>Meet established deadlines</li>
             </ul>
 
-            <h3>5.2 Rates and Payments</h3>
-            <ul>
+            <h3 class="subsection-title">5.2 Rates and Payments</h3>
+            <ul class="terms-list">
                 <li>Platform commission is 10% of project value</li>
                 <li>Payments are processed only through the taskore system</li>
                 <li>Freelancers must comply with withdrawal policies</li>
@@ -71,5 +71,97 @@
         </section>
     </div>
 </div>
+
+<style>
+    /* Terms Page Styles */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .terms-content {
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 0.5rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .page-title:after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 4px;
+        background-color: #3b82f6;
+        margin: 0.75rem auto 0;
+        border-radius: 2px;
+    }
+
+    .last-updated {
+        text-align: center;
+        color: #666;
+        margin-bottom: 2.5rem;
+        font-size: 0.9rem;
+        font-style: italic;
+    }
+
+    .content-section {
+        margin-bottom: 2.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 2rem;
+    }
+
+    .content-section:last-child {
+        border-bottom: none;
+    }
+
+    .section-title {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1.25rem;
+    }
+
+    .subsection-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #444;
+        margin: 1.5rem 0 1rem 0;
+    }
+
+    .section-text {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: #555;
+        margin-bottom: 1.2rem;
+    }
+
+    .terms-list {
+        padding-left: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .terms-list li {
+        margin-bottom: 0.75rem;
+        line-height: 1.6;
+        color: #555;
+    }
+
+    .terms-list li strong {
+        font-weight: 600;
+        color: #333;
+    }
+
+</style>
 
 @Html.Partial("_Footer")
