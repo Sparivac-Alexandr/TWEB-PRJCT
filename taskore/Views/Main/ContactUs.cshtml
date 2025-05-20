@@ -1,41 +1,52 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Contact Us";
 }
 
+@Html.Partial("_Header")
 
-@Html.Partial("_Header_guest")
-
-
-<main class="main-content">
-    <div class="container">
-        <header class="page-header">
-            <h1>Contact Us</h1>
-            <p class="subtitle">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
-        </header>
+<div class="container">
+    <div class="contact-content">
+        <h1 class="page-title">Contact Us</h1>
+        <p class="page-subtitle">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
 
         <div class="contact-grid">
             <section class="info-section">
-                <h2>Get in Touch</h2>
-                <p>Need help or have questions? Contact us through any of these channels:</p>
+                <h2 class="section-title">Get in Touch</h2>
+                <p class="section-text">Need help or have questions? Contact us through any of these channels:</p>
                 <ul class="contact-details">
                     <li>
-                        <strong>Email:</strong>
-                        <span>support@taskore.com</span>
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <strong>Email</strong>
+                            <span>support@taskore.com</span>
+                        </div>
                     </li>
                     <li>
-                        <strong>Phone:</strong>
-                        <span>+x xxx xxx xxxx</span>
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <strong>Phone</strong>
+                            <span>+x xxx xxx xxxx</span>
+                        </div>
                     </li>
                     <li>
-                        <strong>Hours:</strong>
-                        <span>Monday - Friday, 9:00 AM - 6:00 PM </span>
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <strong>Hours</strong>
+                            <span>Monday - Friday, 9:00 AM - 6:00 PM</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>Address</strong>
+                            <span>123 Workspace Avenue, Digital City</span>
+                        </div>
                     </li>
                 </ul>
             </section>
 
             <form class="contact-form">
-                <h2>Send us a Message</h2>
+                <h2 class="section-title">Send us a Message</h2>
                 <div class="form-group">
                     <label for="name">Name</label>
                     <input type="text" id="name" name="name" required>
@@ -56,6 +67,167 @@
             </form>
         </div>
     </div>
-</main>
+</div>
+
+<style>
+    /* Contact Us Page Styles */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .contact-content {
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 0.5rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .page-title:after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 4px;
+        background-color: #3b82f6;
+        margin: 0.75rem auto 0;
+        border-radius: 2px;
+    }
+
+    .page-subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 2.5rem;
+        font-size: 1.1rem;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1.25rem;
+    }
+
+    .section-text {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: #555;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+
+    /* Contact Details Styling */
+    .info-section {
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .contact-details {
+        list-style: none;
+        padding: 0;
+        margin: 1.5rem 0 0 0;
+    }
+
+    .contact-details li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-details li i {
+        font-size: 1.25rem;
+        color: #3b82f6;
+        margin-right: 1rem;
+        margin-top: 0.25rem;
+        width: 24px;
+        text-align: center;
+    }
+
+    .contact-details li div {
+        flex: 1;
+    }
+
+    .contact-details li strong {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: #333;
+    }
+
+    .contact-details li span {
+        color: #555;
+    }
+
+    /* Form Styling */
+    .contact-form {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background-color: #f8fafc;
+        font-size: 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        outline: none;
+    }
+
+    .submit-btn {
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.8rem 1.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        width: 100%;
+    }
+
+    .submit-btn:hover {
+        background-color: #2563eb;
+    }
+</style>
 
 @Html.Partial("_Footer")
