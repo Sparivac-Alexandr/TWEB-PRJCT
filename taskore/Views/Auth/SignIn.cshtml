@@ -39,19 +39,83 @@
                 </div>
                 
                 <div class="input-group">
-                    @Html.PasswordFor(m => m.Password, new { @id = "login-password", @placeholder = "Password", @required = "required" })
-                    <span class="password-toggle" onclick="togglePassword('login-password')">Show</span>
+                    @Html.PasswordFor(m => m.Password, new { @id = "Password", @placeholder = "Password", @required = "required" })
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('Password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
                     @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
                 </div>
                 
                 <button type="submit" class="submit-button">Sign in</button>
                 
                 <div class="back-link">
-                    <a href="@Url.Action("ForgotPass", "Auth")" onclick="showPage('forgot-password')">Forgot password?</a>
+                    <a href="@Url.Action("ForgotPass", "Auth")">Forgot password?</a>
                     <br><br>
-                    Don't have an account? <a href="@Url.Action("SignUp", "Auth")" onclick="showPage('signup')">Sign up</a>
+                    Don't have an account? <a href="@Url.Action("SignUp", "Auth")">Sign up</a>
                 </div>
             }
         </div>
     </div>
+
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+        
+        /* Password toggle button styles */
+        .input-group {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            padding: 5px;
+            z-index: 2;
+        }
+        .password-toggle:hover {
+            color: #3b82f6;
+        }
+    </style>
+
+    <script>
+        function togglePasswordVisibility(fieldId) {
+            const passwordField = document.getElementById(fieldId);
+            const toggleButton = event.currentTarget;
+            const icon = toggleButton.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>

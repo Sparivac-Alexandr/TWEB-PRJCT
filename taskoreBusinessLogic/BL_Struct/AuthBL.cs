@@ -42,6 +42,16 @@ namespace taskoreBusinessLogic.BL_Struct
                     return false;
                 }
                 
+                // Validate data
+                if (string.IsNullOrEmpty(data.Email) || 
+                    string.IsNullOrEmpty(data.Password) || 
+                    string.IsNullOrEmpty(data.FirstName) || 
+                    string.IsNullOrEmpty(data.LastName))
+                {
+                    Debug.WriteLine("ERROR: One or more required fields are empty");
+                    return false;
+                }
+                
                 // Hash the password before storing it
                 string hashedPassword = HashGenerator.HashGen(data.Password);
                 Debug.WriteLine("Password hashed successfully");
@@ -76,14 +86,34 @@ namespace taskoreBusinessLogic.BL_Struct
                 Debug.WriteLine("Created new user object with data: " + 
                     $"Email={newUser.Email}, Name={newUser.FirstName} {newUser.LastName}");
                 
-                context.Users.Add(newUser);
-                Debug.WriteLine("Added user to context");
-                
-                int rowsAffected = context.SaveChanges();
-                Debug.WriteLine("SaveChanges completed. Rows affected: " + rowsAffected);
-                Debug.WriteLine("New user ID assigned by database: " + newUser.Id);
-                
-                return rowsAffected > 0;
+                try
+                {
+                    context.Users.Add(newUser);
+                    Debug.WriteLine("Added user to context");
+                    
+                    int rowsAffected = context.SaveChanges();
+                    Debug.WriteLine("SaveChanges completed. Rows affected: " + rowsAffected);
+                    
+                    if (rowsAffected > 0)
+                    {
+                        Debug.WriteLine("New user ID assigned by database: " + newUser.Id);
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.WriteLine("No rows affected by SaveChanges. Registration failed.");
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("ERROR during database save operation: " + ex.Message);
+                    if (ex.InnerException != null)
+                    {
+                        Debug.WriteLine("Inner exception: " + ex.InnerException.Message);
+                    }
+                    return false;
+                }
             }
             catch (Exception ex)
             {

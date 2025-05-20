@@ -197,68 +197,103 @@ namespace taskore.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult SignUp(UserDataRegister register)
         {
-            Debug.WriteLine(register.Email);
+            Debug.WriteLine("SignUp method called with email: " + register.Email);
             
-            // Check if email already exists before proceeding
-            if (_session.CheckEmailExists(register.Email))
+            try
             {
-                ModelState.AddModelError("Email", "This email is already registered. Please use a different email address.");
-                return View(register);
-            }
+                // Check if all required fields are provided
+                if (string.IsNullOrEmpty(register.Email) || 
+                    string.IsNullOrEmpty(register.Password) || 
+                    string.IsNullOrEmpty(register.ConfirmPassword) ||
+                    string.IsNullOrEmpty(register.FirstName) || 
+                    string.IsNullOrEmpty(register.LastName) || 
+                    string.IsNullOrEmpty(register.Role))
+                {
+                    ModelState.AddModelError("", "All fields are required.");
+                    return View(register);
+                }
+
+                // Check if passwords match
+                if (register.Password != register.ConfirmPassword)
+                {
+                    ModelState.AddModelError("ConfirmPassword", "Passwords do not match.");
+                    return View(register);
+                }
             
-            // Only proceed if model is valid
-            if (ModelState.IsValid)
-            {
-                var data = new UserRegisterDTO
+                // Check if email already exists before proceeding
+                if (_session.CheckEmailExists(register.Email))
                 {
-                    Email = register.Email,
-                    Password = register.Password,
-                    FirstName = register.FirstName,
-                    LastName = register.LastName,
-                    Role = register.Role
-                };
-
-                bool isRegistered = _auth.UserRegisterLogic(data);
-
-                if (isRegistered)
+                    ModelState.AddModelError("Email", "This email is already registered. Please use a different email address.");
+                    return View(register);
+                }
+                
+                // Only proceed if model is valid
+                if (ModelState.IsValid)
                 {
-                    // Auto login the user after registration
-                    UserLoginSession loginData = new UserLoginSession
+                    var data = new UserRegisterDTO
                     {
                         Email = register.Email,
                         Password = register.Password,
-                        LoginIp = Request.UserHostAddress,
-                        LoginDataTime = DateTime.Now
+                        FirstName = register.FirstName,
+                        LastName = register.LastName,
+                        Role = register.Role
                     };
 
-                    LoginResult userLogin = (LoginResult)_session.UserLogin(loginData);
-                    if (userLogin.Status)
+                    Debug.WriteLine("Calling UserRegisterLogic with data: " + 
+                        $"Email={data.Email}, Name={data.FirstName} {data.LastName}, Role={data.Role}");
+
+                    bool isRegistered = _auth.UserRegisterLogic(data);
+                    Debug.WriteLine("UserRegisterLogic returned: " + isRegistered);
+
+                    if (isRegistered)
                     {
-                        // Store user info in session
-                        Session["UserId"] = userLogin.UserId;
-                        Session["UserFullName"] = $"{userLogin.FirstName} {userLogin.LastName}";
-                        Session["UserEmail"] = userLogin.Email;
-                        
-                        // Create and set authentication cookie
-                        string encryptedEmail = taskoreHelpers.CoockieGenerator.Create(userLogin.Email);
-                        HttpCookie authCookie = new HttpCookie("X-KEY", encryptedEmail);
-                        authCookie.Expires = DateTime.Now.AddDays(30); // Cookie valid for 30 days
-                        authCookie.HttpOnly = true;
-                        Response.Cookies.Add(authCookie);
-                        
-                        return RedirectToAction("MyProfile", "Main");
+                        // Auto login the user after registration
+                        UserLoginSession loginData = new UserLoginSession
+                        {
+                            Email = register.Email,
+                            Password = register.Password,
+                            LoginIp = Request.UserHostAddress,
+                            LoginDataTime = DateTime.Now
+                        };
+
+                        LoginResult userLogin = (LoginResult)_session.UserLogin(loginData);
+                        if (userLogin.Status)
+                        {
+                            // Store user info in session
+                            Session["UserId"] = userLogin.UserId;
+                            Session["UserFullName"] = $"{userLogin.FirstName} {userLogin.LastName}";
+                            Session["UserEmail"] = userLogin.Email;
+                            
+                            // Create and set authentication cookie
+                            string encryptedEmail = taskoreHelpers.CoockieGenerator.Create(userLogin.Email);
+                            HttpCookie authCookie = new HttpCookie("X-KEY", encryptedEmail);
+                            authCookie.Expires = DateTime.Now.AddDays(30); // Cookie valid for 30 days
+                            authCookie.HttpOnly = true;
+                            Response.Cookies.Add(authCookie);
+                            
+                            return RedirectToAction("MyProfile", "Main");
+                        }
+                        else
+                        {
+                            // If auto-login fails, still consider registration successful
+                            TempData["SuccessMessage"] = "Account created successfully! Please sign in.";
+                            return RedirectToAction("SignIn");
+                        }
                     }
                     else
                     {
-                        // If auto-login fails, still consider registration successful
-                        TempData["SuccessMessage"] = "Account created successfully! Please sign in.";
-                        return RedirectToAction("SignIn");
+                        ModelState.AddModelError("", "Registration failed. Please try again.");
                     }
                 }
-                else
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception in SignUp: " + ex.Message);
+                if (ex.InnerException != null)
                 {
-                    ModelState.AddModelError("", "Registration failed. Please try again.");
+                    Debug.WriteLine("Inner exception: " + ex.InnerException.Message);
                 }
+                ModelState.AddModelError("", "An error occurred during registration. Please try again.");
             }
             
             // If we got this far, something failed, redisplay form

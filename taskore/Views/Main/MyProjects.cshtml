@@ -9,6 +9,30 @@
 <div class="container">
     <div class="projects-content">
         <h1>My Projects</h1>
+        
+        <div class="filter-controls">
+            <div class="filter-row">
+                <div class="search-box">
+                    <input type="text" id="project-search" placeholder="Search projects..." class="search-input">
+                    <button class="search-button" id="search-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="sort-controls">
+                    <select id="sort-projects" class="filter-select">
+                        <option value="">Sort By</option>
+                        <option value="name-asc">Project Name (A-Z)</option>
+                        <option value="name-desc">Project Name (Z-A)</option>
+                        <option value="progress-asc">Progress (Low to High)</option>
+                        <option value="progress-desc">Progress (High to Low)</option>
+                        <option value="status">Status</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
         @if (Model == null || !Model.Any())
         {
@@ -19,10 +43,10 @@
         }
         else
         {
-            <div class="project-cards">
+            <div class="project-cards" id="projects-container">
                 @foreach (var project in Model)
                 {
-                    <div class="project-card-modern">
+                    <div class="project-card-modern" data-title="@project.Title" data-progress="@project.Progress" data-status="@project.Status">
                         <div class="card-header">
                             <h3 class="project-title">@project.Title</h3>
                             <span class="project-status">@project.Status</span>
@@ -230,6 +254,168 @@
         text-decoration: none;
         font-weight: 500;
     }
-</style> 
+    
+    /* Filter controls styles */
+    .filter-controls {
+        margin-bottom: 20px;
+    }
+    
+    .filter-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .search-box {
+        position: relative;
+        flex-grow: 1;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 12px 40px 12px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    
+    .search-input:focus {
+        border-color: #4096ff;
+    }
+    
+    .search-button {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: none;
+        color: #666;
+        cursor: pointer;
+        outline: none;
+    }
+    
+    .filter-select {
+        padding: 12px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        background-color: white;
+        cursor: pointer;
+        min-width: 200px;
+    }
+    
+    .filter-select:focus {
+        border-color: #4096ff;
+    }
+    
+    .sort-controls {
+        display: flex;
+        gap: 10px;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('project-search');
+        const searchButton = document.getElementById('search-btn');
+        const sortSelect = document.getElementById('sort-projects');
+        const projectsContainer = document.getElementById('projects-container');
+        const projectCards = Array.from(document.querySelectorAll('.project-card-modern'));
+        
+        // Function to filter projects based on search term
+        function filterProjects() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            projectCards.forEach(card => {
+                const title = card.getAttribute('data-title').toLowerCase();
+                const status = card.getAttribute('data-status').toLowerCase();
+                const cardContent = card.textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || status.includes(searchTerm) || cardContent.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Check if any cards are visible
+            const visibleCards = projectCards.filter(card => card.style.display !== 'none');
+            if (visibleCards.length === 0) {
+                // Show a message if no projects match the search
+                let noResults = document.querySelector('.no-results');
+                if (!noResults) {
+                    noResults = document.createElement('div');
+                    noResults.className = 'no-projects no-results';
+                    noResults.innerHTML = '<h3>No matching projects</h3><p>Try adjusting your search criteria.</p>';
+                    projectsContainer.parentNode.appendChild(noResults);
+                } else {
+                    noResults.style.display = '';
+                }
+            } else {
+                // Hide the no results message if it exists
+                const noResults = document.querySelector('.no-results');
+                if (noResults) {
+                    noResults.style.display = 'none';
+                }
+            }
+        }
+        
+        // Function to sort projects
+        function sortProjects() {
+            const sortValue = sortSelect.value;
+            if (!sortValue) return;
+            
+            const visibleCards = projectCards.filter(card => card.style.display !== 'none');
+            
+            visibleCards.sort((a, b) => {
+                switch (sortValue) {
+                    case 'name-asc':
+                        return a.getAttribute('data-title').localeCompare(b.getAttribute('data-title'));
+                    case 'name-desc':
+                        return b.getAttribute('data-title').localeCompare(a.getAttribute('data-title'));
+                    case 'progress-asc':
+                        return parseInt(a.getAttribute('data-progress')) - parseInt(b.getAttribute('data-progress'));
+                    case 'progress-desc':
+                        return parseInt(b.getAttribute('data-progress')) - parseInt(a.getAttribute('data-progress'));
+                    case 'status':
+                        return a.getAttribute('data-status').localeCompare(b.getAttribute('data-status'));
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Re-append cards in sorted order
+            visibleCards.forEach(card => {
+                projectsContainer.appendChild(card);
+            });
+        }
+        
+        // Event listeners
+        if (searchInput) {
+            searchInput.addEventListener('input', filterProjects);
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    filterProjects();
+                    e.preventDefault();
+                }
+            });
+        }
+        
+        if (searchButton) {
+            searchButton.addEventListener('click', filterProjects);
+        }
+        
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function() {
+                sortProjects();
+            });
+        }
+    });
+</script>
 
 @Html.Partial("_Footer") 

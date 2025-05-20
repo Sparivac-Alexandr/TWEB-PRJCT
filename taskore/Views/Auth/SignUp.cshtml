@@ -4,6 +4,9 @@
     ViewBag.Title = "Sign Up";
 }
 @Styles.Render("~/Content/css")
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
 
 <body>
     <div class="auth-right">
@@ -13,6 +16,12 @@
                 <p>Please fill in your information</p>
             </div>
             
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
             
             @using (Html.BeginForm("SignUp", "Auth", FormMethod.Post, new { id = "signup-form" }))
             {
@@ -51,7 +60,21 @@
                         placeholder = "Password (minimum 6 characters)",
                         @required = "required"
                     })
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('Password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
                     @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                </div>
+                <div class="input-group">
+                    @Html.PasswordFor(m => m.ConfirmPassword, new
+                    {
+                        placeholder = "Confirm Password",
+                        @required = "required"
+                    })
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('ConfirmPassword')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
                 </div>
                 <div class="input-group">
                     @Html.DropDownListFor(m => m.Role, new SelectList(new[]
@@ -63,10 +86,112 @@
                 </div>
                 <button type="submit" class="submit-button">Create Account</button>
                 <div class="back-link">
-                    Already have an account? <a href="@Url.Action("SignIn", "Auth")" onclick="showPage('login')">Sign in</a>
+                    Already have an account? <a href="@Url.Action("SignIn", "Auth")">Sign in</a>
                 </div>
             }
         </div>
     </div>
+    
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+        
+        /* Password toggle button styles */
+        .input-group {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            padding: 5px;
+            z-index: 2;
+        }
+        .password-toggle:hover {
+            color: #3b82f6;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function() {
+            $("#signup-form").validate({
+                rules: {
+                    Email: {
+                        required: true,
+                        email: true
+                    },
+                    FirstName: {
+                        required: true
+                    },
+                    LastName: {
+                        required: true
+                    },
+                    Password: {
+                        required: true,
+                        minlength: 6
+                    },
+                    ConfirmPassword: {
+                        required: true,
+                        equalTo: "#Password"
+                    },
+                    Role: {
+                        required: true
+                    }
+                },
+                messages: {
+                    Email: {
+                        required: "Please enter your email address",
+                        email: "Please enter a valid email address"
+                    },
+                    FirstName: "Please enter your first name",
+                    LastName: "Please enter your last name",
+                    Password: {
+                        required: "Please enter a password",
+                        minlength: "Your password must be at least 6 characters long"
+                    },
+                    ConfirmPassword: {
+                        required: "Please confirm your password",
+                        equalTo: "Passwords do not match"
+                    },
+                    Role: "Please select a user type"
+                }
+            });
+        });
+        
+        function togglePasswordVisibility(fieldId) {
+            const passwordField = document.getElementById(fieldId);
+            const toggleButton = event.currentTarget;
+            const icon = toggleButton.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 

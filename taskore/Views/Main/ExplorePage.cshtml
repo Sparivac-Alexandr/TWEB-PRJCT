@@ -24,11 +24,14 @@
                 <div class="filter-options">
                     <select name="category" id="category-filter" class="filter-select">
                         <option value="">All Categories</option>
-                        <option value="web-development">Web Development</option>
-                        <option value="graphic-design">Graphic Design</option>
-                        <option value="content-writing">Content Writing</option>
-                        <option value="digital-marketing">Digital Marketing</option>
-                        <option value="mobile-apps">Mobile Apps</option>
+                        @if (Model != null)
+                        {
+                            foreach (var category in Model.Keys.Where(k => !string.IsNullOrEmpty(k)).OrderBy(k => k))
+                            {
+                                var categoryValue = category.ToLower().Replace(" ", "-");
+                                <option value="@categoryValue">@category</option>
+                            }
+                        }
                     </select>
                     <select name="budget" id="budget-filter" class="filter-select">
                         <option value="">All Budgets</option>
@@ -43,6 +46,13 @@
                         <option value="week">Within a week</option>
                         <option value="month">Within a month</option>
                         <option value="long-term">Long-term</option>
+                    </select>
+                    <select name="sort" id="sort-filter" class="filter-select">
+                        <option value="">Sort By</option>
+                        <option value="name-asc">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
+                        <option value="date-newest">Newest First</option>
+                        <option value="date-oldest">Oldest First</option>
                     </select>
                 </div>
             </div>
@@ -61,12 +71,15 @@
             {
                 if (categoryGroup.Value.Any())
                 {
-                    <section id="category-@categoryGroup.Key.ToLower().Replace(" ", "-")" class="project-category">
+                    <section id="category-@categoryGroup.Key.ToLower().Replace(" ", "-")" class="project-category" data-category="@(string.IsNullOrEmpty(categoryGroup.Key) ? "uncategorized" : categoryGroup.Key.ToLower().Replace(" ", "-"))">
                         <h2>@(string.IsNullOrEmpty(categoryGroup.Key) ? "Uncategorized" : categoryGroup.Key)</h2>
                         <div class="projects-grid">
                             @foreach (var project in categoryGroup.Value)
                             {
-                                <div class="project-card">
+                                <div class="project-card" data-title="@project.Title" data-date="@project.CreatedAt.Ticks" 
+                                     data-category="@(string.IsNullOrEmpty(categoryGroup.Key) ? "uncategorized" : categoryGroup.Key.ToLower().Replace(" ", "-"))" 
+                                     data-budget="@project.Budget.ToLower().Replace("$", "").Replace(",", "")" 
+                                     data-deadline="@(project.Deadline?.ToLower() ?? "")">
                                     <div class="project-header">
                                         <h3>@project.Title</h3>
                                         <span class="project-budget">@project.Budget</span>
@@ -113,5 +126,267 @@
         }
     </div>
 </div>
+
+<script>
+    // Simple script to handle project filtering and searching
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Explore page script loaded');
+
+        // Get the input elements
+        var searchInput = document.querySelector('.search-input');
+        var searchButton = document.querySelector('.search-button');
+        var categoryFilter = document.getElementById('category-filter');
+        var budgetFilter = document.getElementById('budget-filter');
+        var deadlineFilter = document.getElementById('deadline-filter');
+        var sortFilter = document.getElementById('sort-filter');
+
+        // Get all project cards
+        var projectCards = document.querySelectorAll('.project-card');
+
+        if (!projectCards.length) {
+            console.error('No project cards found on the page');
+            return;
+        }
+
+        console.log('Found ' + projectCards.length + ' project cards');
+
+        // Helper function to extract numeric value from budget string
+        function extractBudgetValue(budgetStr) {
+            if (!budgetStr) return 0;
+
+            // Try to match patterns like "$500" or "500 USD" or "500-1000"
+            var matches = budgetStr.match(/(\d+)/g);
+            if (!matches || matches.length === 0) return 0;
+
+            // If range (e.g. "500-1000"), get average
+            if (matches.length > 1 && budgetStr.indexOf('-') !== -1) {
+                return (parseInt(matches[0]) + parseInt(matches[1])) / 2;
+            }
+
+            // Otherwise return first number
+            return parseInt(matches[0]);
+        }
+
+        // Function to filter projects based on search and filter values
+        function filterProjects() {
+            var searchValue = searchInput ? searchInput.value.toLowerCase() : '';
+            var categoryValue = categoryFilter ? categoryFilter.value.toLowerCase() : '';
+            var budgetValue = budgetFilter ? budgetFilter.value.toLowerCase() : '';
+            var deadlineValue = deadlineFilter ? deadlineFilter.value.toLowerCase() : '';
+
+            console.log('Filtering with:', {
+                search: searchValue,
+                category: categoryValue,
+                budget: budgetValue,
+                deadline: deadlineValue
+            });
+
+            // Track visible cards count
+            var visibleCount = 0;
+
+            // Loop through each project card
+            projectCards.forEach(function (card) {
+                // Get text content to search in
+                var title = card.querySelector('h3') ? card.querySelector('h3').textContent.toLowerCase() : '';
+                var description = card.querySelector('.project-description') ?
+                    card.querySelector('.project-description').textContent.toLowerCase() : '';
+
+                // Get skills from tag elements
+                var skills = [];
+                var skillTags = card.querySelectorAll('.skill-tag');
+                skillTags.forEach(function (tag) {
+                    skills.push(tag.textContent.toLowerCase());
+                });
+
+                // Get data attributes for direct comparison
+                var cardCategory = card.getAttribute('data-category').toLowerCase();
+                var cardBudget = card.getAttribute('data-budget').toLowerCase();
+                var cardDeadline = card.getAttribute('data-deadline').toLowerCase();
+
+                // Extract numeric budget value
+                var budgetNumericValue = extractBudgetValue(cardBudget);
+
+                // Check if card matches search term
+                var matchesSearch = !searchValue ||
+                    title.indexOf(searchValue) !== -1 ||
+                    description.indexOf(searchValue) !== -1 ||
+                    skills.some(function (skill) { return skill.indexOf(searchValue) !== -1; });
+
+                // Check if card matches category filter
+                var matchesCategory = !categoryValue || cardCategory === categoryValue;
+
+                // Check if card matches budget filter
+                var matchesBudget = !budgetValue;
+                if (budgetValue) {
+                    switch (budgetValue) {
+                        case 'under-500':
+                            matchesBudget = budgetNumericValue < 500;
+                            break;
+                        case '500-1000':
+                            matchesBudget = budgetNumericValue >= 500 && budgetNumericValue <= 1000;
+                            break;
+                        case '1000-5000':
+                            matchesBudget = budgetNumericValue > 1000 && budgetNumericValue <= 5000;
+                            break;
+                        case 'over-5000':
+                            matchesBudget = budgetNumericValue > 5000;
+                            break;
+                        default:
+                            matchesBudget = cardBudget.indexOf(budgetValue) !== -1;
+                    }
+                }
+
+                // Check if card matches deadline filter
+                var matchesDeadline = !deadlineValue;
+                if (deadlineValue) {
+                    switch (deadlineValue) {
+                        case 'urgent':
+                            matchesDeadline = cardDeadline.indexOf('24h') !== -1 ||
+                                cardDeadline.indexOf('urgent') !== -1;
+                            break;
+                        case 'week':
+                            matchesDeadline = cardDeadline.indexOf('week') !== -1;
+                            break;
+                        case 'month':
+                            matchesDeadline = cardDeadline.indexOf('month') !== -1;
+                            break;
+                        case 'long-term':
+                            matchesDeadline = cardDeadline.indexOf('long') !== -1 ||
+                                cardDeadline.indexOf('term') !== -1;
+                            break;
+                        default:
+                            matchesDeadline = cardDeadline.indexOf(deadlineValue) !== -1;
+                    }
+                }
+
+                // Show or hide card based on all filters
+                var isVisible = matchesSearch && matchesCategory && matchesBudget && matchesDeadline;
+
+                if (isVisible) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            console.log('Visible projects after filtering:', visibleCount);
+
+            // Show/hide category sections based on whether they have visible cards
+            var categories = document.querySelectorAll('.project-category');
+            categories.forEach(function (category) {
+                var visibleCards = category.querySelectorAll('.project-card:not([style*="display: none"])');
+                if (visibleCards.length) {
+                    category.style.display = '';
+                } else {
+                    category.style.display = 'none';
+                }
+            });
+
+            // Show "no results" message if needed
+            var noResultsMessage = document.querySelector('.no-projects');
+            if (visibleCount === 0) {
+                if (!noResultsMessage) {
+                    noResultsMessage = document.createElement('div');
+                    noResultsMessage.className = 'no-projects';
+                    noResultsMessage.innerHTML = '<h3>No projects found</h3><p>Try adjusting your search criteria or filters.</p>';
+
+                    var projectsContent = document.querySelector('.projects-content');
+                    if (projectsContent) {
+                        projectsContent.appendChild(noResultsMessage);
+                    }
+                } else {
+                    noResultsMessage.style.display = '';
+                }
+            } else if (noResultsMessage) {
+                noResultsMessage.style.display = 'none';
+            }
+
+            // Apply sorting after filtering
+            sortProjects();
+        }
+
+        // Function to sort projects based on the selected sort option
+        function sortProjects() {
+            var sortValue = sortFilter ? sortFilter.value : '';
+
+            if (!sortValue) {
+                return; // No sorting needed
+            }
+
+            console.log('Sorting by:', sortValue);
+
+            // Loop through each category section
+            var categories = document.querySelectorAll('.project-category');
+            categories.forEach(function (category) {
+                var grid = category.querySelector('.projects-grid');
+                if (!grid) return;
+
+                var cards = Array.from(grid.querySelectorAll('.project-card:not([style*="display: none"])'));
+
+                // Sort the cards based on the selected sort option
+                cards.sort(function (a, b) {
+                    switch (sortValue) {
+                        case 'name-asc':
+                            var titleA = a.getAttribute('data-title').toLowerCase();
+                            var titleB = b.getAttribute('data-title').toLowerCase();
+                            return titleA.localeCompare(titleB);
+
+                        case 'name-desc':
+                            var titleA = a.getAttribute('data-title').toLowerCase();
+                            var titleB = b.getAttribute('data-title').toLowerCase();
+                            return titleB.localeCompare(titleA);
+
+                        case 'date-newest':
+                            var dateA = parseInt(a.getAttribute('data-date') || '0');
+                            var dateB = parseInt(b.getAttribute('data-date') || '0');
+                            return dateB - dateA;
+
+                        case 'date-oldest':
+                            var dateA = parseInt(a.getAttribute('data-date') || '0');
+                            var dateB = parseInt(b.getAttribute('data-date') || '0');
+                            return dateA - dateB;
+
+                        default:
+                            return 0;
+                    }
+                });
+
+                // Re-append the cards in the sorted order
+                cards.forEach(function (card) {
+                    grid.appendChild(card);
+                });
+            });
+        }
+
+        // Add event listeners
+        if (searchInput) {
+            searchInput.addEventListener('input', filterProjects);
+            searchInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    filterProjects();
+                    e.preventDefault();
+                }
+            });
+        }
+
+        if (searchButton) {
+            searchButton.addEventListener('click', function (e) {
+                filterProjects();
+                e.preventDefault();
+            });
+        }
+
+        if (categoryFilter) categoryFilter.addEventListener('change', filterProjects);
+        if (budgetFilter) budgetFilter.addEventListener('change', filterProjects);
+        if (deadlineFilter) deadlineFilter.addEventListener('change', filterProjects);
+        if (sortFilter) sortFilter.addEventListener('change', filterProjects);
+
+        // Run initial filtering
+        filterProjects();
+
+        console.log('Explore page script initialization complete');
+    }); 
+</script>
 
 @Html.Partial("_Footer")
