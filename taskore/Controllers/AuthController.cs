@@ -79,9 +79,79 @@ namespace taskore.Controllers
             return View();
         }
 
+        [HttpGet]
         public ActionResult ForgotPass()
         {
             return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ForgotPass(PasswordResetModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Check if email exists
+                if (!_session.CheckEmailExists(model.Email))
+                {
+                    TempData["ErrorMessage"] = "No account found with this email address.";
+                    return View(model);
+                }
+
+                bool result = _auth.InitiatePasswordReset(model.Email);
+
+                if (result)
+                {
+                    TempData["SuccessMessage"] = "If your email address is registered with us, you will receive a password reset code shortly. Please check your email.";
+                    return RedirectToAction("ResetPassword");
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "There was a problem processing your request. Please try again.";
+                    return View(model);
+                }
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public ActionResult ResetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ResetPassword(NewPasswordModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // First validate the reset code
+                bool isValidCode = _auth.ValidateResetCode(model.Email, model.ResetCode);
+                
+                if (!isValidCode)
+                {
+                    TempData["ErrorMessage"] = "Invalid or expired reset code. Please request a new one.";
+                    return View(model);
+                }
+
+                // Reset the password
+                bool isReset = _auth.ResetPassword(model.Email, model.NewPassword);
+                
+                if (isReset)
+                {
+                    TempData["SuccessMessage"] = "Your password has been reset successfully. You can now log in with your new password.";
+                    return RedirectToAction("SignIn");
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "There was an error resetting your password. Please try again.";
+                    return View(model);
+                }
+            }
+
+            return View(model);
         }
 
         // GET: SignOut - Acțiune pentru deconectare

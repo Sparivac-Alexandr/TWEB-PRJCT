@@ -207,6 +207,7 @@
     <Content Include="Views\Main\Chat.cshtml" />
     <Content Include="Views\Main\MyProjects.cshtml" />
     <Content Include="Views\Main\FAQ.cshtml" />
+    <Content Include="Views\Auth\ResetPassword.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

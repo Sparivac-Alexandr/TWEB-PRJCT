@@ -11,5 +11,8 @@ namespace taskoreBusinessLogic.Interfaces
     {
         string UserAuthLogic(UserLoginDTO data);
         bool UserRegisterLogic(UserRegisterDTO data);
+        bool InitiatePasswordReset(string email);
+        bool ValidateResetCode(string email, string resetCode);
+        bool ResetPassword(string email, string newPassword);
     }
 }

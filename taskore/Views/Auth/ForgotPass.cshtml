@@ -1,4 +1,5 @@
 ﻿@using System.Web.Optimization
+@model taskore.Models.Auth.PasswordResetModel
 @{
     ViewBag.Title = "Password Recovery";
 }
@@ -10,16 +11,64 @@
                 <h1>Password Recovery</h1>
                 <p>Enter your email to receive reset instructions</p>
             </div>
-            <form id="forgot-password-form">
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            @using (Html.BeginForm("ForgotPass", "Auth", FormMethod.Post, new { id = "forgot-password-form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 <div class="input-group">
-                    <input type="email" placeholder="Email address" required>
+                    @Html.TextBoxFor(m => m.Email, new
+                    {
+                        placeholder = "Email address",
+                        @required = "required",
+                        type = "email"
+                    })
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
                 </div>
                 <button type="submit" class="submit-button">Send Reset Link</button>
                 <div class="back-link">
-                    <a href="@Url.Action("SignIn", "Auth")" onclick="showPage('login')">Back to Login</a>
+                    <a href="@Url.Action("SignIn", "Auth")">Back to Login</a>
                 </div>
-            </form>
+            }
         </div>
     </div>
+
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+    </style>
 </body>
 

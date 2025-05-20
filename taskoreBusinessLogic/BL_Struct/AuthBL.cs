@@ -10,11 +10,16 @@ using taskoreBusinessLogic.Interfaces;
 using taskoreDomain.Enteties.User;
 using System.Diagnostics;
 using taskoreHelpers;
+using System.Net.Mail;
+using System.Net;
 
 namespace taskoreBusinessLogic.BL_Struct
 {
    public class AuthBL : UserApi, IAuth
     {
+        // Store reset codes temporarily (in a real app, this would be in a database)
+        private static Dictionary<string, Tuple<string, DateTime>> resetCodes = new Dictionary<string, Tuple<string, DateTime>>();
+
         public string UserAuthLogic(UserLoginDTO data)
         {
             return UserAuthLogicAction(data);
@@ -89,6 +94,156 @@ namespace taskoreBusinessLogic.BL_Struct
                 }
                 Debug.WriteLine("Stack trace: " + ex.StackTrace);
                 return false;
+            }
+        }
+
+        public bool InitiatePasswordReset(string email)
+        {
+            try
+            {
+                var context = new UserContext();
+                var user = context.Users.FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
+
+                if (user == null)
+                {
+                    Debug.WriteLine($"Password reset failed: User with email {email} not found");
+                    return false;
+                }
+
+                // Generate a random reset code
+                Random random = new Random();
+                string resetCode = random.Next(100000, 999999).ToString();
+
+                // Store the reset code with expiration (30 minutes)
+                resetCodes[email] = new Tuple<string, DateTime>(resetCode, DateTime.Now.AddMinutes(30));
+
+                // In a real application, you would send an email with the reset code
+                // For demonstration purposes, we'll just log it
+                Debug.WriteLine($"Reset code for {email}: {resetCode}");
+
+                // Uncomment this in a real application to send actual emails
+                // SendResetEmail(email, resetCode, user.FirstName);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("ERROR in InitiatePasswordReset: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool ValidateResetCode(string email, string resetCode)
+        {
+            try
+            {
+                if (!resetCodes.ContainsKey(email))
+                {
+                    Debug.WriteLine($"No reset code found for email: {email}");
+                    return false;
+                }
+
+                var storedData = resetCodes[email];
+                string storedCode = storedData.Item1;
+                DateTime expirationTime = storedData.Item2;
+
+                if (DateTime.Now > expirationTime)
+                {
+                    Debug.WriteLine($"Reset code expired for email: {email}");
+                    resetCodes.Remove(email);
+                    return false;
+                }
+
+                if (storedCode != resetCode)
+                {
+                    Debug.WriteLine($"Invalid reset code for email: {email}");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("ERROR in ValidateResetCode: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool ResetPassword(string email, string newPassword)
+        {
+            try
+            {
+                var context = new UserContext();
+                var user = context.Users.FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
+
+                if (user == null)
+                {
+                    Debug.WriteLine($"Password reset failed: User with email {email} not found");
+                    return false;
+                }
+
+                // Hash the new password
+                string hashedPassword = HashGenerator.HashGen(newPassword);
+
+                // Update the password
+                user.Password = hashedPassword;
+                context.SaveChanges();
+
+                // Remove the reset code
+                if (resetCodes.ContainsKey(email))
+                {
+                    resetCodes.Remove(email);
+                }
+
+                Debug.WriteLine($"Password successfully reset for user: {email}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("ERROR in ResetPassword: " + ex.Message);
+                return false;
+            }
+        }
+
+        private void SendResetEmail(string email, string resetCode, string firstName)
+        {
+            try
+            {
+                // This is a basic implementation - in a real app, use proper email configuration
+                var fromAddress = new MailAddress("noreply@taskore.com", "Taskore Support");
+                var toAddress = new MailAddress(email);
+                const string subject = "Taskore Password Reset";
+                string body = $"Hello {firstName},\n\n" +
+                              $"You requested a password reset for your Taskore account. Use the following code to reset your password:\n\n" +
+                              $"Reset Code: {resetCode}\n\n" +
+                              $"This code will expire in 30 minutes. If you did not request this reset, please ignore this email.\n\n" +
+                              $"Best regards,\nThe Taskore Team";
+
+                // Configure mail client (you would use your actual SMTP settings)
+                using (var smtp = new SmtpClient
+                {
+                    Host = "smtp.example.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential("username", "password")
+                })
+                {
+                    using (var message = new MailMessage(fromAddress, toAddress)
+                    {
+                        Subject = subject,
+                        Body = body
+                    })
+                    {
+                        smtp.Send(message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error sending email: " + ex.Message);
+                // In a real application, you might want to handle this differently
             }
         }
     }
