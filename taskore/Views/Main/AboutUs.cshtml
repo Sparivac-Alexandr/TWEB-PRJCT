@@ -1,30 +1,28 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "About Us";
 }
-@Html.Partial("_Header_guest")
-
-
+@Html.Partial("_Header")
 
 <div class="container">
     <div class="about-content">
-        <h1>About Us</h1>
+        <h1 class="page-title">About Us</h1>
 
-        <section id="our-story">
-            <h2>Our Story</h2>
-            <p>Founded in 2024, taskore emerged from a simple vision: to create a seamless connection between talented freelancers and innovative clients. Our platform has grown to become a trusted marketplace where skills meet opportunities, fostering professional growth and business success.</p>
+        <section id="our-story" class="content-section">
+            <h2 class="section-title">Our Story</h2>
+            <p class="section-text">Founded in 2024, taskore emerged from a simple vision: to create a seamless connection between talented freelancers and innovative clients. Our platform has grown to become a trusted marketplace where skills meet opportunities, fostering professional growth and business success.</p>
         </section>
-        <section id="our-mission">
-            <h2>Our Mission</h2>
-            <p>At taskore, we're committed to revolutionizing the way work gets done. Our mission is to empower professionals worldwide by providing a secure, efficient, and transparent platform for freelance collaboration. We believe in creating opportunities that transcend geographical boundaries and traditional work constraints.</p>
+        
+        <section id="our-mission" class="content-section">
+            <h2 class="section-title">Our Mission</h2>
+            <p class="section-text">At taskore, we're committed to revolutionizing the way work gets done. Our mission is to empower professionals worldwide by providing a secure, efficient, and transparent platform for freelance collaboration. We believe in creating opportunities that transcend geographical boundaries and traditional work constraints.</p>
         </section>
 
-        <section id="what-we-offer">
-            <h2>What We Offer</h2>
+        <section id="what-we-offer" class="content-section">
+            <h2 class="section-title">What We Offer</h2>
             <div class="features-grid">
                 <div class="feature-card">
-                    <h3>For Freelancers</h3>
-                    <ul>
+                    <h3 class="card-title">For Freelancers</h3>
+                    <ul class="feature-list">
                         <li>Access to global opportunities</li>
                         <li>Secure payment system</li>
                         <li>Professional growth tools</li>
@@ -32,8 +30,8 @@
                     </ul>
                 </div>
                 <div class="feature-card">
-                    <h3>For Clients</h3>
-                    <ul>
+                    <h3 class="card-title">For Clients</h3>
+                    <ul class="feature-list">
                         <li>Verified talent pool</li>
                         <li>Project management tools</li>
                         <li>Quality guarantees</li>
@@ -43,31 +41,197 @@
             </div>
         </section>
 
-        <section id="our-values">
-            <h2>Our Values</h2>
+        <section id="our-values" class="content-section">
+            <h2 class="section-title">Our Values</h2>
             <div class="values-grid">
                 <div class="value-item">
-                    <h3>Trust</h3>
-                    <p>Building reliable connections between clients and freelancers through transparency and security.</p>
+                    <h3 class="value-title">Trust</h3>
+                    <p class="value-text">Building reliable connections between clients and freelancers through transparency and security.</p>
                 </div>
                 <div class="value-item">
-                    <h3>Innovation</h3>
-                    <p>Continuously improving our platform to meet the evolving needs of the digital workforce.</p>
+                    <h3 class="value-title">Innovation</h3>
+                    <p class="value-text">Continuously improving our platform to meet the evolving needs of the digital workforce.</p>
                 </div>
                 <div class="value-item">
-                    <h3>Quality</h3>
-                    <p>Maintaining high standards in service delivery and user experience.</p>
+                    <h3 class="value-title">Quality</h3>
+                    <p class="value-text">Maintaining high standards in service delivery and user experience.</p>
                 </div>
                 <div class="value-item">
-                    <h3>Community</h3>
-                    <p>Fostering a supportive environment for professional growth and collaboration.</p>
+                    <h3 class="value-title">Community</h3>
+                    <p class="value-text">Fostering a supportive environment for professional growth and collaboration.</p>
                 </div>
             </div>
         </section>
-        <section id="join-us">
-            <h2>Join Our Community</h2>
-            <p>Whether you're a freelancer looking to showcase your talents or a client seeking exceptional professionals, taskore is your platform for success. Join our growing community and be part of the future of work.</p>
+        
+        <section id="join-us" class="content-section">
+            <h2 class="section-title">Join Our Community</h2>
+            <p class="section-text">Whether you're a freelancer looking to showcase your talents or a client seeking exceptional professionals, taskore is your platform for success. Join our growing community and be part of the future of work.</p>
         </section>
     </div>
 </div>
+
+<style>
+    /* About Us Page Styles */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .about-content {
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .page-title:after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 4px;
+        background-color: #3b82f6;
+        margin: 0.75rem auto 0;
+        border-radius: 2px;
+    }
+
+    .content-section {
+        margin-bottom: 3rem;
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1.25rem;
+    }
+
+    .section-text {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: #555;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Features Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .feature-card {
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-title {
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: #3b82f6;
+        margin-bottom: 1rem;
+    }
+
+    .feature-list {
+        padding-left: 1.25rem;
+    }
+
+    .feature-list li {
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
+        color: #555;
+    }
+
+    /* Values Grid */
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .value-item {
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        border-top: 4px solid #3b82f6;
+        transition: transform 0.2s ease;
+    }
+
+    .value-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .value-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+
+    .value-text {
+        color: #555;
+        line-height: 1.6;
+    }
+
+    /* CTA Buttons */
+    .cta-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.8rem 1.75rem;
+        border-radius: 6px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary {
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+    }
+
+    .btn-secondary {
+        background-color: #f8fafc;
+        color: #3b82f6;
+        border: 2px solid #3b82f6;
+    }
+
+    .btn-primary:hover {
+        background-color: #2563eb;
+    }
+
+    .btn-secondary:hover {
+        background-color: #f1f5f9;
+    }
+</style>
+
 @Html.Partial("_Footer")
