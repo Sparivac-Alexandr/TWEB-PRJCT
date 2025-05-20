@@ -207,6 +207,7 @@
     <Content Include="Views\Main\CreateNewsPage.cshtml" />
     <Content Include="Views\Main\Chat.cshtml" />
     <Content Include="Views\Main\MyProjects.cshtml" />
+    <Content Include="Views\Main\FAQ.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

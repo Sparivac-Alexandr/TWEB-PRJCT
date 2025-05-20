@@ -692,6 +692,11 @@ namespace taskore.Controllers
             return View();
         }
         
+        public ActionResult FAQ()
+        {
+            return View();
+        }
+        
         public ActionResult UserStats(string userId)
         {
             // Check if user is logged in
