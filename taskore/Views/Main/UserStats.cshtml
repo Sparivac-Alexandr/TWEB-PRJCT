@@ -1,8 +1,28 @@
+@using taskoreBusinessLogic.DBModel
 @{
     ViewBag.Title = "My Statistics";
+
     var userId = Request.QueryString["userId"];
     var username = ViewBag.UserName ?? "User";
     var userType = ViewBag.UserType ?? "freelancer";
+
+    // Fetch user data from database
+    using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+    {
+        var user = context.Users.FirstOrDefault(u => u.Id.ToString() == userId);
+        if (user != null)
+        {
+            username = $"{user.FirstName} {user.LastName}";
+            ViewBag.TotalProjects = user.CompletedProjects ?? 0;
+            ViewBag.CurrentProjects = user.CurrentProjects ?? 0;
+            ViewBag.OnTimePercentage = user.OnTimePercentage ?? 0;
+            ViewBag.AverageRating = user.Rating ?? 0;
+            ViewBag.CompletionRate = user.CompletionRate ?? 0;
+            ViewBag.ResponseRate = user.ResponseRate ?? 0;
+            ViewBag.ClientSatisfaction = user.ClientSatisfaction ?? 0;
+            ViewBag.ProjectEfficiency = user.ProjectEfficiency ?? 0;
+        }
+    }
 }
 
 <body>

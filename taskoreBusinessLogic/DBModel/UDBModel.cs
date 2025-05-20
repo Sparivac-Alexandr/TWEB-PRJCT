@@ -89,6 +89,24 @@ namespace taskoreBusinessLogic.DBModel
         [Column("completed_projects")]
         public int? CompletedProjects { get; set; }
 
+        [Column("current_projects")]
+        public int? CurrentProjects { get; set; }
+
+        [Column("on_time_percentage")]
+        public double? OnTimePercentage { get; set; }
+
+        [Column("completion_rate")]
+        public double? CompletionRate { get; set; }
+
+        [Column("response_rate")]
+        public double? ResponseRate { get; set; }
+
+        [Column("client_satisfaction")]
+        public double? ClientSatisfaction { get; set; }
+
+        [Column("project_efficiency")]
+        public double? ProjectEfficiency { get; set; }
+
         [Column("last_active_at")]
         public DateTime? LastActiveAt { get; set; }
 

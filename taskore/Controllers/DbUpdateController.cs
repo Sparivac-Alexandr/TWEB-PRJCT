@@ -65,6 +65,12 @@ namespace taskore.Controllers
                         user.Rating = 4.8;
                         user.RatingCount = 40;
                         user.CompletedProjects = 23;
+                        user.CurrentProjects = 2;
+                        user.OnTimePercentage = 92.5;
+                        user.CompletionRate = 95.0;
+                        user.ResponseRate = 98.0;
+                        user.ClientSatisfaction = 96.0;
+                        user.ProjectEfficiency = 87.5;
                     }
                     
                     // Salvăm modificările

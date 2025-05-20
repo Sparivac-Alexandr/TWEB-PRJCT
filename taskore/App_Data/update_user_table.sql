@@ -90,6 +90,42 @@ BEGIN
     ALTER TABLE [dbo].[Users] ADD [completed_projects] INT NULL;
 END
 
+-- Adaugă coloana current_projects
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND name = 'current_projects')
+BEGIN
+    ALTER TABLE [dbo].[Users] ADD [current_projects] INT NULL;
+END
+
+-- Adaugă coloana on_time_percentage
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND name = 'on_time_percentage')
+BEGIN
+    ALTER TABLE [dbo].[Users] ADD [on_time_percentage] FLOAT NULL;
+END
+
+-- Adaugă coloana completion_rate
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND name = 'completion_rate')
+BEGIN
+    ALTER TABLE [dbo].[Users] ADD [completion_rate] FLOAT NULL;
+END
+
+-- Adaugă coloana response_rate
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND name = 'response_rate')
+BEGIN
+    ALTER TABLE [dbo].[Users] ADD [response_rate] FLOAT NULL;
+END
+
+-- Adaugă coloana client_satisfaction
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND name = 'client_satisfaction')
+BEGIN
+    ALTER TABLE [dbo].[Users] ADD [client_satisfaction] FLOAT NULL;
+END
+
+-- Adaugă coloana project_efficiency
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND name = 'project_efficiency')
+BEGIN
+    ALTER TABLE [dbo].[Users] ADD [project_efficiency] FLOAT NULL;
+END
+
 -- Actualizează utilizatorii existenți cu valori implicite
 UPDATE [dbo].[Users]
 SET 
@@ -107,6 +143,12 @@ SET
     [availability_hours] = '30 hrs/week',
     [rating] = 4.8,
     [rating_count] = 40,
-    [completed_projects] = 23
+    [completed_projects] = 23,
+    [current_projects] = 2,
+    [on_time_percentage] = 92.5,
+    [completion_rate] = 95.0,
+    [response_rate] = 98.0,
+    [client_satisfaction] = 96.0,
+    [project_efficiency] = 87.5
 WHERE 
     [headline] IS NULL; 

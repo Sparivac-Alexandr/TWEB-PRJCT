@@ -15,5 +15,12 @@ namespace taskoreBusinessLogic.Interfaces
         bool DeleteProject(int id);
         ProjectDBModel GetProjectById(int id);
         bool UpdateProject(ProjectDBModel project);
+        
+        // Project Application methods
+        bool ApplyForProject(ProjectApplicationDBModel application);
+        List<ProjectApplicationDBModel> GetUserApplications(int userId);
+        ProjectApplicationDBModel GetProjectApplicationById(int id);
+        bool UpdateProjectApplication(ProjectApplicationDBModel application);
+        bool DeleteProjectApplication(int id);
     }
 } 

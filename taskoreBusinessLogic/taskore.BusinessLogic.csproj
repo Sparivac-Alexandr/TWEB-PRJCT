@@ -56,9 +56,11 @@
     <Compile Include="BL_Struct\ReviewBL.cs" />
     <Compile Include="DBModel\ChatMessageDBModel.cs" />
     <Compile Include="DBModel\NewsDBModel.cs" />
+    <Compile Include="DBModel\ProjectApplicationDBModel.cs" />
     <Compile Include="DBModel\ProjectDBModel.cs" />
     <Compile Include="DBModel\ReviewDBModel.cs" />
     <Compile Include="DBModel\Seed\NewsContext.cs" />
+    <Compile Include="DBModel\Seed\ProjectApplicationContext.cs" />
     <Compile Include="DBModel\Seed\ProjectContext.cs" />
     <Compile Include="DBModel\Seed\ReviewContext.cs" />
     <Compile Include="DBModel\Seed\UserContext.cs" />

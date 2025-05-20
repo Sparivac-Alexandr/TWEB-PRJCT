@@ -179,5 +179,128 @@ namespace taskoreBusinessLogic.BL_Struct
                 return false;
             }
         }
+
+        public bool ApplyForProject(ProjectApplicationDBModel application)
+        {
+            try
+            {
+                Debug.WriteLine($"Creating application for project ID: {application.ProjectId}");
+
+                using (var context = new ProjectApplicationContext())
+                {
+                    context.ProjectApplications.Add(application);
+                    int rowsAffected = context.SaveChanges();
+                    Debug.WriteLine($"Project application completed. Rows affected: {rowsAffected}");
+                    return rowsAffected > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ERROR in ApplyForProject: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Debug.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                }
+                Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                return false;
+            }
+        }
+
+        public List<ProjectApplicationDBModel> GetUserApplications(int userId)
+        {
+            try
+            {
+                Debug.WriteLine($"Getting applications for user ID: {userId}");
+                
+                using (var context = new ProjectApplicationContext())
+                {
+                    return context.ProjectApplications
+                        .Where(p => p.FreelancerId == userId || p.ClientId == userId)
+                        .OrderByDescending(p => p.CreatedAt)
+                        .ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ERROR in GetUserApplications: {ex.Message}");
+                return new List<ProjectApplicationDBModel>();
+            }
+        }
+
+        public ProjectApplicationDBModel GetProjectApplicationById(int id)
+        {
+            try
+            {
+                Debug.WriteLine($"Getting project application with ID: {id}");
+                
+                using (var context = new ProjectApplicationContext())
+                {
+                    return context.ProjectApplications.FirstOrDefault(p => p.Id == id);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ERROR in GetProjectApplicationById: {ex.Message}");
+                return null;
+            }
+        }
+
+        public bool UpdateProjectApplication(ProjectApplicationDBModel application)
+        {
+            try
+            {
+                Debug.WriteLine($"Updating project application with ID: {application.Id}");
+                
+                using (var context = new ProjectApplicationContext())
+                {
+                    var existingApplication = context.ProjectApplications.Find(application.Id);
+                    
+                    if (existingApplication == null)
+                    {
+                        Debug.WriteLine($"Project application with ID {application.Id} not found");
+                        return false;
+                    }
+                    
+                    existingApplication.Status = application.Status;
+                    existingApplication.Progress = application.Progress;
+                    existingApplication.UpdatedAt = DateTime.Now;
+                    
+                    int rowsAffected = context.SaveChanges();
+                    Debug.WriteLine($"Project application update completed. Rows affected: {rowsAffected}");
+                    return rowsAffected > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ERROR in UpdateProjectApplication: {ex.Message}");
+                return false;
+            }
+        }
+
+        public bool DeleteProjectApplication(int id)
+        {
+            try
+            {
+                Debug.WriteLine($"Deleting project application with ID: {id}");
+                
+                using (var context = new ProjectApplicationContext())
+                {
+                    var application = context.ProjectApplications.Find(id);
+                    if (application != null)
+                    {
+                        context.ProjectApplications.Remove(application);
+                        int rowsAffected = context.SaveChanges();
+                        Debug.WriteLine($"Project application deletion completed. Rows affected: {rowsAffected}");
+                        return rowsAffected > 0;
+                    }
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ERROR in DeleteProjectApplication: {ex.Message}");
+                return false;
+            }
+        }
     }
 } 

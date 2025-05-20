@@ -759,105 +759,6 @@ namespace taskore.Controllers
                 return View(new List<UDBModel>());
             }
         }
-        
-        public ActionResult Deals()
-        {
-            // Check if user is logged in
-            if (Session["UserId"] == null)
-            {
-                return RedirectToAction("SignIn", "Auth");
-            }
-            
-            // Model pentru a stoca date despre deals - folosim un dictionary în loc de obiect anonim
-            var dealsModel = new List<Dictionary<string, object>>();
-            
-            // Adăugăm primul deal
-            var deal1 = new Dictionary<string, object>
-            {
-                { "Id", 1 },
-                { "Title", "Website Redesign Project" },
-                { "ClientName", "Tech Solutions Inc." },
-                { "FreelancerName", "Alex Johnson" },
-                { "Status", "In Progress" },
-                { "Budget", "$2,500" },
-                { "StartDate", "2023-11-15" },
-                { "Deadline", "2024-01-30" },
-                { "Progress", 65 },
-                { "Messages", 28 },
-                { "LastActivity", "3 hours ago" }
-            };
-            dealsModel.Add(deal1);
-            
-            // Adăugăm al doilea deal
-            var deal2 = new Dictionary<string, object>
-            {
-                { "Id", 2 },
-                { "Title", "Mobile App Development" },
-                { "ClientName", "Green Innovations" },
-                { "FreelancerName", "Sarah Williams" },
-                { "Status", "Pending Approval" },
-                { "Budget", "$5,000" },
-                { "StartDate", "2023-12-01" },
-                { "Deadline", "2024-02-28" },
-                { "Progress", 30 },
-                { "Messages", 14 },
-                { "LastActivity", "1 day ago" }
-            };
-            dealsModel.Add(deal2);
-            
-            // Adăugăm al treilea deal
-            var deal3 = new Dictionary<string, object>
-            {
-                { "Id", 3 },
-                { "Title", "E-commerce Integration" },
-                { "ClientName", "Fashion Outlet" },
-                { "FreelancerName", "David Chen" },
-                { "Status", "Completed" },
-                { "Budget", "$1,800" },
-                { "StartDate", "2023-10-05" },
-                { "Deadline", "2023-11-20" },
-                { "Progress", 100 },
-                { "Messages", 42 },
-                { "LastActivity", "1 week ago" }
-            };
-            dealsModel.Add(deal3);
-            
-            // Adăugăm al patrulea deal
-            var deal4 = new Dictionary<string, object>
-            {
-                { "Id", 4 },
-                { "Title", "SEO Optimization" },
-                { "ClientName", "Healthy Life Blog" },
-                { "FreelancerName", "Emma Rodriguez" },
-                { "Status", "In Review" },
-                { "Budget", "$800" },
-                { "StartDate", "2023-11-25" },
-                { "Deadline", "2023-12-15" },
-                { "Progress", 90 },
-                { "Messages", 16 },
-                { "LastActivity", "2 days ago" }
-            };
-            dealsModel.Add(deal4);
-            
-            // Adăugăm al cincilea deal
-            var deal5 = new Dictionary<string, object>
-            {
-                { "Id", 5 },
-                { "Title", "Logo & Branding Package" },
-                { "ClientName", "Startup Ventures" },
-                { "FreelancerName", "Michael Thompson" },
-                { "Status", "In Progress" },
-                { "Budget", "$1,200" },
-                { "StartDate", "2023-12-05" },
-                { "Deadline", "2024-01-10" },
-                { "Progress", 45 },
-                { "Messages", 21 },
-                { "LastActivity", "5 hours ago" }
-            };
-            dealsModel.Add(deal5);
-            
-            return View(dealsModel);
-        }
 
         public ActionResult News()
         {
@@ -1458,6 +1359,110 @@ namespace taskore.Controllers
                 context.SaveChanges();
             }
             return RedirectToAction("Chat", new { userId = ToUserId });
+        }
+
+        // Method to handle applying for a project
+        public ActionResult ApplyForProject(int projectId)
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                TempData["ErrorMessage"] = "You need to be logged in to apply for a project.";
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            try
+            {
+                int freelancerId = (int)Session["UserId"];
+                string freelancerName = Session["UserFullName"] as string ?? "Unknown Freelancer";
+                
+                // Get the project details
+                var project = _projectService.GetProjectById(projectId);
+                if (project == null)
+                {
+                    TempData["ErrorMessage"] = "Project not found.";
+                    return RedirectToAction("ExplorePage");
+                }
+                
+                // Check if user has already applied for this project
+                using (var context = new ProjectApplicationContext())
+                {
+                    bool alreadyApplied = context.ProjectApplications
+                        .Any(a => a.ProjectId == projectId && a.FreelancerId == freelancerId);
+                    
+                    if (alreadyApplied)
+                    {
+                        TempData["ErrorMessage"] = "You have already applied for this project.";
+                        return RedirectToAction("ExplorePage");
+                    }
+                }
+                
+                // Get the client name
+                string clientName = FetchUserName(project.UserId);
+                
+                // Create a project application model
+                var application = new ProjectApplicationDBModel
+                {
+                    Title = project.Title,
+                    Status = "In Progress",
+                    Client = clientName,
+                    Freelancer = freelancerName,
+                    Budget = project.Budget,
+                    StartDate = DateTime.Now,
+                    EndDate = DateTime.TryParse(project.Deadline, out DateTime deadline) ? deadline : DateTime.Now.AddMonths(1),
+                    Progress = 0, // Initial progress
+                    ProjectId = projectId,
+                    ClientId = project.UserId,
+                    FreelancerId = freelancerId
+                };
+                
+                // Save the application
+                bool isApplied = _projectService.ApplyForProject(application);
+                
+                if (isApplied)
+                {
+                    TempData["SuccessMessage"] = "You have successfully applied for this project.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to apply for this project. Please try again.";
+                }
+                
+                return RedirectToAction("ExplorePage");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error applying for project: {ex.Message}");
+                TempData["ErrorMessage"] = "An error occurred while applying for the project.";
+                return RedirectToAction("ExplorePage");
+            }
+        }
+
+        // View to show user's applied projects
+        public ActionResult MyProjects()
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                TempData["ErrorMessage"] = "You need to be logged in to view your projects.";
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            try
+            {
+                int userId = (int)Session["UserId"];
+                
+                // Get all project applications for the current user
+                var applications = _projectService.GetUserApplications(userId);
+                
+                return View(applications);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading projects: {ex.Message}");
+                TempData["ErrorMessage"] = "An error occurred while loading your projects.";
+                return View(new List<ProjectApplicationDBModel>());
+            }
         }
     }
 }

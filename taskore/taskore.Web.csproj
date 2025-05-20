@@ -202,12 +202,11 @@
     <Content Include="Views\Main\UserStats.cshtml" />
     <Content Include="Views\Main\AllFreelancers.cshtml" />
     <Content Include="Views\Main\UserProfile.cshtml" />
-    <Content Include="Views\Main\Deals.cshtml" />
-    <Content Include="Views\Auth\View.cshtml" />
     <Content Include="Views\Main\AdminDashboard.cshtml" />
     <Content Include="Views\Main\News.cshtml" />
     <Content Include="Views\Main\CreateNewsPage.cshtml" />
     <Content Include="Views\Main\Chat.cshtml" />
+    <Content Include="Views\Main\MyProjects.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
