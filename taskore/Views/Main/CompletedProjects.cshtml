@@ -1,9 +1,12 @@
+@model List<taskoreBusinessLogic.DBModel.ProjectApplicationDBModel>
+
 @{
     ViewBag.Title = "Completed Projects";
-    var userId = Request.QueryString["userId"];
+    var userId = ViewBag.UserId;
     var username = ViewBag.UserName ?? "User";
-    var completedCount = ViewBag.CompletedCount ?? 23;
+    var completedCount = Model != null ? Model.Count : 0;
     var userType = ViewBag.UserType ?? "freelancer";
+    var isOwnProfile = (Session["UserId"] != null && userId != null && int.Parse(Session["UserId"].ToString()) == (int)userId);
 }
 
 <body>
@@ -12,108 +15,87 @@
     <div class="projects-container">
         <div class="projects-header">
             <div class="back-link">
-                <a href="@Url.Action("MyProfile", "Main")" class="back-btn">
-                    <i class="fas fa-arrow-left"></i> Back to Profile
-                </a>
+                @if (isOwnProfile)
+                {
+                    <a href="@Url.Action("MyProfile", "Main")" class="back-btn">
+                        <i class="fas fa-arrow-left"></i> Back to My Profile
+                    </a>
+                }
+                else
+                {
+                    <a href="@Url.Action("UserProfile", "Main", new { userId = userId })" class="back-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Profile
+                    </a>
+                }
             </div>
             <div class="projects-title">
-                <h1>@(userType == "freelancer" ? "Completed Projects" : "Posted Projects") by @username</h1>
+                <h1>
+                    @if (isOwnProfile)
+                    {
+                        @(userType == "freelancer" ? "My Completed Projects" : "My Posted Projects")
+                    }
+                    else
+                    {
+                        @(userType == "freelancer" ? "Completed Projects" : "Posted Projects") @:by @username
+                    }
+                </h1>
             </div>
         </div>
 
         <div class="projects-body">
-            <div class="projects-list">
-                <!-- Example projects - in a real app, these would be loaded from a database -->
-                <div class="project-item">
-                    <div class="project-header">
-                        <div class="project-title">E-commerce Website Redesign</div>
-                        <div class="project-date">Completed on: October 15, 2023</div>
-                    </div>
-                    <div class="project-details">
-                        <div class="project-description">
-                            <p>Completely redesigned the UX/UI of an online retail store, including mobile responsiveness and checkout optimization. Increased conversion rates by 25%.</p>
-                        </div>
-                        <div class="project-meta">
-                            <div class="meta-item">
-                                <i class="fas fa-tag"></i>
-                                <span>Web Development, UI/UX Design</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-dollar-sign"></i>
-                                <span>$3,800</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-clock"></i>
-                                <span>6 weeks</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="project-client">
-                        <div class="client-label">Client:</div>
-                        <div class="client-name">TechRetail Solutions</div>
-                    </div>
+            @if (Model == null || !Model.Any())
+            {
+                <div class="no-projects">
+                    <h3>No completed projects found</h3>
+                    <p>
+                        @if (isOwnProfile)
+                        {
+                            @:You don't have any completed projects yet.
+                        }
+                        else
+                        {
+                            @:This user doesn't have any completed projects yet.
+                        }
+                    </p>
                 </div>
-
-                <div class="project-item">
-                    <div class="project-header">
-                        <div class="project-title">Fitness Tracker Mobile App</div>
-                        <div class="project-date">Completed on: August 28, 2023</div>
-                    </div>
-                    <div class="project-details">
-                        <div class="project-description">
-                            <p>Developed a cross-platform mobile application for tracking workouts, nutrition, and fitness goals. Implemented real-time progress visualization and social features.</p>
+            }
+            else
+            {
+                <div class="projects-list">
+                    @foreach (var project in Model)
+                    {
+                        <div class="project-item">
+                            <div class="project-header">
+                                <div class="project-title">@project.Title</div>
+                                <div class="project-date">Completed on: @project.EndDate.ToString("MMMM d, yyyy")</div>
+                            </div>
+                            <div class="project-details">
+                                <div class="project-description">
+                                    <p>Successfully completed project with @(userType == "freelancer" ? "client" : "freelancer") @(userType == "freelancer" ? project.Client : project.Freelancer)</p>
+                                </div>
+                                <div class="project-meta">
+                                    <div class="meta-item">
+                                        <i class="fas fa-tag"></i>
+                                        <span>Completed Project</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-dollar-sign"></i>
+                                        <span>@project.Budget</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span>@((project.EndDate - project.StartDate).TotalDays) days</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="project-client">
+                                <div class="client-label">@(userType == "freelancer" ? "Client:" : "Freelancer:")</div>
+                                <div class="client-name">@(userType == "freelancer" ? project.Client : project.Freelancer)</div>
+                            </div>
                         </div>
-                        <div class="project-meta">
-                            <div class="meta-item">
-                                <i class="fas fa-tag"></i>
-                                <span>Mobile Development, UI/UX Design</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-dollar-sign"></i>
-                                <span>$5,500</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-clock"></i>
-                                <span>8 weeks</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="project-client">
-                        <div class="client-label">Client:</div>
-                        <div class="client-name">HealthFit Studios</div>
-                    </div>
+                    }
                 </div>
-
-                <div class="project-item">
-                    <div class="project-header">
-                        <div class="project-title">Corporate Brand Identity</div>
-                        <div class="project-date">Completed on: July 10, 2023</div>
-                    </div>
-                    <div class="project-details">
-                        <div class="project-description">
-                            <p>Created a comprehensive brand identity package including logo design, color palette, typography guidelines, and marketing materials for a financial consulting firm.</p>
-                        </div>
-                        <div class="project-meta">
-                            <div class="meta-item">
-                                <i class="fas fa-tag"></i>
-                                <span>Graphic Design, Branding</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-dollar-sign"></i>
-                                <span>$2,200</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-clock"></i>
-                                <span>4 weeks</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="project-client">
-                        <div class="client-label">Client:</div>
-                        <div class="client-name">Apex Financial Advisors</div>
-                    </div>
-                </div>
-            </div>
+            }
         </div>
     </div>
 
@@ -245,5 +227,21 @@
     .client-label {
         font-weight: 600;
     }
-
+    
+    .no-projects {
+        text-align: center;
+        padding: 50px 20px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+    
+    .no-projects h3 {
+        margin-bottom: 10px;
+        color: #333;
+    }
+    
+    .no-projects p {
+        color: #666;
+    }
 </style> 

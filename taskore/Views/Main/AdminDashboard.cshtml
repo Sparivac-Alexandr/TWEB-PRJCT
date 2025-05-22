@@ -40,7 +40,6 @@
         </div>
         <ul>
             <li><a href="#" class="active" data-section="manage-users-section"><i class="fas fa-users"></i> Manage Users</a></li>
-            <li><a href="#" data-section="manage-reports-section"><i class="fas fa-chart-bar"></i> Manage Reports</a></li>
             <li><a href="#" data-section="manage-projects-section"><i class="fas fa-project-diagram"></i> Manage Projects</a></li>
             <li><a href="#" data-section="add-post-section"><i class="fas fa-plus-circle"></i> Add New Post</a></li>
             <li><a href="#" data-section="manage-posts-section"><i class="fas fa-newspaper"></i> Manage Posts</a></li>
@@ -152,39 +151,6 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Manage Reports Section -->
-        <div id="manage-reports-section" class="content-section">
-            <h1>Manage Reports</h1>
-            <p class="text-muted">View and manage system reports.</p>
-
-            <div class="row mt-4">
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <h3>Total Users</h3>
-                        <div class="value">@ViewBag.TotalUsers</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <h3>Active Projects</h3>
-                        <div class="value">24</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <h3>Completed Tasks</h3>
-                        <div class="value">152</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <h3>Pending Tasks</h3>
-                        <div class="value">38</div>
                     </div>
                 </div>
             </div>
@@ -1035,7 +1001,6 @@
         }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Get the anti-forgery token for AJAX requests
     const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
@@ -1047,7 +1012,6 @@
 
         // Initialize all functionality
         initTabNavigation();
-        initCharts();
         initNewsManagement();
         initUserManagement();
         initProjectManagement();
@@ -1145,54 +1109,6 @@
                 document.getElementById(sectionId).style.display = 'block';
             });
         });
-    }
-
-    // Charts initialization
-    function initCharts() {
-        const usersChartEl = document.getElementById('usersChart');
-        const projectsChartEl = document.getElementById('projectsChart');
-
-        if (usersChartEl) {
-            var usersCtx = usersChartEl.getContext('2d');
-            var usersChart = new Chart(usersCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-                    datasets: [{
-                        label: 'New Users',
-                        data: [12, 19, 15, 17, 14, 23, 25, 32],
-                        borderColor: '#1a237e',
-                        backgroundColor: 'rgba(26, 35, 126, 0.1)',
-                        borderWidth: 2,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
-        }
-
-        if (projectsChartEl) {
-            var projectsCtx = projectsChartEl.getContext('2d');
-            var projectsChart = new Chart(projectsCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Completed', 'In Progress', 'New'],
-                    datasets: [{
-                        data: [12, 19, 8],
-                        backgroundColor: [
-                            '#4caf50',
-                            '#ff9800',
-                            '#2196f3'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
-        }
     }
 
     // News management initialization

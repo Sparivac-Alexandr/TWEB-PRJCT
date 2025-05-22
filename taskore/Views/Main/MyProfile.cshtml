@@ -41,7 +41,7 @@
                     <div class="profile-stat-box">
                         <div class="stat-label">@(userType == "freelancer" ? "Completed" : "Projects Posted")</div>
                         <a href="@Url.Action("CompletedProjects", "Main", new { userId = Session["UserId"] })" class="projects-box">
-                            <span class="projects-count">@(userData?.CompletedProjects ?? 23)</span>
+                            <span class="projects-count">@(ViewBag.CompletedProjectsCount ?? userData?.CompletedProjects ?? 0)</span>
                             <i class="fas fa-check-circle projects-icon"></i>
                         </a>
                     </div>

@@ -199,6 +199,31 @@ namespace taskore.Controllers
                 // Pass user data to the view using ViewBag
                 ViewBag.UserData = user;
                 
+                // Count completed projects for this user
+                try 
+                {
+                    // Get all user applications
+                    var allUserApplications = _projectService.GetUserApplications(userId);
+                    
+                    // Get completed projects count
+                    var completedProjectsCount = allUserApplications.Count(p => p.Status == "Completed");
+                    
+                    // If user record exists, update CompletedProjects count
+                    if (user != null)
+                    {
+                        user.CompletedProjects = completedProjectsCount;
+                        context.SaveChanges();
+                    }
+                    
+                    // Pass the count to the view
+                    ViewBag.CompletedProjectsCount = completedProjectsCount;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error getting completed projects count: {ex.Message}");
+                    ViewBag.CompletedProjectsCount = 0;
+                }
+                
                 // If user data doesn't exist in database yet, we'll use session data
                 // The profile page already handles null user data gracefully
             }
@@ -561,13 +586,49 @@ namespace taskore.Controllers
                 return RedirectToAction("SignIn", "Auth");
             }
 
-            // In a real application, you would fetch the user data and completed projects from a database
-            if (string.IsNullOrEmpty(userId))
+            try
             {
-                userId = Session["UserId"].ToString();
-            }
+                // If userId is not provided, use the current user's ID
+                if (string.IsNullOrEmpty(userId))
+                {
+                    userId = Session["UserId"].ToString();
+                }
 
-            return View();
+                int userIdInt = Convert.ToInt32(userId);
+                
+                // Get user info from database for the specific requested user
+                string userName = "User";
+                string userType = "freelancer";
+                
+                using (var context = new UserContext())
+                {
+                    var user = context.Users.FirstOrDefault(u => u.Id == userIdInt);
+                    if (user != null)
+                    {
+                        userName = $"{user.FirstName} {user.LastName}";
+                        // You could determine userType here if that's stored in the user record
+                    }
+                }
+                
+                // Get user applications
+                var allUserApplications = _projectService.GetUserApplications(userIdInt);
+                
+                // Filter to only show completed projects for this specific user
+                var completedProjects = allUserApplications.Where(p => p.Status == "Completed").ToList();
+                
+                // Set ViewBag values for the view
+                ViewBag.UserName = userName;
+                ViewBag.UserType = userType;
+                ViewBag.UserId = userIdInt; // Add the userId to ViewBag for reference in the view
+                
+                return View(completedProjects);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading completed projects: {ex.Message}");
+                TempData["ErrorMessage"] = "An error occurred while loading completed projects.";
+                return View(new List<ProjectApplicationDBModel>());
+            }
         }
         
         public ActionResult UserProfile(string userId)
@@ -627,34 +688,6 @@ namespace taskore.Controllers
             
             // In a production environment, you should check if the user is an admin
             // Example: if(Session["UserRole"].ToString() != "Admin") { return RedirectToAction("Index", "Home"); }
-            
-            // Get some stats for the dashboard
-            using (var db = new taskoreBusinessLogic.DBModel.Seed.UserContext())
-            {
-                // Count total users
-                ViewBag.TotalUsers = db.Users.Count();
-                
-                // You could add more statistics here
-                // ViewBag.TotalProjects = db.Projects.Count();
-                // ViewBag.CompletedTasks = db.Tasks.Count(t => t.Status == "Completed");
-                // ViewBag.PendingTasks = db.Tasks.Count(t => t.Status == "Pending");
-            }
-
-            // Get news stats
-            try
-            {
-                using (var newsContext = new taskoreBusinessLogic.DBModel.Seed.NewsContext())
-                {
-                    ViewBag.TotalNews = newsContext.News.Count();
-                    ViewBag.HighPriorityNews = newsContext.News.Count(n => n.Priority == "High");
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Error getting news stats: " + ex.Message);
-                ViewBag.TotalNews = 0;
-                ViewBag.HighPriorityNews = 0;
-            }
             
             // Create empty model for the news form
             ViewBag.NewsModel = new NewsDBModel
@@ -1483,6 +1516,253 @@ namespace taskore.Controllers
                 Debug.WriteLine($"Error loading projects: {ex.Message}");
                 TempData["ErrorMessage"] = "An error occurred while loading your projects.";
                 return View(new List<ProjectApplicationDBModel>());
+            }
+        }
+        
+        // GET: Show edit form for a project application
+        public ActionResult EditProjectApplication(int id)
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                TempData["ErrorMessage"] = "You need to be logged in to edit projects.";
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            try
+            {
+                int userId = (int)Session["UserId"];
+                
+                // Get the project application
+                var projectApplication = _projectService.GetProjectApplicationById(id);
+                
+                // Check if project exists and belongs to the current user
+                if (projectApplication == null)
+                {
+                    TempData["ErrorMessage"] = "Project not found.";
+                    return RedirectToAction("MyProjects");
+                }
+                
+                if (projectApplication.FreelancerId != userId && projectApplication.ClientId != userId)
+                {
+                    TempData["ErrorMessage"] = "You are not authorized to edit this project.";
+                    return RedirectToAction("MyProjects");
+                }
+                
+                return View(projectApplication);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading project for editing: {ex.Message}");
+                TempData["ErrorMessage"] = "An error occurred while loading the project.";
+                return RedirectToAction("MyProjects");
+            }
+        }
+        
+        // GET: Return project application data in JSON format
+        [HttpGet]
+        public ActionResult GetProjectApplicationById(int id)
+        {
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                return Json(new { success = false, message = "You need to be logged in to get project details." }, JsonRequestBehavior.AllowGet);
+            }
+            
+            try
+            {
+                int userId = (int)Session["UserId"];
+                
+                var projectApplication = _projectService.GetProjectApplicationById(id);
+                
+                if (projectApplication == null)
+                {
+                    return Json(new { success = false, message = "Project not found." }, JsonRequestBehavior.AllowGet);
+                }
+                
+                if (projectApplication.FreelancerId != userId && projectApplication.ClientId != userId)
+                {
+                    return Json(new { success = false, message = "You are not authorized to view this project." }, JsonRequestBehavior.AllowGet);
+                }
+                
+                return Json(new { 
+                    success = true, 
+                    Id = projectApplication.Id,
+                    Title = projectApplication.Title,
+                    Status = projectApplication.Status,
+                    Progress = projectApplication.Progress,
+                    Client = projectApplication.Client,
+                    Freelancer = projectApplication.Freelancer,
+                    Budget = projectApplication.Budget,
+                    StartDate = projectApplication.StartDate.ToString("yyyy-MM-dd"),
+                    EndDate = projectApplication.EndDate.ToString("yyyy-MM-dd")
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error getting project {id}: " + ex.Message);
+                return Json(new { success = false, message = "An error occurred while getting the project details." }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        
+        // POST: Handle the project application edit submission
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [System.Web.Mvc.ValidateInput(false)]
+        public ActionResult UpdateProjectApplication([System.Web.Mvc.ModelBinder(typeof(System.Web.Mvc.DefaultModelBinder))]ProjectApplicationDBModel model)
+        {
+            Debug.WriteLine("UpdateProjectApplication: Request started");
+            
+            // Check if user is logged in
+            if (Session["UserId"] == null)
+            {
+                Debug.WriteLine("UpdateProjectApplication: User not logged in");
+                TempData["ErrorMessage"] = "You need to be logged in to edit projects.";
+                return RedirectToAction("SignIn", "Auth");
+            }
+            
+            // Check if we're dealing with AJAX request or direct form submission
+            bool isAjaxRequest = Request.IsAjaxRequest();
+            
+            if (!ModelState.IsValid)
+            {
+                Debug.WriteLine("UpdateProjectApplication: ModelState is invalid");
+                
+                // Log each validation error
+                foreach (var key in ModelState.Keys)
+                {
+                    var state = ModelState[key];
+                    if (state.Errors.Any())
+                    {
+                        Debug.WriteLine($"Error in field {key}: {string.Join(", ", state.Errors.Select(e => e.ErrorMessage))}");
+                    }
+                }
+                
+                if (isAjaxRequest)
+                {
+                    return Json(new { 
+                        success = false, 
+                        message = "Invalid data submitted. Please check all required fields.", 
+                        errors = ModelState.Keys
+                            .Where(k => ModelState[k].Errors.Count > 0)
+                            .Select(k => new { field = k, errors = ModelState[k].Errors.Select(e => e.ErrorMessage).ToList() })
+                            .ToList()
+                    });
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Invalid data submitted. Please check all required fields.";
+                    return RedirectToAction("MyProjects");
+                }
+            }
+            
+            try
+            {
+                int userId = (int)Session["UserId"];
+                int projectId = model.Id;
+                
+                Debug.WriteLine($"UpdateProjectApplication: Updating project {projectId} with Status={model.Status}, Progress={model.Progress}");
+                Debug.WriteLine($"Model details: Title={model.Title}, Client={model.Client}, Freelancer={model.Freelancer}");
+                Debug.WriteLine($"Budget={model.Budget}, StartDate={model.StartDate}, EndDate={model.EndDate}");
+                Debug.WriteLine($"ProjectId={model.ProjectId}, ClientId={model.ClientId}, FreelancerId={model.FreelancerId}");
+                
+                // Get the existing project application
+                var existingApplication = _projectService.GetProjectApplicationById(projectId);
+                
+                if (existingApplication == null)
+                {
+                    Debug.WriteLine($"UpdateProjectApplication: Project {projectId} not found");
+                    
+                    if (isAjaxRequest)
+                    {
+                        return Json(new { success = false, message = "Project not found." });
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "Project not found.";
+                        return RedirectToAction("MyProjects");
+                    }
+                }
+                
+                Debug.WriteLine($"Found existing project: Title={existingApplication.Title}, Status={existingApplication.Status}");
+                
+                // Check if the user has permission to edit this project
+                if (existingApplication.FreelancerId != userId && existingApplication.ClientId != userId)
+                {
+                    Debug.WriteLine($"UpdateProjectApplication: User {userId} not authorized to edit project {projectId}");
+                    
+                    if (isAjaxRequest)
+                    {
+                        return Json(new { success = false, message = "You are not authorized to edit this project." });
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "You are not authorized to edit this project.";
+                        return RedirectToAction("MyProjects");
+                    }
+                }
+                
+                // Update only the fields that can be edited
+                existingApplication.Status = model.Status;
+                existingApplication.Progress = model.Progress;
+                existingApplication.UpdatedAt = DateTime.Now;
+                
+                Debug.WriteLine($"Calling service to update project {projectId}");
+                
+                // Save the changes
+                bool isUpdated = _projectService.UpdateProjectApplication(existingApplication);
+                
+                Debug.WriteLine($"Update result: {isUpdated}");
+                
+                if (isUpdated)
+                {
+                    if (isAjaxRequest)
+                    {
+                        return Json(new { 
+                            success = true, 
+                            message = "Project updated successfully.",
+                            projectId = model.Id,
+                            status = model.Status,
+                            progress = model.Progress
+                        });
+                    }
+                    else
+                    {
+                        TempData["SuccessMessage"] = "Project updated successfully.";
+                        return RedirectToAction("MyProjects");
+                    }
+                }
+                else
+                {
+                    if (isAjaxRequest)
+                    {
+                        return Json(new { success = false, message = "Failed to update project." });
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "Failed to update project.";
+                        return RedirectToAction("MyProjects");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error updating project: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Debug.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                }
+                Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                if (isAjaxRequest)
+                {
+                    return Json(new { success = false, message = "An error occurred while updating the project: " + ex.Message });
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "An error occurred while updating the project: " + ex.Message;
+                    return RedirectToAction("MyProjects");
+                }
             }
         }
     }

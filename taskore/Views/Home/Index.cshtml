@@ -3,233 +3,93 @@
 }
 <body>
 
-    @Html.Partial("_Header")
+    @Html.Partial("_Header_guest")
 
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <h1>Connect with Top Freelance Talent</h1>
-            <p>Find skilled professionals for your projects or showcase your expertise to clients worldwide.</p>
+            <h1>Welcome to Taskore</h1>
+            <p>Your ultimate platform for task management and productivity</p>
             <div class="hero-buttons">
-                <a href="@Url.Action("SignUp", "Auth")" class="btn-primary">Hire a Freelancer</a>
-                <a href="@Url.Action("SignUp", "Auth")" class="btn-secondary">Become a Freelancer</a>
+                <a href="@Url.Action("SignIn", "Auth")" class="btn-primary">Sign In</a>
+                <a href="@Url.Action("SignUp", "Auth")" class="btn-secondary">Sign Up</a>
             </div>
         </div>
     </section>
 
-    <!-- Services Section -->
-    <section class="services">
+    <!-- About Section -->
+    <section class="about">
         <div class="section-header">
-            <h2>Our Services</h2>
-            <p>Discover the perfect match for your project needs with our comprehensive freelance services</p>
+            <h2>About Taskore</h2>
+            <p>Streamline your workflow and boost your productivity</p>
         </div>
-        <div class="services-grid">
-            <div class="service-card">
-                <div class="service-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code">
-                        <polyline points="16 18 22 12 16 6"></polyline>
-                        <polyline points="8 6 2 12 8 18"></polyline>
-                    </svg>
-                </div>
-                <h3>Web Development</h3>
-                <p>From simple websites to complex web applications, our developers bring your digital ideas to life.</p>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil">
-                        <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-                    </svg>
-                </div>
-                <h3>Content Writing</h3>
-                <p>Engaging content that connects with your audience and drives your business objectives.</p>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-palette">
-                        <circle cx="13.5" cy="6.5" r=".5"></circle>
-                        <circle cx="17.5" cy="10.5" r=".5"></circle>
-                        <circle cx="8.5" cy="7.5" r=".5"></circle>
-                        <circle cx="6.5" cy="12.5" r=".5"></circle>
-                        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
-                    </svg>
-                </div>
-                <h3>Graphic Design</h3>
-                <p>Creative visual solutions that enhance your brand and communicate your message effectively.</p>
-            </div>
+        <div class="about-content">
+            <p>Taskore is a powerful task management application designed to help individuals and teams organize their work efficiently. Whether you're managing personal projects or collaborating with a team, Taskore provides the tools you need to stay on track and achieve your goals.</p>
         </div>
     </section>
 
-    <!-- How It Works Section -->
-    <section class="how-it-works">
+    <!-- Features Section -->
+    <section class="features">
         <div class="section-header">
-            <h2>How It Works</h2>
-            <p>Start your journey with taskore in three simple steps</p>
+            <h2>Key Features</h2>
+            <p>Discover what makes Taskore the perfect solution for your productivity needs</p>
         </div>
-        <div class="steps-container">
-            <div class="step">
-                <div class="step-number">1</div>
-                <div class="step-content">
-                    <h3>Post Your Project</h3>
-                    <p>Describe your project needs in detail. Specify your budget, timeline, and expectations to find the perfect match for your job.</p>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-square">
+                        <polyline points="9 11 12 14 22 4"></polyline>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
                 </div>
-                <div class="step-image">
-                    <img src="/api/placeholder/500/300" alt="">
-                </div>
+                <h3>Task Management</h3>
+                <p>Create, organize, and prioritize tasks with ease. Set deadlines and track your progress.</p>
             </div>
-            <div class="step step-reverse">
-                <div class="step-number">2</div>
-                <div class="step-content">
-                    <h3>Review Proposals</h3>
-                    <p>Receive and review proposals from talented freelancers. Check their portfolios, ratings, and experience before making your choice.</p>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
                 </div>
-                <div class="step-image">
-                    <img src="/api/placeholder/500/300" alt="">
-                </div>
+                <h3>Team Collaboration</h3>
+                <p>Work together seamlessly with team members. Assign tasks and share project updates.</p>
             </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <div class="step-content">
-                    <h3>Get Work Done</h3>
-                    <p>Collaborate efficiently with your chosen freelancer through our platform. Release payment only when you're completely satisfied with the work.</p>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell">
+                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
+                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
+                    </svg>
                 </div>
-                <div class="step-image">
-                    <img src="/api/placeholder/500/300" alt="">
+                <h3>Reminders & Notifications</h3>
+                <p>Never miss a deadline with customizable reminders and timely notifications.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-2">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
                 </div>
+                <h3>Progress Tracking</h3>
+                <p>Monitor your productivity with intuitive dashboards and performance metrics.</p>
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="stats">
+    <!-- Get Started Section -->
+    <section class="get-started">
         <div class="section-header">
-            <h2>Our Success in Numbers</h2>
-            <p>Join our growing community of clients and freelancers</p>
+            <h2>Ready to Get Started?</h2>
+            <p>Join thousands of users who have transformed their productivity with Taskore</p>
         </div>
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-number">500+</div>
-                <div class="stat-label">Freelancers</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">350+</div>
-                <div class="stat-label">Clients</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">1200+</div>
-                <div class="stat-label">Projects Completed</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">4.8</div>
-                <div class="stat-label">Average Rating</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Categories Section -->
-    <section class="categories">
-        <div class="section-header">
-            <h2>Popular Categories</h2>
-            <p>Explore our most sought-after service categories</p>
-        </div>
-        <div class="categories-grid">
-            <div class="category-card">
-                <div class="category-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-2">
-                        <path d="m18 16 4-4-4-4"></path>
-                        <path d="m6 8-4 4 4 4"></path>
-                        <path d="m14.5 4-5 16"></path>
-                    </svg>
-                </div>
-                <h3>Programming</h3>
-                <p>180 freelancers</p>
-            </div>
-            <div class="category-card">
-                <div class="category-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-megaphone">
-                        <path d="m3 11 18-5v12L3 13"></path>
-                        <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path>
-                    </svg>
-                </div>
-                <h3>Marketing</h3>
-                <p>120 freelancers</p>
-            </div>
-            <div class="category-card">
-                <div class="category-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen-tool">
-                        <path d="m12 19 7-7 3 3-7 7-3-3z"></path>
-                        <path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
-                        <path d="m2 2 7.586 7.586"></path>
-                        <circle cx="11" cy="11" r="2"></circle>
-                    </svg>
-                </div>
-                <h3>Design</h3>
-                <p>150 freelancers</p>
-            </div>
-            <div class="category-card">
-                <div class="category-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" x2="8" y1="13" y2="13"></line>
-                        <line x1="16" x2="8" y1="17" y2="17"></line>
-                        <line x1="10" x2="8" y1="9" y2="9"></line>
-                    </svg>
-                </div>
-                <h3>Writing</h3>
-                <p>90 freelancers</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="testimonials">
-        <div class="section-header">
-            <h2>What Our Users Say</h2>
-            <p>Real stories from clients and freelancers who found success on taskore</p>
-        </div>
-        <div class="testimonials-container">
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>As a freelance designer, taskore has been instrumental in growing my client base. The platform is user-friendly and provides great tools to showcase my portfolio and communicate with clients.</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <img src="/api/placeholder/50/50" alt="Michael Chen">
-                        </div>
-                        <div class="author-details">
-                            <h4>Michael Chen</h4>
-                            <p>UI/UX Designer</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>The quality of freelancers on taskore is outstanding. I've completed multiple content writing projects and have built long-term relationships with several clients through this platform.</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">
-                            <img src="/api/placeholder/50/50" alt="Emma Rodriguez">
-                        </div>
-                        <div class="author-details">
-                            <h4>Emma Rodriguez</h4>
-                            <p>Marketing Director</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
         <div class="cta-container">
-            <h2>Ready to Transform Your Project?</h2>
-            <p>Join thousands of satisfied clients and freelancers on taskore today. Whether you're looking to hire talent or showcase your skills, we've got you covered.</p>
-            <div class="hero-buttons">
-                <a href="@Url.Action("SignUp", "Auth")" class="btn-primary">Sign Up Now</a>
-                <a href="@Url.Action("SignUp", "Auth")" class="btn-secondary">Learn More</a>
-            </div>
+            <a href="@Url.Action("SignIn", "Auth")" class="btn-primary">Sign In</a>
+            <a href="@Url.Action("SignUp", "Auth")" class="btn-secondary">Sign Up</a>
         </div>
     </section>
 
@@ -811,5 +671,5 @@
         }
     </style>
 
-    @Html.Partial("_Footer")
+    @Html.Partial("_Footer_guest")
 </body>

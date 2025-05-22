@@ -209,6 +209,7 @@
     <Content Include="Views\Main\MyProjects.cshtml" />
     <Content Include="Views\Main\FAQ.cshtml" />
     <Content Include="Views\Auth\ResetPassword.cshtml" />
+    <Content Include="Views\Main\EditProjectApplication.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
