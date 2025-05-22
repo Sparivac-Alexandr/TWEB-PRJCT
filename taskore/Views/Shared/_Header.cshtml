@@ -9,7 +9,8 @@
     <div class="header-container">
         <div class="logo-search">
             <div class="logo">
-                <a href="@Url.Action("Index", "Home")">
+                <a href="@Url.Action("News", "Main")">
+                    <img src="@Url.Content("~/wwwroot/logo.png")" alt="Logo" class="header-logo-img">
                     <span class="logo-text">taskore</span>
                     <span class="logo-dot">.</span>
                 </a>
@@ -17,45 +18,86 @@
         </div>
         
         <nav class="main-nav">
-
-            <a href="@Url.Action("News", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "News" ? "active" : "")">
-                <i class="fas fa-newspaper"></i>
-                <span>News</span>
-            </a>
-
-            <a href="@Url.Action("UserStats", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "UserStats" ? "active" : "")">
-                <i class="fas fa-chart-bar"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="@Url.Action("ExplorePage", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "ExplorePage" ? "active" : "")">
+            <!-- Projects Dropdown -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Projects</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="@Url.Action("ExplorePage", "Main")" class="dropdown-item @(ViewContext.RouteData.Values["Action"].ToString() == "ExplorePage" ? "active" : "")">
                 <i class="fas fa-compass"></i>
-                <span>Projects</span>
+                        <span>Explore Projects</span>
             </a>
-            <a href="@Url.Action("MyProjects", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "MyProjects" ? "active" : "")">
-                <i class="fas fa-briefcase"></i>
-                <span>My Projects</span>
+                    <a href="@Url.Action("MyProjects", "Main")" class="dropdown-item @(ViewContext.RouteData.Values["Action"].ToString() == "MyProjects" ? "active" : "")">
+                        <i class="fas fa-folder"></i>
+                <span>Applied Projects</span>
             </a>
-            <a href="@Url.Action("CreateProjectPage", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "CreateProjectPage" ? "active" : "")">
+                    <a href="@Url.Action("CompletedProjects", "Main")" class="dropdown-item @(ViewContext.RouteData.Values["Action"].ToString() == "CompletedProjects" ? "active" : "")">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Completed Projects</span>
+                    </a>
+                    <a href="@Url.Action("CreateProjectPage", "Main")" class="dropdown-item @(ViewContext.RouteData.Values["Action"].ToString() == "CreateProjectPage" ? "active" : "")">
                 <i class="fas fa-plus-circle"></i>
                 <span>New Project</span>
             </a>
-            <a href="@Url.Action("AllFreelancers", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "AllFreelancers" ? "active" : "")">
+                </div>
+            </div>
+
+            <!-- Community Dropdown -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn">
                 <i class="fas fa-users"></i>
-                <span>Users</span>
-            </a>
+                    <span>Community</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="@Url.Action("AllFreelancers", "Main")" class="dropdown-item @(ViewContext.RouteData.Values["Action"].ToString() == "AllFreelancers" ? "active" : "")">
+                        <i class="fas fa-user-friends"></i>
+                        <span>Freelancers</span>
+                    </a>
+                    <a href="@Url.Action("UserReviews", "Main")" class="dropdown-item @(ViewContext.RouteData.Values["Action"].ToString() == "UserReviews" ? "active" : "")">
+                        <i class="fas fa-star"></i>
+                        <span>My Reviews</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Information Dropdown -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Information</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="@Url.Action("News", "Main")" class="dropdown-item @(ViewContext.RouteData.Values["Action"].ToString() == "News" ? "active" : "")">
+                        <i class="fas fa-newspaper"></i>
+                        <span>News</span>
+                    </a>
+                    <a href="@Url.Action("UserStats", "Main")" class="dropdown-item @(ViewContext.RouteData.Values["Action"].ToString() == "UserStats" ? "active" : "")">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Chat Section (separat) -->
             <a href="@Url.Action("Chat", "Main")" class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "Chat" ? "active" : "")">
                 <i class="fas fa-comments"></i>
                 <span>Chat</span>
             </a>
-
         </nav>
         
         <div class="header-actions">
-            <div class="user-menu">
                 @if (Session["UserFullName"] != null)
                 {
+                <div class="user-menu">
                     <div class="user-info">
+                        <a href="@Url.Action("MyProfile", "Main")" class="user-name-link">
                         <span class="user-name">@Session["UserFullName"]</span>
+                        </a>
                     </div>
                     <div class="user-avatar">
                         @{
@@ -103,19 +145,12 @@
                             <i class="fas fa-user"></i>
                             <span>My Profile</span>
                         </a>
-                        <a href="@Url.Action("UserStats", "Main")" class="dropdown-item">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>My Statistics</span>
-                        </a>
-                        <a href="@Url.Action("AdminDashboard", "Main")" class="dropdown-item">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>Admin Dashboard</span>
-                        </a>
                         <div class="dropdown-divider"></div>
                         <a href="@Url.Action("SignOut", "Auth")" class="dropdown-item">
                             <i class="fas fa-sign-out-alt"></i>
                             <span>Sign Out</span>
                         </a>
+                    </div>
                     </div>
                 }
                 else
@@ -125,7 +160,6 @@
                         <a href="@Url.Action("SignUp", "Auth")" class="btn-sign-up">Sign Up</a>
                     </div>
                 }
-            </div>
         </div>
     </div>
 </header>
@@ -160,6 +194,12 @@
         align-items: center;
         text-decoration: none;
     }
+    
+    .header-logo-img {
+        height: 30px;
+        width: auto;
+        margin-right: 6px;
+    }
 
     .logo-text {
         font-size: 1.5rem;
@@ -177,30 +217,96 @@
     .main-nav {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 1rem;
     }
 
-    .nav-link {
+    /* Dropdown Navigation */
+    .nav-dropdown {
+        position: relative;
+    }
+
+    .nav-dropdown-btn {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         padding: 0.5rem 0.75rem;
         color: #64748b;
-        text-decoration: none;
+        background: none;
+        border: none;
         font-weight: 500;
         font-size: 0.9rem;
         border-radius: 4px;
-        position: relative;
+        cursor: pointer;
         transition: all 0.2s ease;
     }
 
-    .nav-link i {
+    .nav-dropdown-btn i {
         font-size: 1.1rem;
     }
 
-    .nav-link:hover, .nav-link.active {
+    .nav-dropdown-btn .fa-chevron-down {
+        font-size: 0.8rem;
+        margin-left: 0.25rem;
+        transition: transform 0.2s ease;
+    }
+
+    .nav-dropdown:hover .nav-dropdown-btn,
+    .nav-dropdown.active .nav-dropdown-btn {
         color: #3b82f6;
         background-color: #f1f5f9;
+    }
+
+    .nav-dropdown:hover .nav-dropdown-btn .fa-chevron-down,
+    .nav-dropdown.active .nav-dropdown-btn .fa-chevron-down {
+        transform: rotate(180deg);
+    }
+
+    .nav-dropdown-menu {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        left: 0;
+        background-color: white;
+        border-radius: 8px;
+        min-width: 200px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 101;
+    }
+
+    .nav-dropdown:hover .nav-dropdown-menu,
+    .nav-dropdown.active .nav-dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .nav-dropdown-menu .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: #0f172a;
+        text-decoration: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .nav-dropdown-menu .dropdown-item i {
+        width: 16px;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    .nav-dropdown-menu .dropdown-item:hover,
+    .nav-dropdown-menu .dropdown-item.active {
+        background-color: #f1f5f9;
+        color: #3b82f6;
+    }
+
+    .nav-dropdown-menu .dropdown-item.active i {
+        color: #3b82f6;
     }
 
     /* Header Actions */
@@ -216,6 +322,7 @@
         align-items: center;
         gap: 0.75rem;
         cursor: pointer;
+        z-index: 102;
     }
 
     .user-info {
@@ -224,10 +331,20 @@
         align-items: flex-end;
     }
 
+    .user-name-link {
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .user-name-link:hover .user-name {
+        color: #3b82f6;
+    }
+
     .user-name {
         font-weight: 600;
         font-size: 0.9rem;
         color: #0f172a;
+        transition: color 0.2s ease;
     }
 
     .user-avatar {
@@ -237,6 +354,11 @@
         overflow: hidden;
         background-color: #f1f5f9;
         border: 2px solid #e2e8f0;
+        transition: border-color 0.2s ease;
+    }
+
+    .user-menu:hover .user-avatar {
+        border-color: #3b82f6;
     }
 
     .user-avatar img {
@@ -257,7 +379,7 @@
         background-color: #f1f5f9;
     }
 
-    /* Dropdown Menu */
+    /* User Dropdown Menu */
     .dropdown-menu {
         position: absolute;
         top: calc(100% + 0.75rem);
@@ -269,21 +391,28 @@
         opacity: 0;
         visibility: hidden;
         transform: translateY(-10px);
-        transition: all 0.3s ease;
-        z-index: 101;
+        transition: all 0.2s ease;
+        z-index: 102;
+        pointer-events: none;
     }
     
-    /* Show dropdown when the parent has the class */
     .user-menu.show-dropdown .dropdown-menu {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
+        pointer-events: auto;
     }
 
     .dropdown-header {
         padding: 1rem;
         display: flex;
         flex-direction: column;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .dropdown-header span:first-child {
+        font-weight: 600;
+        color: #0f172a;
     }
 
     .user-email {
@@ -305,17 +434,23 @@
         padding: 0.75rem 1rem;
         color: #0f172a;
         text-decoration: none;
-        transition: background-color 0.2s ease;
+        transition: all 0.2s ease;
     }
 
     .dropdown-item i {
         width: 16px;
         font-size: 0.9rem;
         color: #64748b;
+        transition: color 0.2s ease;
     }
 
     .dropdown-item:hover {
         background-color: #f1f5f9;
+        color: #3b82f6;
+    }
+
+    .dropdown-item:hover i {
+        color: #3b82f6;
     }
 
     /* Auth Buttons */
@@ -351,4 +486,91 @@
     .btn-sign-up:hover {
         background-color: #2563eb;
     }
+
+    /* Stil pentru noua secțiune Chat */
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        color: #64748b;
+        background: none;
+        border: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    .nav-link i {
+        font-size: 1.1rem;
+    }
+    .nav-link.active, .nav-link:hover {
+        color: #3b82f6;
+        background-color: #f1f5f9;
+    }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle navigation dropdowns
+        const dropdowns = document.querySelectorAll('.nav-dropdown');
+        const userMenu = document.querySelector('.user-menu');
+        
+        // Close all dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            // Close navigation dropdowns
+            dropdowns.forEach(dropdown => {
+                dropdown.classList.remove('active');
+            });
+
+            // Close user menu if clicking outside
+            if (userMenu && !userMenu.contains(e.target) && !e.target.closest('.user-name-link')) {
+                userMenu.classList.remove('show-dropdown');
+            }
+        });
+
+        // Handle navigation dropdowns
+        dropdowns.forEach(dropdown => {
+            const btn = dropdown.querySelector('.nav-dropdown-btn');
+            
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdowns.forEach(d => {
+                    if (d !== dropdown) {
+                        d.classList.remove('active');
+                    }
+                });
+                dropdown.classList.toggle('active');
+            });
+        });
+
+        // Handle user menu dropdown (only for avatar click)
+        if (userMenu) {
+            const avatar = userMenu.querySelector('.user-avatar');
+            if (avatar) {
+                avatar.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userMenu.classList.toggle('show-dropdown');
+                });
+            }
+
+            // Prevent dropdown from closing when clicking inside
+            const dropdownMenu = userMenu.querySelector('.dropdown-menu');
+            if (dropdownMenu) {
+                dropdownMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            // Handle dropdown items
+            const dropdownItems = userMenu.querySelectorAll('.dropdown-item');
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    userMenu.classList.remove('show-dropdown');
+                });
+            });
+        }
+    });
+</script>

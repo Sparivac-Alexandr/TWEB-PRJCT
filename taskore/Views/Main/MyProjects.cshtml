@@ -1,14 +1,14 @@
 @model List<taskoreBusinessLogic.DBModel.ProjectApplicationDBModel>
 
 @{
-    ViewBag.Title = "My Projects";
+    ViewBag.Title = "Applied Projects";
 }
 
 @Html.Partial("_Header")
 
 <div class="container">
     <div class="projects-content">
-        <h1>My Projects</h1>
+        <h1>Applied Projects</h1>
         
         <div class="filter-controls">
             <div class="filter-row">
@@ -46,10 +46,11 @@
             <div class="project-cards" id="projects-container">
                 @foreach (var project in Model)
                 {
-                    <div class="project-card-modern" data-title="@project.Title" data-progress="@project.Progress" data-status="@project.Status">
+                    var status = string.IsNullOrEmpty(project.Status) ? "Ready to Apply" : project.Status;
+                    <div class="project-card-modern" data-title="@project.Title" data-progress="@project.Progress" data-status="@status">
                         <div class="card-header">
                             <h3 class="project-title">@project.Title</h3>
-                            <span class="project-status">@project.Status</span>
+                            <span class="project-status-badge @status.ToLower().Replace(" ", "-")">@status</span>
                             <div class="settings-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="3"></circle>
@@ -316,6 +317,30 @@
     .sort-controls {
         display: flex;
         gap: 10px;
+    }
+    
+    .project-status-badge {
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-left: 10px;
+        display: inline-block;
+    }
+    .project-status-badge.in-progress {
+        background: #fffbe6;
+        color: #d48806;
+        border: 1px solid #ffe58f;
+    }
+    .project-status-badge.completed {
+        background: #e6fffb;
+        color: #08979c;
+        border: 1px solid #87e8de;
+    }
+    .project-status-badge.ready-to-apply {
+        background: #f0f5ff;
+        color: #2f54eb;
+        border: 1px solid #adc6ff;
     }
 </style>
 

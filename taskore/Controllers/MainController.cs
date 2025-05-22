@@ -1367,7 +1367,7 @@ namespace taskore.Controllers
         }
 
         // Method to handle applying for a project
-        public ActionResult ApplyForProject(int projectId)
+        public ActionResult ApplyForProject(int projectId, bool deleteAfterApply = false)
         {
             // Check if user is logged in
             if (Session["UserId"] == null)
@@ -1426,7 +1426,23 @@ namespace taskore.Controllers
                 
                 if (isApplied)
                 {
-                    TempData["SuccessMessage"] = "You have successfully applied for this project.";
+                    // If the application was successful and deleteAfterApply is true, delete the original project
+                    if (deleteAfterApply)
+                    {
+                        bool isDeleted = _projectService.DeleteProject(projectId);
+                        if (isDeleted)
+                        {
+                            TempData["SuccessMessage"] = "You have successfully applied for this project and it has been removed from the public listings.";
+                        }
+                        else
+                        {
+                            TempData["SuccessMessage"] = "You have successfully applied for this project, but there was an issue removing it from the public listings.";
+                        }
+                    }
+                    else
+                    {
+                        TempData["SuccessMessage"] = "You have successfully applied for this project.";
+                    }
                 }
                 else
                 {

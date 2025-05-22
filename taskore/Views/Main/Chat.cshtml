@@ -9,202 +9,461 @@
 
 @Html.Partial("_Header")
 
-<div class="main-content-container">
-    <div class="chat-page-container">
-        <div class="chat-sidebar">
-            <h3>Chats</h3>
-            <div class="chat-sidebar-divider"></div>
-            <ul class="chat-user-list">
+<div class="chat-container">
+    <div class="chat-layout">
+        <!-- Sidebar -->
+        <aside class="chat-sidebar">
+            <div class="sidebar-header">
+                <h2>Messages</h2>
+            </div>
+            <input type="text" id="userSearch" class="chat-search-input" placeholder="Search users..." />
+            <div class="users-list">
                 @foreach (var user in chatUsers)
                 {
                     var newCount = newMessagesPerUser.ContainsKey(user.Id) ? newMessagesPerUser[user.Id] : 0;
-                    <li class="chat-user-item @(selectedUser != null && user.Id == selectedUser.Id ? "active" : "")">
-                        <a href="@Url.Action("Chat", "Main", new { userId = user.Id })">
-                            @user.FirstName @user.LastName
-                        </a>
-                    </li>
+                    var isActive = selectedUser != null && user.Id == selectedUser.Id;
+                    var userInitials = $"{user.FirstName[0]}{user.LastName[0]}";
+                    
+                    <a href="@Url.Action("Chat", "Main", new { userId = user.Id })" 
+                       class="user-item @(isActive ? "active" : "")" 
+                       data-user-id="@user.Id">
+                        <div class="user-avatar">
+                            <div class="avatar-initials">@userInitials</div>
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name">@user.FirstName @user.LastName</div>
+                        </div>
+                    </a>
                 }
-            </ul>
-        </div>
-        <div class="chat-main">
-            <div class="chat-header">
-                <h2>@(selectedUser != null ? ($"{selectedUser.FirstName} {selectedUser.LastName}") : "Select a chat")</h2>
             </div>
-            <div class="chat-messages" id="chat-messages">
-                @if (messages.Any())
-                {
-                    foreach (var msg in messages)
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            @if (selectedUser != null)
+            {
+                <div class="chat-header">
+                    <div class="chat-user-info">
+                        <div class="user-avatar">
+                            <div class="avatar-initials">@selectedUser.FirstName[0]@selectedUser.LastName[0]</div>
+                        </div>
+                        <div class="user-details">
+                            <h3>@selectedUser.FirstName @selectedUser.LastName</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chat-messages">
+                    @if (messages.Any())
                     {
-                        var isMine = msg.SenderId == currentUserId;
-                        var userName = isMine ? "Me" : (selectedUser != null ? selectedUser.FirstName + " " + selectedUser.LastName : "");
-                        <div class="chat-message @(isMine ? "mine" : "theirs")">
-                            <span class="msg-text">@msg.Content</span>
-                            <span class="msg-time">@msg.SentAt.ToString("HH:mm")</span>
+                        var currentDate = DateTime.MinValue;
+                        foreach (var msg in messages)
+                        {
+                            var messageDate = msg.SentAt.Date;
+                            if (messageDate != currentDate)
+                            {
+                                currentDate = messageDate;
+                                <div class="date-divider">
+                                    <span>@messageDate.ToString("MMMM dd, yyyy")</span>
+                                </div>
+                            }
+
+                            var isMine = msg.SenderId == currentUserId;
+                            <div class="message-wrapper @(isMine ? "sent" : "received")">
+                                <div class="message-content">
+                                    <div class="message-text">@msg.Content</div>
+                                    <div class="message-time">@msg.SentAt.ToString("HH:mm")</div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="no-messages">
+                            <div class="no-messages-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h3>No messages yet</h3>
+                            <p>Start the conversation by sending a message</p>
                         </div>
                     }
-                }
-                else
-                {
-                    <div class="no-messages">No messages yet.</div>
-                }
-            </div>
-            <form class="chat-input-form" action="@Url.Action("SendMessage", "Main")" method="post">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="ToUserId" value="@(selectedUser?.Id ?? 0)" />
-                <div class="chat-input-row">
-                    <input type="text" name="Message" class="chat-input" placeholder="Type your message..." autocomplete="off" required @(selectedUser == null ? "disabled" : "") />
-                    <button type="submit" class="chat-send-btn" @(selectedUser == null ? "disabled" : "")>Send</button>
                 </div>
-            </form>
-        </div>
+
+                <form class="chat-input-form" action="@Url.Action("SendMessage", "Main")" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ToUserId" value="@selectedUser.Id" />
+                    <div class="input-wrapper">
+                        <input type="text" 
+                               name="Message" 
+                               class="chat-input" 
+                               placeholder="Type your message..." 
+                               autocomplete="off" 
+                               required />
+                        <button type="submit" class="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="no-chat-selected">
+                    <div class="no-chat-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h2>Select a conversation</h2>
+                    <p>Choose a user from the list to start chatting</p>
+                </div>
+            }
+        </main>
     </div>
 </div>
 
 @Html.Partial("_Footer")
 
 <style>
-.main-content-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
-}
-.chat-page-container {
-    display: flex;
-    height: 85vh;
-    background: #f8fafc;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    overflow: hidden;
-    margin: 0 auto 1rem auto;
-    max-width: 1200px;
-}
-.chat-sidebar {
-    width: 280px;
-    background: #fff;
-    border-right: 1px solid #e2e8f0;
-    padding: 1rem;
-}
-.chat-user-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.chat-user-item {
-    margin-bottom: 0.5rem;
-    padding: 0.7rem 1rem;
-    border-radius: 6px;
-    background: #fff;
-    transition: background 0.2s;
-}
-.chat-user-item.active {
-    background: #e5e7eb;
-}
-.chat-user-item:not(:last-child) {
-    margin-bottom: 0.7rem;
-}
-.chat-user-item a {
-    color: #334155;
-    text-decoration: none;
-    transition: color 0.2s;
-    display: block;
-}
-.chat-user-item:hover {
-    background: #f1f5f9;
-    border-color: #bcd0ee;
-}
-.chat-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: #f8fafc;
-}
-.chat-header {
-    padding: 1rem;
-    border-bottom: 1px solid #e2e8f0;
-    background: #fff;
-}
-.chat-messages {
-    flex: 1;
-    padding: 1rem;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-.chat-message {
-    padding: 0.5rem 1rem;
-    border-radius: 16px;
-    max-width: 75%;
-    min-width: 120px;
-    padding-bottom: 1.2em;
-    word-break: break-word;
-    margin-bottom: 0.25rem;
-    position: relative;
-}
-.chat-message.mine {
-    background: #3b82f6;
-    color: #fff;
-    align-self: flex-end;
-}
-.chat-message.theirs {
-    background: #e2e8f0;
-    color: #334155;
-    align-self: flex-start;
-}
-.msg-user {
-    font-weight: bold;
-    margin-right: 0.5rem;
-}
-.chat-input-form {
-    padding: 1rem;
-    background: #fff;
-    border-top: 1px solid #e2e8f0;
-}
-.chat-input-row {
-    display: flex;
-    gap: 0.5rem;
-}
-.chat-input {
-    flex: 1;
-    padding: 0.5rem 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    font-size: 1rem;
-}
-.chat-send-btn {
-    background: #3b82f6;
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    padding: 0.5rem 1.5rem;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.chat-send-btn:hover {
-    background: #2563eb;
-}
-.no-messages {
-    color: #64748b;
-    text-align: center;
-    margin-top: 2rem;
-}
-.chat-sidebar-divider {
-    height: 1px;
-    background: #e5e7eb;
-    margin: 0.7rem 0 1.2rem 0;
-    border: none;
-}
-.msg-time {
-    position: absolute;
-    right: 1.1rem;
-    bottom: 0.25rem;
-    font-size: 0.75rem;
-    color: #64748b;
-    opacity: 0.85;
-}
-.chat-message.mine .msg-time {
-    color: #fff;
-    opacity: 0.85;
-}
-</style> 
+    .chat-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        height: calc(100vh - 180px);
+        background: #f6f8fa;
+        border-radius: 18px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .chat-layout {
+        display: flex;
+        height: 100%;
+        background: transparent;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+    .chat-sidebar {
+        width: 300px;
+        background: #fff;
+        border-right: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+    }
+    .sidebar-header {
+        padding: 1.2rem 1.2rem 0.5rem 1.2rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: #fff;
+    }
+    .sidebar-header h2 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.7rem 0;
+    }
+    .chat-search-input {
+        width: 92%;
+        margin: 0.7rem auto 0.5rem auto;
+        display: block;
+        padding: 0.45rem 0.9rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.4rem;
+        font-size: 1rem;
+        color: #222;
+        background: #fff;
+        box-shadow: none;
+        transition: border 0.15s;
+    }
+    .chat-search-input:focus {
+        outline: none;
+        border-color: #bcd0ee;
+        background: #fff;
+    }
+    .users-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.5rem 0.2rem 0.5rem 0.2rem;
+    }
+    .user-item {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.6rem 1rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        color: #0f172a;
+        transition: background 0.18s, color 0.18s;
+        position: relative;
+        margin-bottom: 0.2rem;
+    }
+    .user-item:hover {
+        background: #e0e7ef;
+        color: #2563eb;
+    }
+    .user-item.active {
+        background: #e0f2fe;
+        color: #2563eb;
+        font-weight: 600;
+    }
+    .user-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #e2e8f0;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .avatar-initials {
+        font-weight: 600;
+        color: #3b82f6;
+        background: #e0f2fe;
+        font-size: 1.1rem;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .user-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+    }
+    .user-name {
+        font-weight: 500;
+        font-size: 0.97rem;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .unread-badge { display: none !important; }
+    /* Main Chat Area Styles */
+    .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #f6f8fa;
+    }
+    .chat-header {
+        padding: 1rem 1.5rem 0.7rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: #fff;
+        min-height: 60px;
+    }
+    .chat-user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+    }
+    .user-details h3 {
+        font-size: 1.08rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0;
+    }
+    .chat-messages {
+        flex: 1;
+        padding: 1.2rem 1.5rem 1.2rem 1.5rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+        background: #f6f8fa;
+        scrollbar-width: thin;
+        scrollbar-color: #e2e8f0 #f6f8fa;
+    }
+    .chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 8px;
+    }
+    .date-divider {
+        text-align: center;
+        margin: 0.7rem 0;
+        position: relative;
+    }
+    .date-divider span {
+        background: #f6f8fa;
+        padding: 0.18rem 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        color: #64748b;
+        position: relative;
+        z-index: 1;
+    }
+    .date-divider::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 1px;
+        background: #e2e8f0;
+        z-index: 0;
+    }
+    .message-wrapper {
+        display: flex;
+        flex-direction: column;
+        max-width: 65%;
+    }
+    .message-wrapper.sent {
+        align-self: flex-end;
+    }
+    .message-wrapper.received {
+        align-self: flex-start;
+    }
+    .message-content {
+        padding: 0.7rem 1.1rem;
+        border-radius: 1.2rem;
+        position: relative;
+        font-size: 1rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        margin-bottom: 2px;
+    }
+    .message-wrapper.sent .message-content {
+        background: #3b82f6;
+        color: white;
+        border-bottom-right-radius: 0.4rem;
+        border-top-right-radius: 1.2rem;
+    }
+    .message-wrapper.received .message-content {
+        background: #e2e8f0;
+        color: #0f172a;
+        border-bottom-left-radius: 0.4rem;
+        border-top-left-radius: 1.2rem;
+    }
+    .message-text {
+        font-size: 1rem;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+    .message-time {
+        font-size: 0.8rem;
+        opacity: 0.7;
+        margin-top: 0.18rem;
+        text-align: right;
+    }
+    .chat-input-form {
+        padding: 1rem 1.5rem;
+        background: #fff;
+        border-top: 1px solid #e2e8f0;
+    }
+    .input-wrapper {
+        display: flex;
+        gap: 0.7rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.5rem;
+        padding: 0.5rem 0.7rem;
+        align-items: center;
+    }
+    .chat-input {
+        flex: 1;
+        border: none;
+        background: none;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        color: #0f172a;
+    }
+    .chat-input:focus {
+        outline: none;
+    }
+    .send-button {
+        width: 2.5rem;
+        height: 2.5rem;
+        border: none;
+        border-radius: 50%;
+        background: #3b82f6;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
+        font-size: 1.2rem;
+    }
+    .send-button:hover {
+        background: #2563eb;
+        transform: scale(1.07);
+    }
+    .no-messages, .no-chat-selected {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+    }
+    .no-messages-icon, .no-chat-icon {
+        font-size: 2.5rem;
+        color: #e2e8f0;
+        margin-bottom: 1rem;
+    }
+    .no-messages h3, .no-chat-selected h2 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0 0 0.5rem 0;
+    }
+    .no-messages p, .no-chat-selected p {
+        font-size: 0.93rem;
+        margin: 0;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatMessages = document.getElementById('chat-messages');
+        const userSearch = document.getElementById('userSearch');
+        const userItems = document.querySelectorAll('.user-item');
+
+        // Scroll to bottom of messages
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Search functionality
+        if (userSearch) {
+            userSearch.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                
+                userItems.forEach(item => {
+                    const userName = item.querySelector('.user-name').textContent.toLowerCase();
+                    if (userName.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Auto-scroll to bottom when new messages arrive
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            });
+        });
+
+        if (chatMessages) {
+            observer.observe(chatMessages, { childList: true });
+        }
+
+        // Handle form submission
+        const chatForm = document.querySelector('.chat-input-form');
+        if (chatForm) {
+            chatForm.addEventListener('submit', function(e) {
+                const input = this.querySelector('.chat-input');
+                if (input.value.trim() === '') {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+</script> 

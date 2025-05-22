@@ -143,6 +143,7 @@
     <Content Include="wwwroot\create-prjct.css" />
     <Content Include="wwwroot\explore-page.css" />
     <Content Include="wwwroot\explore-page.js" />
+    <Content Include="wwwroot\logo.png" />
     <Content Include="wwwroot\js\header.js" />
     <Content Include="wwwroot\js\profile.js" />
     <Content Include="wwwroot\my-profile.css" />
