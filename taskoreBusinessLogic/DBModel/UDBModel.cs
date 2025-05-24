@@ -113,5 +113,6 @@ namespace taskoreBusinessLogic.DBModel
         // Not mapped to database, used for form submission
         [NotMapped]
         public string FullName { get; set; }
+        public object ProfileImagePath { get; internal set; }
     }
 }

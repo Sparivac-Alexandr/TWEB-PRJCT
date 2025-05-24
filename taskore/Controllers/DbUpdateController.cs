@@ -9,8 +9,10 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using taskoreBusinessLogic.BL_Struct;
 using taskoreBusinessLogic.DBModel;
 using taskoreBusinessLogic.DBModel.Seed;
+using taskoreBusinessLogic.Interfaces;
 
 namespace taskore.Controllers
 {
@@ -26,60 +28,37 @@ namespace taskore.Controllers
     
     public class DbUpdateController : Controller
     {
+        private readonly IDbUpdate _dbUpdateBL;
+        
+        public DbUpdateController()
+        {
+            _dbUpdateBL = new DbUpdateBL();
+        }
+        
         // GET: /DbUpdate/UpdateUserTable
         public ActionResult UpdateUserTable()
         {
             try
             {
-                // Pasul 1: Forțăm inițializarea bazei de date
-                using (var context = new UserContext())
+                // Pasul 1: Inițializăm baza de date folosind business logic
+                bool initSuccess = _dbUpdateBL.InitializeDatabase();
+                
+                if (!initSuccess)
                 {
-                    // Forțăm inițializarea pentru a aplica strategia de DropCreateDatabaseIfModelChanges
-                    context.Database.Initialize(force: true);
-                    
-                    // Testăm că modelul este corect prin efectuarea unei operații simple
-                    var users = context.Users.ToList();
-                    Debug.WriteLine($"Found {users.Count} users in database");
+                    return Content("Database initialization failed.");
                 }
                 
-                // Pasul 2: Încărcăm date implicite în baza de date
-                using (var context = new UserContext())
-                {
-                    // Verificăm dacă avem utilizatori care nu au headline setat
-                    var usersWithoutHeadline = context.Users.Where(u => u.Headline == null).ToList();
-                    foreach (var user in usersWithoutHeadline)
-                    {
-                        // Actualizăm cu valori implicite
-                        user.Headline = "Web Developer & UI/UX Designer";
-                        user.About = "A passionate web developer and UI/UX designer with experience in creating responsive websites and user-friendly interfaces that deliver exceptional user experiences.";
-                        user.Skills = "HTML5,CSS3,JavaScript,React.js,Node.js,Figma,UI/UX Design,Responsive Design,API Integration,WordPress";
-                        user.Phone = "+1 234 567 8900";
-                        user.Location = "New York, USA";
-                        user.Website = "www.portfolio.com";
-                        user.PreferredProjectTypes = "Web Development, UI/UX Design, E-commerce";
-                        user.HourlyRate = "$45 - $65 per hour";
-                        user.ProjectDuration = "Short to medium-term (1-6 months)";
-                        user.CommunicationStyle = "Weekly video calls, daily messaging";
-                        user.AvailabilityStatus = "Available for work";
-                        user.AvailabilityHours = "30 hrs/week";
-                        user.Rating = 4.8;
-                        user.RatingCount = 40;
-                        user.CompletedProjects = 23;
-                        user.CurrentProjects = 2;
-                        user.OnTimePercentage = 92.5;
-                        user.CompletionRate = 95.0;
-                        user.ResponseRate = 98.0;
-                        user.ClientSatisfaction = 96.0;
-                        user.ProjectEfficiency = 87.5;
-                    }
-                    
-                    // Salvăm modificările
-                    context.SaveChanges();
-                    
-                    Debug.WriteLine($"Updated {usersWithoutHeadline.Count} users with default values");
-                }
+                // Pasul 2: Actualizăm profilurile utilizatorilor folosind business logic
+                bool updateSuccess = _dbUpdateBL.UpdateUserProfiles();
                 
-                return Content($"Database updated successfully! The user profiles now have all the required fields.");
+                if (updateSuccess)
+                {
+                    return Content($"Database updated successfully! The user profiles now have all the required fields.");
+                }
+                else
+                {
+                    return Content("No users needed updating or update process failed.");
+                }
             }
             catch (Exception ex)
             {

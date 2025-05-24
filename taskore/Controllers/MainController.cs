@@ -20,6 +20,7 @@ namespace taskore.Controllers
         private readonly ISesion _sessionService;
         private readonly INews _newsService;
         private readonly IReview _reviewService;
+        private readonly IUser _userService;
         
         public MainController()
         {
@@ -29,6 +30,7 @@ namespace taskore.Controllers
             _sessionService = bl.GetSesionBL();
             _newsService = bl.GetNewsBL();
             _reviewService = bl.GetReviewBL();
+            _userService = bl.GetUserBL();
         }
         
         // GET: Main
@@ -54,7 +56,7 @@ namespace taskore.Controllers
                 {
                     if (!userNames.ContainsKey(project.UserId))
                     {
-                        // Get the full name of the user
+                        // Get the full name of the user using the user service
                         string userName = FetchUserName(project.UserId);
                         userNames[project.UserId] = userName;
                     }
@@ -85,18 +87,8 @@ namespace taskore.Controllers
                     return Session["UserFullName"].ToString();
                 }
                 
-                // If not the current user, query the database directly
-                using (var context = new UserContext())
-                {
-                    var user = context.Users.FirstOrDefault(u => u.Id == userId);
-                    if (user != null)
-                    {
-                        return $"{user.FirstName} {user.LastName}";
-                    }
-                }
-                
-                // If we couldn't get the user data, return a placeholder
-                return "Unknown User";
+                // If not the current user, use the user service
+                return _userService.GetUserName(userId);
             }
             catch (Exception ex)
             {
@@ -191,49 +183,42 @@ namespace taskore.Controllers
 
             int userId = (int)Session["UserId"];
             
-            // Get user data from database
-            using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+            // Get user data from database using user service
+            var user = _userService.GetUserById(userId);
+            
+            // Pass user data to the view using ViewBag
+            ViewBag.UserData = user;
+            
+            // Count completed projects for this user
+            try 
             {
-                var user = context.Users.FirstOrDefault(u => u.Id == userId);
+                // Get all user applications
+                var allUserApplications = _projectService.GetUserApplications(userId);
                 
-                // Pass user data to the view using ViewBag
-                ViewBag.UserData = user;
+                // Get completed projects count
+                var completedProjectsCount = allUserApplications.Count(p => p.Status == "Completed");
                 
-                // Count completed projects for this user
-                try 
+                // If user record exists, update CompletedProjects count
+                if (user != null)
                 {
-                    // Get all user applications
-                    var allUserApplications = _projectService.GetUserApplications(userId);
-                    
-                    // Get completed projects count
-                    var completedProjectsCount = allUserApplications.Count(p => p.Status == "Completed");
-                    
-                    // If user record exists, update CompletedProjects count
-                    if (user != null)
-                    {
-                        user.CompletedProjects = completedProjectsCount;
-                        context.SaveChanges();
-                    }
-                    
-                    // Pass the count to the view
-                    ViewBag.CompletedProjectsCount = completedProjectsCount;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error getting completed projects count: {ex.Message}");
-                    ViewBag.CompletedProjectsCount = 0;
+                    _userService.UpdateUserCompletedProjects(userId, completedProjectsCount);
                 }
                 
-                // If user data doesn't exist in database yet, we'll use session data
-                // The profile page already handles null user data gracefully
+                // Pass the count to the view
+                ViewBag.CompletedProjectsCount = completedProjectsCount;
             }
-
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error getting completed projects count: {ex.Message}");
+                ViewBag.CompletedProjectsCount = 0;
+            }
+            
             return View();
         }
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult UpdateUserProfile(taskoreBusinessLogic.DBModel.UDBModel model)
+        public ActionResult UpdateUserProfile(UDBModel model)
         {
             // Check if user is logged in
             if (Session["UserId"] == null)
@@ -252,106 +237,107 @@ namespace taskore.Controllers
             
             try
             {
-                using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+                // Find the existing user in the database
+                var existingUser = _userService.GetUserById(userId);
+                
+                if (existingUser == null)
                 {
-                    // Find the existing user in the database
-                    var existingUser = context.Users.FirstOrDefault(u => u.Id == userId);
-                    
-                    if (existingUser == null)
+                    // Create a new user if one doesn't exist
+                    existingUser = new UDBModel
                     {
-                        // Create a new user if one doesn't exist
-                        existingUser = new taskoreBusinessLogic.DBModel.UDBModel
-                        {
-                            Id = userId,
-                            Email = Session["UserEmail"]?.ToString(),
-                            FirstName = Session["UserFullName"]?.ToString().Split(' ')[0],
-                            LastName = Session["UserFullName"]?.ToString().Split(' ')[1] ?? "",
-                            // Set default password - this should be changed in a real application
-                            Password = "default-password-hash"
-                        };
-                        context.Users.Add(existingUser);
-                    }
-                    
-                    // Handle name update if provided
-                    if (!string.IsNullOrEmpty(model.FullName))
-                    {
-                        var nameParts = model.FullName.Split(new[] { ' ' }, 2);
-                        existingUser.FirstName = nameParts[0];
-                        existingUser.LastName = nameParts.Length > 1 ? nameParts[1] : "";
-                        
-                        // Update session data
-                        Session["UserFullName"] = model.FullName;
-                    }
-                    
-                    // Update user fields only if they are provided in the form
-                    // Basic information
-                    if (!string.IsNullOrEmpty(model.Headline))
-                        existingUser.Headline = model.Headline;
-                    
-                    if (!string.IsNullOrEmpty(model.About))
-                        existingUser.About = model.About;
-                    
-                    if (!string.IsNullOrEmpty(model.Skills))
-                        existingUser.Skills = model.Skills;
-                    
-                    // Contact information
-                    if (!string.IsNullOrEmpty(model.Email))
-                        existingUser.Email = model.Email;
-                    
-                    if (!string.IsNullOrEmpty(model.Phone))
-                        existingUser.Phone = model.Phone;
-                    
-                    if (!string.IsNullOrEmpty(model.Location))
-                        existingUser.Location = model.Location;
-                    
-                    if (!string.IsNullOrEmpty(model.Website))
-                        existingUser.Website = model.Website;
-                    
-                    // Preferences
-                    if (!string.IsNullOrEmpty(model.PreferredProjectTypes))
-                        existingUser.PreferredProjectTypes = model.PreferredProjectTypes;
-                    
-                    if (!string.IsNullOrEmpty(model.HourlyRate))
-                        existingUser.HourlyRate = model.HourlyRate;
-                    
-                    if (!string.IsNullOrEmpty(model.ProjectDuration))
-                        existingUser.ProjectDuration = model.ProjectDuration;
-                    
-                    if (!string.IsNullOrEmpty(model.CommunicationStyle))
-                        existingUser.CommunicationStyle = model.CommunicationStyle;
-                    
-                    // Availability
-                    if (!string.IsNullOrEmpty(model.AvailabilityStatus))
-                        existingUser.AvailabilityStatus = model.AvailabilityStatus;
-                    
-                    if (!string.IsNullOrEmpty(model.AvailabilityHours))
-                    {
-                        // Add hrs/week if it's not already included
-                        if (!model.AvailabilityHours.Contains("hrs/week"))
-                            existingUser.AvailabilityHours = model.AvailabilityHours + " hrs/week";
-                        else
-                            existingUser.AvailabilityHours = model.AvailabilityHours;
-                    }
-                    
-                    // Save changes to database
-                    context.SaveChanges();
-                    
-                    // Update session data if needed
-                    if (!string.IsNullOrEmpty(model.Email))
-                    {
-                        Session["UserEmail"] = model.Email;
-                    }
-                    
-                    // For AJAX requests
-                    if (Request.IsAjaxRequest())
-                    {
-                        return Json(new { success = true, message = "Profile updated successfully" });
-                    }
-                    
-                    // For standard form submissions
-                    TempData["SuccessMessage"] = "Profile updated successfully!";
-                    return RedirectToAction("MyProfile");
+                        Id = userId,
+                        Email = Session["UserEmail"]?.ToString(),
+                        FirstName = Session["UserFullName"]?.ToString().Split(' ')[0],
+                        LastName = Session["UserFullName"]?.ToString().Split(' ')[1] ?? "",
+                        // Set default password - this should be changed in a real application
+                        Password = "default-password-hash"
+                    };
                 }
+                
+                // Handle name update if provided
+                if (!string.IsNullOrEmpty(model.FullName))
+                {
+                    var nameParts = model.FullName.Split(new[] { ' ' }, 2);
+                    existingUser.FirstName = nameParts[0];
+                    existingUser.LastName = nameParts.Length > 1 ? nameParts[1] : "";
+                    
+                    // Update session data
+                    Session["UserFullName"] = model.FullName;
+                }
+                
+                // Update user fields only if they are provided in the form
+                // Basic information
+                if (!string.IsNullOrEmpty(model.Headline))
+                    existingUser.Headline = model.Headline;
+                
+                if (!string.IsNullOrEmpty(model.About))
+                    existingUser.About = model.About;
+                
+                if (!string.IsNullOrEmpty(model.Skills))
+                    existingUser.Skills = model.Skills;
+                
+                // Contact information
+                if (!string.IsNullOrEmpty(model.Email))
+                    existingUser.Email = model.Email;
+                
+                if (!string.IsNullOrEmpty(model.Phone))
+                    existingUser.Phone = model.Phone;
+                
+                if (!string.IsNullOrEmpty(model.Location))
+                    existingUser.Location = model.Location;
+                
+                if (!string.IsNullOrEmpty(model.Website))
+                    existingUser.Website = model.Website;
+                
+                // Preferences
+                if (!string.IsNullOrEmpty(model.PreferredProjectTypes))
+                    existingUser.PreferredProjectTypes = model.PreferredProjectTypes;
+                
+                if (!string.IsNullOrEmpty(model.HourlyRate))
+                    existingUser.HourlyRate = model.HourlyRate;
+                
+                if (!string.IsNullOrEmpty(model.ProjectDuration))
+                    existingUser.ProjectDuration = model.ProjectDuration;
+                
+                if (!string.IsNullOrEmpty(model.CommunicationStyle))
+                    existingUser.CommunicationStyle = model.CommunicationStyle;
+                
+                // Availability
+                if (!string.IsNullOrEmpty(model.AvailabilityStatus))
+                    existingUser.AvailabilityStatus = model.AvailabilityStatus;
+                
+                if (!string.IsNullOrEmpty(model.AvailabilityHours))
+                {
+                    // Add hrs/week if it's not already included
+                    if (!model.AvailabilityHours.Contains("hrs/week"))
+                        existingUser.AvailabilityHours = model.AvailabilityHours + " hrs/week";
+                    else
+                        existingUser.AvailabilityHours = model.AvailabilityHours;
+                }
+                
+                // Save changes to database using user service
+                bool updateSuccess = _userService.UpdateUserProfile(existingUser);
+                
+                if (!updateSuccess)
+                {
+                    throw new Exception("Failed to update user profile");
+                }
+                
+                // Update session data if needed
+                if (!string.IsNullOrEmpty(model.Email))
+                {
+                    Session["UserEmail"] = model.Email;
+                }
+                
+                // For AJAX requests
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { success = true, message = "Profile updated successfully" });
+                }
+                
+                // For standard form submissions
+                TempData["SuccessMessage"] = "Profile updated successfully!";
+                return RedirectToAction("MyProfile");
             }
             catch (Exception ex)
             {
@@ -387,15 +373,11 @@ namespace taskore.Controllers
                 return RedirectToAction("AllFreelancers");
             }
 
-            // Get user details from database
-            UDBModel targetUser = null;
-            using (var context = new UserContext())
+            // Get user details from database using user service
+            UDBModel targetUser = _userService.GetUserById(targetUserId);
+            if (targetUser == null)
             {
-                targetUser = context.Users.FirstOrDefault(u => u.Id == targetUserId);
-                if (targetUser == null)
-                {
-                    return RedirectToAction("AllFreelancers");
-                }
+                return RedirectToAction("AllFreelancers");
             }
 
             // Get reviews for this user
@@ -777,15 +759,9 @@ namespace taskore.Controllers
         {
             try
             {
-                // Get all users from the database
-                List<UDBModel> allUsers = new List<UDBModel>();
-                
-                using (var context = new UserContext())
-                {
-                    // Retrieve all users from the database
-                    allUsers = context.Users.ToList();
-                    Debug.WriteLine($"Loaded {allUsers.Count} users from database");
-                }
+                // Get all users from the database using user service
+                List<UDBModel> allUsers = _userService.GetAllUsers();
+                Debug.WriteLine($"Loaded {allUsers.Count} users from database");
                 
                 // Pass the data directly to the view without adding any random data
                 return View(allUsers);
@@ -1144,36 +1120,33 @@ namespace taskore.Controllers
             
             try
             {
-                using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+                // Don't allow deletion of the current user
+                if (Session["UserId"] != null)
                 {
-                    // Don't allow deletion of the current user
-                    if (Session["UserId"] != null)
+                    int currentUserId;
+                    if (int.TryParse(Session["UserId"].ToString(), out currentUserId) && currentUserId == id)
                     {
-                        int currentUserId;
-                        if (int.TryParse(Session["UserId"].ToString(), out currentUserId) && currentUserId == id)
-                        {
-                            return Json(new { success = false, message = "You cannot delete your own account." });
-                        }
+                        return Json(new { success = false, message = "You cannot delete your own account." });
                     }
-                    
-                    var user = context.Users.Find(id);
-                    if (user == null)
-                    {
-                        return Json(new { success = false, message = "User not found." });
-                    }
-                    
-                    // Delete the user
-                    context.Users.Remove(user);
-                    int rowsAffected = context.SaveChanges();
-                    
-                    if (rowsAffected > 0)
-                    {
-                        return Json(new { success = true, message = "User deleted successfully." });
-                    }
-                    else
-                    {
-                        return Json(new { success = false, message = "Failed to delete user. Please try again." });
-                    }
+                }
+                
+                // Check if the user exists
+                var user = _userService.GetUserById(id);
+                if (user == null)
+                {
+                    return Json(new { success = false, message = "User not found." });
+                }
+                
+                // Delete the user using user service
+                bool isDeleted = _userService.DeleteUser(id);
+                
+                if (isDeleted)
+                {
+                    return Json(new { success = true, message = "User deleted successfully." });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Failed to delete user. Please try again." });
                 }
             }
             catch (Exception ex)
@@ -1313,12 +1286,12 @@ namespace taskore.Controllers
             int currentUserId = (int)Session["UserId"];
             DateTime lastVisit = Session["LastChatVisit"] != null ? (DateTime)Session["LastChatVisit"] : DateTime.MinValue;
 
+            // Get current user and update last active time
+            var currentUser = _userService.GetUserById(currentUserId);
+            
+            // The rest of the method needs to be updated to use session service or another service for chat messages
             using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
             {
-                // Actualizez prezența online
-                var me = context.Users.FirstOrDefault(u => u.Id == currentUserId);
-                if (me != null) { me.LastActiveAt = DateTime.Now; context.SaveChanges(); }
-
                 // Userii cu care ai mesaje
                 var userIdsWithMessages = context.ChatMessages
                     .Where(m => m.SenderId == currentUserId || m.ReceiverId == currentUserId)

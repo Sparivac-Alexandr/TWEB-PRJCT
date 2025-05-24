@@ -35,5 +35,10 @@ namespace taskoreBusinessLogic
         {
             return new ReviewBL();
         }
+        
+        public IUser GetUserBL()
+        {
+            return new UserBL();
+        }
     }
 }
