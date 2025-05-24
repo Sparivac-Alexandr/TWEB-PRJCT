@@ -209,8 +209,8 @@
     <Content Include="Views\Main\FAQ.cshtml" />
     <Content Include="Views\Auth\ResetPassword.cshtml" />
     <Content Include="Views\Main\EditProjectApplication.cshtml" />
-    <Content Include="Views\Auth\View.cshtml" />
     <Content Include="Views\Main\Index.cshtml" />
+    <Content Include="Views\Auth\View.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

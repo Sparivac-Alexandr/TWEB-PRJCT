@@ -293,12 +293,32 @@ namespace taskoreBusinessLogic.BL_Struct
                         Debug.WriteLine($"Project application deletion completed. Rows affected: {rowsAffected}");
                         return rowsAffected > 0;
                     }
+                    Debug.WriteLine($"Project application with ID {id} not found for deletion");
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"ERROR in DeleteProjectApplication: {ex.Message}");
+                Debug.WriteLine($"ERROR in DeleteProjectApplication for ID {id}: " + ex.Message);
+                return false;
+            }
+        }
+        
+        public bool HasUserAppliedForProject(int projectId, int userId)
+        {
+            try
+            {
+                Debug.WriteLine($"Checking if user {userId} has already applied for project {projectId}");
+                
+                using (var context = new ProjectApplicationContext())
+                {
+                    return context.ProjectApplications
+                        .Any(a => a.ProjectId == projectId && a.FreelancerId == userId);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ERROR in HasUserAppliedForProject: {ex.Message}");
                 return false;
             }
         }

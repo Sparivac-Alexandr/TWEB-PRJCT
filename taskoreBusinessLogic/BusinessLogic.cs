@@ -40,5 +40,10 @@ namespace taskoreBusinessLogic
         {
             return new UserBL();
         }
+        
+        public IChat GetChatBL()
+        {
+            return new ChatBL();
+        }
     }
 }

@@ -22,5 +22,6 @@ namespace taskoreBusinessLogic.Interfaces
         ProjectApplicationDBModel GetProjectApplicationById(int id);
         bool UpdateProjectApplication(ProjectApplicationDBModel application);
         bool DeleteProjectApplication(int id);
+        bool HasUserAppliedForProject(int projectId, int userId);
     }
 } 

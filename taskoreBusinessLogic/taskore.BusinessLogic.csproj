@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BL_Struct\ChatBL.cs" />
     <Compile Include="BL_Struct\DbUpdateBL.cs" />
     <Compile Include="BL_Struct\NewsBL.cs" />
     <Compile Include="BL_Struct\ProjectBL.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Core\UserApi.cs" />
     <Compile Include="DBModel\UDBModel.cs" />
     <Compile Include="Interfaces\IAuth.cs" />
+    <Compile Include="Interfaces\IChat.cs" />
     <Compile Include="Interfaces\IDbUpdate.cs" />
     <Compile Include="Interfaces\INews.cs" />
     <Compile Include="Interfaces\IProject.cs" />

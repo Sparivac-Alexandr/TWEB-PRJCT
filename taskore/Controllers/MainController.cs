@@ -21,6 +21,7 @@ namespace taskore.Controllers
         private readonly INews _newsService;
         private readonly IReview _reviewService;
         private readonly IUser _userService;
+        private readonly IChat _chatService;
         
         public MainController()
         {
@@ -31,6 +32,7 @@ namespace taskore.Controllers
             _newsService = bl.GetNewsBL();
             _reviewService = bl.GetReviewBL();
             _userService = bl.GetUserBL();
+            _chatService = bl.GetChatBL();
         }
         
         // GET: Main
@@ -569,34 +571,29 @@ namespace taskore.Controllers
         
         public ActionResult CompletedProjects(string userId)
         {
-            // Check if user is logged in
-            if (Session["UserId"] == null)
-            {
-                return RedirectToAction("SignIn", "Auth");
-            }
-
             try
             {
-                // If userId is not provided, use the current user's ID
                 if (string.IsNullOrEmpty(userId))
                 {
-                    userId = Session["UserId"].ToString();
+                    userId = Session["UserId"]?.ToString();
+                    if (string.IsNullOrEmpty(userId))
+                    {
+                        return RedirectToAction("SignIn", "Auth");
+                    }
                 }
-
+                
                 int userIdInt = Convert.ToInt32(userId);
                 
                 // Get user info from database for the specific requested user
                 string userName = "User";
                 string userType = "freelancer";
                 
-                using (var context = new UserContext())
+                // Replace direct DbContext with user service call
+                var user = _userService.GetUserById(userIdInt);
+                if (user != null)
                 {
-                    var user = context.Users.FirstOrDefault(u => u.Id == userIdInt);
-                    if (user != null)
-                    {
-                        userName = $"{user.FirstName} {user.LastName}";
-                        // You could determine userType here if that's stored in the user record
-                    }
+                    userName = $"{user.FirstName} {user.LastName}";
+                    // You could determine userType here if that's stored in the user record
                 }
                 
                 // Get user applications
@@ -634,35 +631,32 @@ namespace taskore.Controllers
                 return RedirectToAction("MyProfile");
             }
 
-            // Using DBContext to get user data by ID
-            using (var db = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+            // Replace direct DbContext with user service call
+            var user = _userService.GetUserById(Convert.ToInt32(userId));
+            if (user == null)
             {
-                var user = db.Users.FirstOrDefault(u => u.Id.ToString() == userId);
-                if (user == null)
-                {
-                    return RedirectToAction("AllFreelancers");
-                }
-                
-                // Pass all user data to the view via ViewBag
-                ViewBag.UserId = user.Id;
-                ViewBag.UserFullName = $"{user.FirstName} {user.LastName}";
-                ViewBag.UserEmail = user.Email;
-                ViewBag.Phone = user.Phone ?? "";
-                ViewBag.Location = user.Location ?? "";
-                ViewBag.Website = user.Website ?? "";
-                ViewBag.Headline = user.Headline ?? "";
-                ViewBag.About = user.About ?? "";
-                ViewBag.Skills = user.Skills ?? "";
-                ViewBag.PreferredProjectTypes = user.PreferredProjectTypes ?? "";
-                ViewBag.HourlyRate = user.HourlyRate ?? "";
-                ViewBag.ProjectDuration = user.ProjectDuration ?? "";
-                ViewBag.CommunicationStyle = user.CommunicationStyle ?? "";
-                ViewBag.AvailabilityStatus = user.AvailabilityStatus ?? "Available";
-                ViewBag.AvailabilityHours = user.AvailabilityHours ?? "";
-                ViewBag.Rating = user.Rating ?? 0;
-                ViewBag.RatingCount = user.RatingCount ?? 0;
-                ViewBag.CompletedProjects = user.CompletedProjects ?? 0;
+                return RedirectToAction("AllFreelancers");
             }
+            
+            // Pass all user data to the view via ViewBag
+            ViewBag.UserId = user.Id;
+            ViewBag.UserFullName = $"{user.FirstName} {user.LastName}";
+            ViewBag.UserEmail = user.Email;
+            ViewBag.Phone = user.Phone ?? "";
+            ViewBag.Location = user.Location ?? "";
+            ViewBag.Website = user.Website ?? "";
+            ViewBag.Headline = user.Headline ?? "";
+            ViewBag.About = user.About ?? "";
+            ViewBag.Skills = user.Skills ?? "";
+            ViewBag.PreferredProjectTypes = user.PreferredProjectTypes ?? "";
+            ViewBag.HourlyRate = user.HourlyRate ?? "";
+            ViewBag.ProjectDuration = user.ProjectDuration ?? "";
+            ViewBag.CommunicationStyle = user.CommunicationStyle ?? "";
+            ViewBag.AvailabilityStatus = user.AvailabilityStatus ?? "Available";
+            ViewBag.AvailabilityHours = user.AvailabilityHours ?? "";
+            ViewBag.Rating = user.Rating ?? 0;
+            ViewBag.RatingCount = user.RatingCount ?? 0;
+            ViewBag.CompletedProjects = user.CompletedProjects ?? 0;
             
             return View();
         }
@@ -1296,47 +1290,39 @@ namespace taskore.Controllers
             // Get current user and update last active time
             var currentUser = _userService.GetUserById(currentUserId);
             
-            // The rest of the method needs to be updated to use session service or another service for chat messages
-            using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
+            // Get users with whom the current user has exchanged messages
+            var users = _chatService.GetChatUsers(currentUserId);
+            ViewBag.ChatUsers = users;
+
+            // Get new messages count per user for the badge
+            var newMessagesPerUser = _chatService.GetNewMessagesPerUser(currentUserId, lastVisit);
+            ViewBag.NewMessagesPerUser = newMessagesPerUser;
+
+            // Total new messages count for global badge
+            var newMessagesCount = newMessagesPerUser.Values.Sum();
+            ViewBag.NewMessagesCount = newMessagesCount;
+
+            // Select user for chat
+            UDBModel selectedUser = null;
+            if (userId.HasValue)
             {
-                // Userii cu care ai mesaje
-                var userIdsWithMessages = context.ChatMessages
-                    .Where(m => m.SenderId == currentUserId || m.ReceiverId == currentUserId)
-                    .Select(m => m.SenderId == currentUserId ? m.ReceiverId : m.SenderId)
-                    .Distinct()
-                    .ToList();
-                var users = context.Users.Where(u => userIdsWithMessages.Contains(u.Id)).ToList();
-                ViewBag.ChatUsers = users;
-
-                // Pentru badge per user în lista de chats
-                var newMessagesPerUser = users.ToDictionary(
-                    u => u.Id,
-                    u => context.ChatMessages.Count(m => m.ReceiverId == currentUserId && m.SenderId == u.Id && m.SentAt > lastVisit)
-                );
-                ViewBag.NewMessagesPerUser = newMessagesPerUser;
-
-                // Badge global = suma badge-urilor individuale (mesaje noi de la fiecare user)
-                var newMessagesCount = newMessagesPerUser.Values.Sum();
-                ViewBag.NewMessagesCount = newMessagesCount;
-
-                // Selectare user pentru chat
-                var selectedUser = userId.HasValue
-                    ? context.Users.FirstOrDefault(u => u.Id == userId.Value)
-                    : (newUserId.HasValue ? context.Users.FirstOrDefault(u => u.Id == newUserId.Value) : null);
-                ViewBag.SelectedUser = selectedUser;
-
-                List<taskoreBusinessLogic.DBModel.ChatMessageDBModel> messages = new List<taskoreBusinessLogic.DBModel.ChatMessageDBModel>();
-                if (selectedUser != null)
-                {
-                    messages = context.ChatMessages
-                        .Where(m => (m.SenderId == currentUserId && m.ReceiverId == selectedUser.Id) ||
-                                    (m.SenderId == selectedUser.Id && m.ReceiverId == currentUserId))
-                        .OrderBy(m => m.SentAt)
-                        .ToList();
-                }
-                ViewBag.Messages = messages;
+                selectedUser = _userService.GetUserById(userId.Value);
             }
-            // Actualizez ultima vizită la chat
+            else if (newUserId.HasValue)
+            {
+                selectedUser = _userService.GetUserById(newUserId.Value);
+            }
+            ViewBag.SelectedUser = selectedUser;
+
+            // Get conversation messages if a user is selected
+            List<ChatMessageDBModel> messages = new List<ChatMessageDBModel>();
+            if (selectedUser != null)
+            {
+                messages = _chatService.GetConversation(currentUserId, selectedUser.Id);
+            }
+            ViewBag.Messages = messages;
+
+            // Update last visit timestamp
             Session["LastChatVisit"] = DateTime.Now;
             return View();
         }
@@ -1351,31 +1337,21 @@ namespace taskore.Controllers
             int fromUserId = (int)Session["UserId"];
             if (ToUserId <= 0 || string.IsNullOrWhiteSpace(Message))
             {
-                // Nu trimite mesaj dacă nu e selectat userul sau mesajul e gol
+                // Don't send message if no user selected or message is empty
                 return RedirectToAction("Chat");
             }
-            using (var context = new taskoreBusinessLogic.DBModel.Seed.UserContext())
-            {
-                // Actualizez prezența online
-                var me = context.Users.FirstOrDefault(u => u.Id == fromUserId);
-                if (me != null) { me.LastActiveAt = DateTime.Now; context.SaveChanges(); }
 
-                var toUser = context.Users.FirstOrDefault(u => u.Id == ToUserId);
-                if (toUser == null)
-                {
-                    // Nu există destinatarul
-                    return RedirectToAction("Chat");
-                }
-                var chatMsg = new taskoreBusinessLogic.DBModel.ChatMessageDBModel
-                {
-                    SenderId = fromUserId,
-                    ReceiverId = ToUserId,
-                    Content = Message,
-                    SentAt = DateTime.Now
-                };
-                context.ChatMessages.Add(chatMsg);
-                context.SaveChanges();
+            // Update user's online presence and send the message
+            _chatService.UpdateUserLastActive(fromUserId);
+            
+            // Send the message using the chat service
+            bool messageSent = _chatService.SendMessage(fromUserId, ToUserId, Message);
+            
+            if (!messageSent)
+            {
+                TempData["ErrorMessage"] = "Failed to send message.";
             }
+            
             return RedirectToAction("Chat", new { userId = ToUserId });
         }
 
@@ -1385,34 +1361,31 @@ namespace taskore.Controllers
             // Check if user is logged in
             if (Session["UserId"] == null)
             {
-                TempData["ErrorMessage"] = "You need to be logged in to apply for a project.";
+                TempData["ErrorMessage"] = "You need to be logged in to apply for projects.";
                 return RedirectToAction("SignIn", "Auth");
             }
             
             try
             {
                 int freelancerId = (int)Session["UserId"];
-                string freelancerName = Session["UserFullName"] as string ?? "Unknown Freelancer";
+                string freelancerName = Session["UserFullName"] as string ?? "Freelancer";
                 
                 // Get the project details
                 var project = _projectService.GetProjectById(projectId);
+                
                 if (project == null)
                 {
                     TempData["ErrorMessage"] = "Project not found.";
                     return RedirectToAction("ExplorePage");
                 }
                 
-                // Check if user has already applied for this project
-                using (var context = new ProjectApplicationContext())
+                // Check if user has already applied for this project - using project service instead of direct DbContext
+                bool alreadyApplied = _projectService.HasUserAppliedForProject(projectId, freelancerId);
+                
+                if (alreadyApplied)
                 {
-                    bool alreadyApplied = context.ProjectApplications
-                        .Any(a => a.ProjectId == projectId && a.FreelancerId == freelancerId);
-                    
-                    if (alreadyApplied)
-                    {
-                        TempData["ErrorMessage"] = "You have already applied for this project.";
-                        return RedirectToAction("ExplorePage");
-                    }
+                    TempData["ErrorMessage"] = "You have already applied for this project.";
+                    return RedirectToAction("ExplorePage");
                 }
                 
                 // Get the client name
