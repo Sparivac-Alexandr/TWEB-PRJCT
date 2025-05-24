@@ -76,6 +76,13 @@ namespace taskore.Controllers
             }
         }
         
+        // GET: Main/Index - Default landing page
+        public ActionResult Index()
+        {
+            // Redirect to the ExplorePage action which serves as main content page
+            return View();
+        }
+        
         // Helper method to fetch a user's name from their ID
         private string FetchUserName(int userId)
         {

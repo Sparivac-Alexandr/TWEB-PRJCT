@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using taskoreBusinessLogic.DBModel;
 
 namespace taskoreBusinessLogic.Interfaces
@@ -15,5 +16,6 @@ namespace taskoreBusinessLogic.Interfaces
         List<UDBModel> GetAllUsers();
         bool DeleteUser(int userId);
         int UpdateUserCompletedProjects(int userId, int completedProjectsCount);
+        string UploadProfileImage(int userId, HttpPostedFile uploadedFile);
     }
 } 

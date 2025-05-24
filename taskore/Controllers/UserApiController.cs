@@ -8,13 +8,21 @@ using System.Web;
 using System.Web.Http;
 using System.Data.SqlClient;
 using System.Configuration;
+using taskoreBusinessLogic;
+using taskoreBusinessLogic.Interfaces;
 
 namespace taskore.Controllers
 {
     [RoutePrefix("api/user")]
     public class UserApiController : ApiController
     {
-        private readonly string connectionString = ConfigurationManager.ConnectionStrings["taskore"].ConnectionString;
+        private readonly IUser _userService;
+        
+        public UserApiController()
+        {
+            var bl = new BusinessLogic();
+            _userService = bl.GetUserBL();
+        }
 
         [HttpPost]
         [Route("upload-profile-image")]
@@ -41,34 +49,15 @@ namespace taskore.Controllers
                 // Get the uploaded file
                 var uploadedFile = httpRequest.Files[0];
                 
-                // Validate file type (must be an image)
-                string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
-                string fileExtension = Path.GetExtension(uploadedFile.FileName).ToLower();
+                // Use the business logic service to upload the profile image
+                string relativeFilePath = _userService.UploadProfileImage(userId, uploadedFile);
                 
-                if (!allowedExtensions.Contains(fileExtension))
+                if (string.IsNullOrEmpty(relativeFilePath))
                 {
-                    return ResponseMessage(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid file type. Only JPG, PNG, and GIF files are allowed."));
+                    return ResponseMessage(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Failed to upload profile image"));
                 }
                 
-                // Generate a unique filename to avoid collisions
-                string uniqueFileName = $"user_{userId}_{DateTime.Now.Ticks}{fileExtension}";
-                
-                // Create the directory if it doesn't exist
-                string uploadDirectory = HttpContext.Current.Server.MapPath("~/wwwroot/images/avatars");
-                if (!Directory.Exists(uploadDirectory))
-                {
-                    Directory.CreateDirectory(uploadDirectory);
-                }
-                
-                // Save the file
-                string filePath = Path.Combine(uploadDirectory, uniqueFileName);
-                uploadedFile.SaveAs(filePath);
-                
-                // Get the relative path to save in the database
-                string relativeFilePath = $"~/wwwroot/images/avatars/{uniqueFileName}";
-                
-                // Instead of updating the database directly, just store the image path in session
-                // We'll need to modify the Users table to include profile_image_url column later
+                // Store the image path in session
                 HttpContext.Current.Session["ProfileImageUrl"] = relativeFilePath;
                 
                 // Return success response with the image URL
